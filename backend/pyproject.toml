@@ -1,6 +1,6 @@
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q --strict-markers"
+addopts = "-q --strict-markers --basetemp=.pytest_tmp"
 
 [tool.coverage.run]
 source = ["app"]
