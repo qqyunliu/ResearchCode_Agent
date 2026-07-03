@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic-settings
+tree-sitter
+tree-sitter-language-pack
+httpx
+pytest
+pytest-cov
