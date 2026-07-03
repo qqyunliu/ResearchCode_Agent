@@ -11,3 +11,7 @@ For every implementation step:
 - Mention common mistakes or risks that are useful for learning.
 - Work in small steps and obtain the user's opinion before moving to the next
   implementation step.
+- After verification succeeds on an isolated feature branch, treat committing
+  and pushing that branch as one step. Request separate confirmation for work
+  that affects `main`, merges branches, deletes branches, or performs another
+  high-impact repository operation.
