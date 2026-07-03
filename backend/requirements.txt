@@ -4,6 +4,6 @@ sqlalchemy
 pydantic-settings
 tree-sitter
 tree-sitter-language-pack
-httpx
+httpx2
 pytest
 pytest-cov
