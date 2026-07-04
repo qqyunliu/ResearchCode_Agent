@@ -3,6 +3,8 @@ from functools import lru_cache
 from qdrant_client import QdrantClient
 
 from app.core.config import get_settings
+from app.llm.client import OpenAICompatibleLlmClient
+from app.rag.context_builder import RagContextBuilder
 from app.retrieval.chunk_builder import CodeChunkBuilder
 from app.retrieval.embedding_service import (
     EmbeddingService,
@@ -49,3 +51,18 @@ def get_vector_store() -> QdrantVectorStore:
     else:
         client = QdrantClient(path=settings.qdrant_path)
     return QdrantVectorStore(client)
+
+
+@lru_cache
+def get_llm_client() -> OpenAICompatibleLlmClient:
+    settings = get_settings()
+    return OpenAICompatibleLlmClient(
+        model=settings.llm_model,
+        api_key=settings.llm_api_key,
+        base_url=settings.llm_base_url,
+    )
+
+
+@lru_cache
+def get_rag_context_builder() -> RagContextBuilder:
+    return RagContextBuilder(get_settings().rag_max_context_chars)

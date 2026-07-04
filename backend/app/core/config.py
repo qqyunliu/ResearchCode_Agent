@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     search_default_limit: int = 10
     search_max_limit: int = 50
     chunk_max_content_chars: int = 4000
+    llm_api_key: str | None = None
+    llm_base_url: str | None = None
+    llm_model: str = "gpt-4.1-mini"
+    rag_max_context_chars: int = 12000
 
     model_config = SettingsConfigDict(env_file=".env", env_prefix="RCA_")
 
