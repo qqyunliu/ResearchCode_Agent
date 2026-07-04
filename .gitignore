@@ -5,3 +5,4 @@ __pycache__/
 *.db
 .coverage
 .pytest_tmp/
+qdrant_storage/
