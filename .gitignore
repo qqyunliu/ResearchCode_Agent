@@ -1,7 +1,9 @@
 .worktrees/
 .venv/
+.env
 __pycache__/
 *.py[cod]
 *.db
 .coverage
 .pytest_tmp/
+qdrant_storage/
