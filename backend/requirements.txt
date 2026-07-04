@@ -7,3 +7,6 @@ tree-sitter-language-pack
 httpx2
 pytest
 pytest-cov
+openai
+qdrant-client
+sentence-transformers
