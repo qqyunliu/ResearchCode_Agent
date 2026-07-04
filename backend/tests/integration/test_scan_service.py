@@ -102,7 +102,7 @@ class FailingRegistry:
         self.registry = ParserRegistry()
 
     def parse(self, scanned_file):
-        if scanned_file.language == "java":
+        if scanned_file.file_path.endswith("AlertController.java"):
             raise RuntimeError("intentional parser failure")
         return self.registry.parse(scanned_file)
 
@@ -121,10 +121,10 @@ def test_parser_failure_is_recorded_while_other_files_are_indexed(
         select(ScanIssue).where(ScanIssue.project_id == project.id)
     )
     assert summary.parse_errors == 1
-    assert summary.files_indexed == 3
+    assert summary.files_indexed == 5
     assert issue is not None
     assert issue.issue_type == "parse_error"
-    assert issue.file_path == "backend/AlertController.java"
+    assert issue.file_path == "backend/src/AlertController.java"
     assert count(session, CodeEntity, project.id) > 0
 
 

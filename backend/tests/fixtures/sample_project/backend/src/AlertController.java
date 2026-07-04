@@ -5,4 +5,9 @@ class AlertController {
     Alert getAlert(Long id) {
         return null;
     }
+
+    @PostMapping("/search")
+    List<Alert> search() {
+        return List.of();
+    }
 }
