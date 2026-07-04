@@ -9,6 +9,7 @@ from app.core.dependencies import (
 )
 from app.retrieval.chunk_builder import CodeChunkBuilder
 from app.retrieval.embedding_service import EmbeddingService
+from app.retrieval.hybrid_search import HybridSearchService
 from app.retrieval.keyword_search import KeywordSearchService
 from app.retrieval.vector_store import QdrantVectorStore
 from app.schemas.retrieval import (
@@ -49,6 +50,27 @@ def keyword_search(
     session: Session = Depends(get_session),
 ) -> list[SearchHitRead]:
     return KeywordSearchService(session).search(
+        data.project_id,
+        data.query,
+        data.limit,
+    )
+
+
+@router.post(
+    "/search/hybrid",
+    response_model=list[SearchHitRead],
+)
+def hybrid_search(
+    data: SearchRequest,
+    session: Session = Depends(get_session),
+    embeddings: EmbeddingService = Depends(get_embedding_service),
+    vector_store: QdrantVectorStore = Depends(get_vector_store),
+) -> list[SearchHitRead]:
+    return HybridSearchService(
+        embeddings=embeddings,
+        vector_store=vector_store,
+        keyword_search=KeywordSearchService(session),
+    ).search(
         data.project_id,
         data.query,
         data.limit,

@@ -67,6 +67,11 @@ class QdrantVectorStore:
             for point in response.points
         ]
 
+    def has_collection(self, project_id: int) -> bool:
+        return self._client.collection_exists(
+            self.collection_name(project_id)
+        )
+
     @staticmethod
     def _validate_rebuild_input(
         chunks: Sequence[CodeChunk],

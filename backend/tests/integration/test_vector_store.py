@@ -122,6 +122,7 @@ def test_rebuild_rejects_invalid_chunk_vector_pairs(
 def test_search_missing_project_collection_returns_empty_list() -> None:
     store = QdrantVectorStore(QdrantClient(":memory:"))
 
+    assert store.has_collection(project_id=404) is False
     assert store.search(
         project_id=404,
         query_vector=[1.0, 0.0],
