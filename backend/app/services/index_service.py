@@ -3,7 +3,7 @@ import threading
 from dataclasses import replace
 from pathlib import Path
 
-from sqlalchemy import delete
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from app.errors import DomainError
@@ -24,6 +24,7 @@ from app.parsers.base import (
 from app.parsers.registry import ParserRegistry
 from app.parsers.relation_builder import build_relations
 from app.schemas.scan import ScanSummary
+from app.schemas.stats import ProjectStats
 from app.services.scanner import (
     ProjectScanner,
     ScanIssueCandidate,
@@ -98,6 +99,59 @@ class IndexService:
             raise
         finally:
             lock.release()
+
+    def get_stats(self, project_id: int) -> ProjectStats:
+        project = self.session.get(Project, project_id)
+        if project is None:
+            raise DomainError(
+                code="PROJECT_NOT_FOUND",
+                message=f"Project {project_id} does not exist.",
+                status_code=404,
+            )
+
+        total_files, total_lines = self.session.execute(
+            select(
+                func.count(CodeFile.id),
+                func.coalesce(func.sum(CodeFile.line_count), 0),
+            ).where(CodeFile.project_id == project_id)
+        ).one()
+        languages = self._grouped_counts(
+            CodeFile.language,
+            CodeFile.project_id,
+            project_id,
+        )
+        entity_types = self._grouped_counts(
+            CodeEntity.entity_type,
+            CodeEntity.project_id,
+            project_id,
+        )
+        relation_types = self._grouped_counts(
+            CodeRelation.relation_type,
+            CodeRelation.project_id,
+            project_id,
+        )
+        issue_types = self._grouped_counts(
+            ScanIssue.issue_type,
+            ScanIssue.project_id,
+            project_id,
+        )
+
+        return ProjectStats(
+            project_id=project_id,
+            total_files=total_files,
+            total_lines=total_lines,
+            languages=languages,
+            entity_types=entity_types,
+            relation_types=relation_types,
+            backend_api_count=entity_types.get("backend_api", 0),
+            frontend_api_call_count=entity_types.get(
+                "frontend_api_call",
+                0,
+            ),
+            skipped_files=issue_types.get("skipped", 0),
+            parse_errors=issue_types.get("parse_error", 0),
+            last_scan_at=project.last_scan_at,
+        )
 
     def _parse_files(
         self,
@@ -243,6 +297,20 @@ class IndexService:
                 project_id,
                 threading.Lock(),
             )
+
+    def _grouped_counts(
+        self,
+        group_column: object,
+        project_column: object,
+        project_id: int,
+    ) -> dict[str, int]:
+        rows = self.session.execute(
+            select(group_column, func.count())
+            .where(project_column == project_id)
+            .group_by(group_column)
+            .order_by(group_column)
+        ).all()
+        return {key: count for key, count in rows}
 
     @staticmethod
     def _namespace_result(file_path: str, result: ParseResult) -> ParseResult:
