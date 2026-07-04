@@ -9,8 +9,13 @@ from app.core.dependencies import (
 )
 from app.retrieval.chunk_builder import CodeChunkBuilder
 from app.retrieval.embedding_service import EmbeddingService
+from app.retrieval.keyword_search import KeywordSearchService
 from app.retrieval.vector_store import QdrantVectorStore
-from app.schemas.retrieval import VectorIndexSummary
+from app.schemas.retrieval import (
+    SearchHitRead,
+    SearchRequest,
+    VectorIndexSummary,
+)
 from app.services.vector_index_service import VectorIndexService
 
 router = APIRouter()
@@ -33,3 +38,18 @@ def build_vector_index(
         embeddings=embeddings,
         vector_store=vector_store,
     ).build(project_id)
+
+
+@router.post(
+    "/search/keyword",
+    response_model=list[SearchHitRead],
+)
+def keyword_search(
+    data: SearchRequest,
+    session: Session = Depends(get_session),
+) -> list[SearchHitRead]:
+    return KeywordSearchService(session).search(
+        data.project_id,
+        data.query,
+        data.limit,
+    )

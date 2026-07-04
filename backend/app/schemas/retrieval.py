@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class VectorIndexSummary(BaseModel):
@@ -11,6 +11,8 @@ class SearchRequest(BaseModel):
     project_id: int
     query: str = Field(min_length=1)
     limit: int = Field(default=10, ge=1, le=50)
+
+    model_config = ConfigDict(str_strip_whitespace=True)
 
 
 class SearchHitRead(BaseModel):
