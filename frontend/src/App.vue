@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import GraphView from "@/views/GraphView.vue"
+import { RouterView } from "vue-router"
+
+import AppNav from "@/components/AppNav.vue"
 </script>
 
 <template>
-  <GraphView />
+  <AppNav />
+  <RouterView />
 </template>
