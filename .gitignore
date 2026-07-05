@@ -7,3 +7,5 @@ __pycache__/
 .coverage
 .pytest_tmp/
 qdrant_storage/
+node_modules/
+dist/

@@ -15,3 +15,15 @@ For every implementation step:
   and pushing that branch as one step. Request separate confirmation for work
   that affects `main`, merges branches, deletes branches, or performs another
   high-impact repository operation.
+
+## High-token capabilities
+
+- Do not use potentially high-token capabilities without the user's explicit
+  permission for that specific use.
+- This includes OCR or image-text recognition, visual webpage analysis,
+  browser-driven frontend inspection or interaction, repeated real-LLM calls,
+  and similar token-intensive tools.
+- Prefer local automated tests, builds, structured API responses, and direct
+  text/code inspection when they can verify the same behavior.
+- Before requesting permission, explain why the high-token capability is
+  necessary and give a lower-cost alternative when one exists.

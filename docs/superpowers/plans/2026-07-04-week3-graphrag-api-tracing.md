@@ -450,15 +450,15 @@ Wire dependencies with override-friendly factories. Automated endpoint tests inj
 - Create: `frontend/src/components/__tests__/GraphPanel.spec.ts`
 - Create: `frontend/src/views/__tests__/GraphView.spec.ts`
 
-- [ ] **Step 1: Scaffold only the required frontend**
+- [x] **Step 1: Scaffold only the required frontend**
 
 Use Vue 3, TypeScript, Vite, Axios, Cytoscape.js, Vitest, Vue Test Utils, and jsdom. Do not add router, state management, authentication, general chat, project management, or Element Plus yet.
 
-- [ ] **Step 2: Define API and UI contracts**
+- [x] **Step 2: Define API and UI contracts**
 
 Mirror `GraphResponse` in TypeScript. `searchChain()` calls `POST /api/graph/search-chain`; use a Vite development proxy from `/api` to `http://127.0.0.1:8000`.
 
-- [ ] **Step 3: Write failing component tests**
+- [x] **Step 3: Write failing component tests**
 
 Mock Cytoscape and the graph API. Cover:
 
@@ -468,15 +468,15 @@ Mock Cytoscape and the graph API. Cover:
 - selecting a node displays type, qualified name, file path, line range, and code snippet;
 - a second search replaces the previous graph and destroys the old Cytoscape instance.
 
-- [ ] **Step 4: Implement `GraphPanel.vue`**
+- [x] **Step 4: Implement `GraphPanel.vue`**
 
 Create Cytoscape only after the container exists. Style node colors by `entity_type`, label edges by `relation_type`, use a left-to-right layout, emit selected-node details, and destroy the instance on unmount.
 
-- [ ] **Step 5: Implement `GraphView.vue`**
+- [x] **Step 5: Implement `GraphView.vue`**
 
 Provide project ID, query input, search button, graph canvas, legend, and node detail panel. Keep project ID explicit because project-selection UI belongs to Week 4 integration.
 
-- [ ] **Step 6: Install and run frontend checks**
+- [x] **Step 6: Install and run frontend checks**
 
 Network dependency installation requires user approval during execution:
 
