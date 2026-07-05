@@ -30,3 +30,8 @@ class Project(TimestampMixin, Base):
     entities = relationship("CodeEntity", cascade="all, delete-orphan")
     relations = relationship("CodeRelation", cascade="all, delete-orphan")
     issues = relationship("ScanIssue", cascade="all, delete-orphan")
+    conversations = relationship(
+        "Conversation",
+        back_populates="project",
+        cascade="all, delete-orphan",
+    )

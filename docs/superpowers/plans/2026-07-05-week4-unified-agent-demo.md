@@ -305,7 +305,7 @@ git push
 - Modify: `backend/tests/unit/test_models.py`
 - Create: `backend/tests/unit/test_conversation_service.py`
 
-- [ ] **Step 1: Write failing model tests**
+- [x] **Step 1: Write failing model tests**
 
 Require:
 
@@ -316,7 +316,7 @@ Require:
 - deleting a conversation cascades to messages;
 - messages are ordered by `(created_at, id)`.
 
-- [ ] **Step 2: Write failing service tests**
+- [x] **Step 2: Write failing service tests**
 
 Test `ConversationService` methods:
 
@@ -334,26 +334,26 @@ get_history(conversation_id: int) -> Conversation
 
 Cover missing project, missing conversation, project mismatch, title derived from the first 80 question characters, JSON-safe response metadata, atomic user/assistant insertion, and rollback on flush failure.
 
-- [ ] **Step 3: Run tests and observe RED**
+- [x] **Step 3: Run tests and observe RED**
 
 ```cmd
 .venv\python.exe -m pytest tests\unit\test_models.py tests\unit\test_conversation_service.py -v
 ```
 
-- [ ] **Step 4: Implement models and persistence**
+- [x] **Step 4: Implement models and persistence**
 
 Use SQLAlchemy relationships and `CheckConstraint("role IN ('user', 'assistant')")`. Store assistant references, graph nodes, graph edges, and uncertainties in `metadata_json`; do not store prompts or credentials.
 
 `save_exchange` must own one transaction and return the persisted conversation plus assistant message. It must not call an LLM.
 
-- [ ] **Step 5: Run focused and full backend tests**
+- [x] **Step 5: Run focused and full backend tests**
 
 ```cmd
 .venv\python.exe -m pytest tests\unit\test_models.py tests\unit\test_conversation_service.py
 .venv\python.exe -m pytest
 ```
 
-- [ ] **Step 6: User manual test gate**
+- [x] **Step 6: User manual test gate**
 
 Ask the user to run the focused tests with `-v`. Explain that the test database is temporary and verify the cascade, ordering, mismatch, and rollback cases before approval.
 
