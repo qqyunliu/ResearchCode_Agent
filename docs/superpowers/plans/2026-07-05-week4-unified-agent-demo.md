@@ -142,7 +142,7 @@ git push
 - Create: `backend/tests/unit/test_tool_registry.py`
 - Create: `backend/tests/unit/test_agent_executor.py`
 
-- [ ] **Step 1: Write failing registry tests**
+- [x] **Step 1: Write failing registry tests**
 
 Require unique nonblank names, callable values, deterministic names, and explicit unknown-tool errors:
 
@@ -163,7 +163,7 @@ DomainError(
 )
 ```
 
-- [ ] **Step 2: Define a unified internal result and write executor tests**
+- [x] **Step 2: Define a unified internal result and write executor tests**
 
 `AgentResult` contains:
 
@@ -178,24 +178,24 @@ uncertainties: tuple[str, ...] = ()
 
 Use fake code-QA, trace, and change-plan services. Verify exact routing, forwarded `project_id/question/limit`, `max_depth=2` for trace, normalization into immutable tuples, and `AGENT_TASK_UNSUPPORTED` for an invalid task.
 
-- [ ] **Step 3: Run tests and observe RED**
+- [x] **Step 3: Run tests and observe RED**
 
 ```cmd
 .venv\python.exe -m pytest tests\unit\test_tool_registry.py tests\unit\test_agent_executor.py -v
 ```
 
-- [ ] **Step 4: Implement the registry and executor**
+- [x] **Step 4: Implement the registry and executor**
 
 The executor receives the three focused services through its constructor. It must call existing service methods rather than reimplement search, context construction, or prompting.
 
-- [ ] **Step 5: Run focused and full backend tests**
+- [x] **Step 5: Run focused and full backend tests**
 
 ```cmd
 .venv\python.exe -m pytest tests\unit\test_tool_registry.py tests\unit\test_agent_executor.py
 .venv\python.exe -m pytest
 ```
 
-- [ ] **Step 6: User manual test gate**
+- [x] **Step 6: User manual test gate**
 
 Ask the user to run the two focused test files with `-v` and verify that all three routing cases are listed as passed. This task has no public API yet.
 
