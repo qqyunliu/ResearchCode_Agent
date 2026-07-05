@@ -79,19 +79,19 @@ Edge direction is evidence direction. Traversal may optionally inspect incoming 
 - Modify: `backend/tests/unit/test_relation_builder.py`
 - Modify: `backend/tests/integration/test_scan_service.py`
 
-- [ ] **Step 1: Add parser regression assertions**
+- [x] **Step 1: Add parser regression assertions**
 
 Assert that a controller fixture produces exactly one `DEFINES_API` edge per API mapping and one `CONTAINS` edge per method, and that backend API metadata includes `controller_class`, `handler_method`, `http_method`, `path`, and `normalized_path`.
 
-- [ ] **Step 2: Add relation-builder regression assertions**
+- [x] **Step 2: Add relation-builder regression assertions**
 
 Assert that exact normalized method/path matches create one `REQUESTS_API` edge and repeated candidate input cannot create duplicate `(source_key, target_key, relation_type)` edges.
 
-- [ ] **Step 3: Add rescan integration coverage**
+- [x] **Step 3: Add rescan integration coverage**
 
 Scan the same fixture project twice. Assert unchanged entity/relation counts and no duplicate entity keys or graph edges after the second scan.
 
-- [ ] **Step 4: Run the focused baseline tests**
+- [x] **Step 4: Run the focused baseline tests**
 
 Run from `backend`:
 
@@ -110,7 +110,7 @@ Expected: all tests pass without production changes unless a real regression is 
 - Modify: `backend/tests/fixtures/sample_project/backend/src/AlertController.java`
 - Modify: `backend/tests/unit/test_java_parser.py`
 
-- [ ] **Step 1: Strengthen the Java fixture**
+- [x] **Step 1: Strengthen the Java fixture**
 
 Change the sample controller to demonstrate constructor injection and an actual invocation:
 
@@ -133,7 +133,7 @@ class AlertController {
 
 Keep a second method/API in the fixture so multi-endpoint behavior remains covered.
 
-- [ ] **Step 2: Write failing extraction tests**
+- [x] **Step 2: Write failing extraction tests**
 
 Cover:
 
@@ -159,11 +159,11 @@ Expected method metadata:
 }
 ```
 
-- [ ] **Step 3: Implement tree-sitter evidence extraction**
+- [x] **Step 3: Implement tree-sitter evidence extraction**
 
 Use Java syntax nodes, not whole-file regexes, to collect class fields, constructor parameters/assignments, and method-invocation receiver/method names. Store only JSON-safe evidence in entity metadata. Do not emit cross-file relations from the parser because the target service entity may be parsed later.
 
-- [ ] **Step 4: Run parser tests**
+- [x] **Step 4: Run parser tests**
 
 ```cmd
 .venv\python.exe -m pytest tests\unit\test_java_parser.py
@@ -180,7 +180,7 @@ Expected: parser tests pass and existing API extraction remains unchanged.
 - Modify: `backend/tests/unit/test_relation_builder.py`
 - Modify: `backend/tests/integration/test_scan_api.py`
 
-- [ ] **Step 1: Write failing relation-resolution tests**
+- [x] **Step 1: Write failing relation-resolution tests**
 
 Build in-memory candidates representing controller methods and service methods. Cover:
 
@@ -191,7 +191,7 @@ Build in-memory candidates representing controller methods and service methods. 
 - duplicate invocation evidence produces one edge;
 - candidates from the same scan can resolve across different files.
 
-- [ ] **Step 2: Implement project-scan-level resolution**
+- [x] **Step 2: Implement project-scan-level resolution**
 
 Index Java classes by qualified/simple name and Java methods by `(declaring_class, method_name)`. Use class metadata `is_service` to limit targets. Emit:
 
@@ -210,7 +210,7 @@ RelationCandidate(
 
 Fall back to confidence `0.6` only for a single unambiguous service method candidate.
 
-- [ ] **Step 3: Verify persisted relations through the scan API**
+- [x] **Step 3: Verify persisted relations through the scan API**
 
 Scan the sample project and assert the persisted chain contains:
 
@@ -221,7 +221,7 @@ AlertView request
   -> AlertService.findById
 ```
 
-- [ ] **Step 4: Run focused parser/scan tests**
+- [x] **Step 4: Run focused parser/scan tests**
 
 ```cmd
 .venv\python.exe -m pytest tests\unit\test_java_parser.py tests\unit\test_relation_builder.py tests\integration\test_scan_api.py

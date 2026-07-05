@@ -69,6 +69,30 @@ def test_scan_persists_counts_and_rescan_replaces_without_duplicates(
         session, CodeRelation, project.id
     )
     assert second.status == "ready"
+    duplicate_entity_keys = session.execute(
+        select(CodeEntity.entity_key, func.count())
+        .where(CodeEntity.project_id == project.id)
+        .group_by(CodeEntity.entity_key)
+        .having(func.count() > 1)
+    ).all()
+    duplicate_edges = session.execute(
+        select(
+            CodeRelation.source_id,
+            CodeRelation.target_id,
+            CodeRelation.relation_type,
+            func.count(),
+        )
+        .where(CodeRelation.project_id == project.id)
+        .group_by(
+            CodeRelation.source_id,
+            CodeRelation.target_id,
+            CodeRelation.relation_type,
+        )
+        .having(func.count() > 1)
+    ).all()
+
+    assert duplicate_entity_keys == []
+    assert duplicate_edges == []
     session.refresh(project)
     assert project.status == "ready"
     assert project.last_scan_at is not None

@@ -14,6 +14,7 @@ RelationType: TypeAlias = Literal[
     "CONTAINS",
     "DEFINES_API",
     "REQUESTS_API",
+    "CALLS_METHOD",
 ]
 
 
