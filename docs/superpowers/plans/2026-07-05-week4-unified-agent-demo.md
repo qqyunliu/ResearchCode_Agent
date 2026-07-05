@@ -64,7 +64,7 @@
 - Create: `backend/scripts/classify_agent_question.py`
 - Create: `backend/tests/unit/test_agent_planner.py`
 
-- [ ] **Step 1: Write failing classification tests**
+- [x] **Step 1: Write failing classification tests**
 
 Define `TaskType` as a string enum with `CODE_QA`, `TRACE_CHAIN`, and `CHANGE_PLAN`. Test English and Chinese examples, whitespace rejection, fallback to `CODE_QA`, and precedence:
 
@@ -86,7 +86,7 @@ def test_plan_classifies_question(question, expected):
     assert SimpleAgentPlanner().plan(question) is expected
 ```
 
-- [ ] **Step 2: Run tests and observe RED**
+- [x] **Step 2: Run tests and observe RED**
 
 ```cmd
 .venv\python.exe -m pytest tests\unit\test_agent_planner.py -v
@@ -94,11 +94,11 @@ def test_plan_classifies_question(question, expected):
 
 Expected: collection fails because `app.agent.planner` does not exist.
 
-- [ ] **Step 3: Implement deterministic priority rules**
+- [x] **Step 3: Implement deterministic priority rules**
 
 Use normalized lowercase text and immutable keyword groups. Check change-plan keywords first, trace keywords second, then code-QA keywords/fallback. Raise `ValueError("question must not be blank")` for blank input. Do not call an LLM.
 
-- [ ] **Step 4: Add the inspection script**
+- [x] **Step 4: Add the inspection script**
 
 Support:
 
@@ -112,14 +112,14 @@ Expected output:
 Task type: CHANGE_PLAN
 ```
 
-- [ ] **Step 5: Run focused and regression tests**
+- [x] **Step 5: Run focused and regression tests**
 
 ```cmd
 .venv\python.exe -m pytest tests\unit\test_agent_planner.py
 .venv\python.exe -m pytest
 ```
 
-- [ ] **Step 6: User manual test gate**
+- [x] **Step 6: User manual test gate**
 
 Ask the user to run the script with one location question, one chain question, and one modification question. Stop until all three classifications are approved.
 
