@@ -5,6 +5,7 @@ from qdrant_client import QdrantClient
 from app.core.config import get_settings
 from app.llm.client import OpenAICompatibleLlmClient
 from app.rag.context_builder import RagContextBuilder
+from app.rag.graph_context_builder import GraphContextBuilder
 from app.retrieval.chunk_builder import CodeChunkBuilder
 from app.retrieval.embedding_service import (
     EmbeddingService,
@@ -66,3 +67,8 @@ def get_llm_client() -> OpenAICompatibleLlmClient:
 @lru_cache
 def get_rag_context_builder() -> RagContextBuilder:
     return RagContextBuilder(get_settings().rag_max_context_chars)
+
+
+@lru_cache
+def get_graph_context_builder() -> GraphContextBuilder:
+    return GraphContextBuilder(get_settings().rag_max_context_chars)

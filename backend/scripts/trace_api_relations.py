@@ -32,6 +32,12 @@ def main() -> None:
         for relation in relations
         if relation.relation_type == "DEFINES_API"
     }
+    calls_by_method: dict[str, list[RelationCandidate]] = {}
+    for relation in relations:
+        if relation.relation_type == "CALLS_METHOD":
+            calls_by_method.setdefault(relation.source_key, []).append(
+                relation
+            )
     request_relations = [
         relation
         for relation in relations
@@ -56,6 +62,14 @@ def main() -> None:
         print(f"    {backend.qualified_name}")
         if handler is not None:
             print(f"      -[DEFINES_API]-> {handler.qualified_name}")
+            for call in calls_by_method.get(handler.local_key, []):
+                service_method = entity_by_key.get(call.target_key)
+                if service_method is not None:
+                    print(
+                        "        "
+                        f"-[CALLS_METHOD confidence={call.confidence}]-> "
+                        f"{service_method.qualified_name}"
+                    )
 
     for issue in scan_result.issues:
         print(

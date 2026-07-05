@@ -1,6 +1,11 @@
 import shutil
 from pathlib import Path
 
+from sqlalchemy import select
+
+from app.core.database import get_session
+from app.models import CodeEntity, CodeRelation
+
 
 def create_sample_project(client, tmp_path) -> int:
     source = Path(__file__).parents[1] / "fixtures" / "sample_project"
@@ -29,7 +34,7 @@ def test_scan_and_stats_endpoints(client, tmp_path) -> None:
         "status": "ready",
         "files_indexed": 5,
         "entities_indexed": 13,
-        "relations_indexed": 9,
+        "relations_indexed": 10,
         "files_skipped": 0,
         "parse_errors": 0,
     }
@@ -44,6 +49,7 @@ def test_scan_and_stats_endpoints(client, tmp_path) -> None:
     assert stats.json()["entity_types"]["backend_api"] == 2
     assert stats.json()["entity_types"]["frontend_api_call"] == 3
     assert stats.json()["relation_types"] == {
+        "CALLS_METHOD": 1,
         "CONTAINS": 5,
         "DEFINES_API": 2,
         "REQUESTS_API": 2,
@@ -74,3 +80,31 @@ def test_week1_acceptance_flow(client, tmp_path) -> None:
     assert stats.json()["entity_types"]["frontend_api_call"] == 3
     assert stats.json()["relation_types"]["REQUESTS_API"] == 2
     assert stats.json()["entity_types"]["python_function"] >= 2
+
+
+def test_scan_persists_controller_to_service_call(client, tmp_path) -> None:
+    project_id = create_sample_project(client, tmp_path)
+
+    scan = client.post(f"/api/projects/{project_id}/scan")
+
+    assert scan.status_code == 200
+    session_override = client.app.dependency_overrides[get_session]
+    session_iterator = session_override()
+    session = next(session_iterator)
+    try:
+        call_relation = session.scalar(
+            select(CodeRelation).where(
+                CodeRelation.project_id == project_id,
+                CodeRelation.relation_type == "CALLS_METHOD",
+            )
+        )
+        assert call_relation is not None
+        source = session.get(CodeEntity, call_relation.source_id)
+        target = session.get(CodeEntity, call_relation.target_id)
+        assert source is not None
+        assert target is not None
+        assert source.qualified_name == "AlertController.getAlert"
+        assert target.qualified_name == "AlertService.findById"
+        assert call_relation.confidence == 0.8
+    finally:
+        session_iterator.close()

@@ -113,6 +113,7 @@ class _JavaExtractor:
         body = node.child_by_field_name("body")
         if body is None:
             return
+        dependencies = self._injected_dependencies(body)
         for child in self._named_children(body):
             if child.kind() == "method_declaration":
                 self._visit_method(
@@ -121,6 +122,7 @@ class _JavaExtractor:
                     local_key,
                     base_paths,
                     is_controller,
+                    dependencies,
                 )
             elif child.kind() == "class_declaration":
                 self._visit_class(child, (*enclosing_classes, name))
@@ -132,6 +134,7 @@ class _JavaExtractor:
         class_key: str,
         base_paths: list[str],
         is_controller: bool,
+        dependencies: dict[str, str],
     ) -> None:
         name_node = node.child_by_field_name("name")
         if name_node is None:
@@ -161,6 +164,11 @@ class _JavaExtractor:
                     "parameters": self._text(parameters) if parameters else "()",
                     "return_type": (
                         self._text(return_type) if return_type else None
+                    ),
+                    "declaring_class": class_name,
+                    "invocations": self._service_invocations(
+                        node,
+                        dependencies,
                     ),
                 },
             )
@@ -194,6 +202,104 @@ class _JavaExtractor:
                             http_method,
                             path,
                         )
+
+    def _injected_dependencies(self, class_body: object) -> dict[str, str]:
+        dependencies: dict[str, str] = {}
+        for child in self._named_children(class_body):
+            if child.kind() == "field_declaration":
+                annotation_names = {
+                    annotation.name for annotation in self._annotations(child)
+                }
+                if not annotation_names.intersection({"Autowired", "Resource"}):
+                    continue
+                type_node = child.child_by_field_name("type")
+                if type_node is None:
+                    continue
+                receiver_type = self._text(type_node)
+                for declarator in self._named_children(child):
+                    if declarator.kind() != "variable_declarator":
+                        continue
+                    name_node = declarator.child_by_field_name("name")
+                    if name_node is not None:
+                        dependencies[self._text(name_node)] = receiver_type
+            elif child.kind() == "constructor_declaration":
+                dependencies.update(
+                    self._constructor_dependencies(child)
+                )
+        return dependencies
+
+    def _constructor_dependencies(
+        self,
+        constructor: object,
+    ) -> dict[str, str]:
+        parameters = constructor.child_by_field_name("parameters")
+        body = constructor.child_by_field_name("body")
+        if parameters is None or body is None:
+            return {}
+
+        parameter_types: dict[str, str] = {}
+        for parameter in self._named_children(parameters):
+            if parameter.kind() != "formal_parameter":
+                continue
+            name_node = parameter.child_by_field_name("name")
+            type_node = parameter.child_by_field_name("type")
+            if name_node is not None and type_node is not None:
+                parameter_types[self._text(name_node)] = self._text(type_node)
+
+        dependencies: dict[str, str] = {}
+        for descendant in self._descendants(body):
+            if descendant.kind() != "assignment_expression":
+                continue
+            left = descendant.child_by_field_name("left")
+            right = descendant.child_by_field_name("right")
+            if (
+                left is None
+                or right is None
+                or left.kind() != "field_access"
+                or right.kind() != "identifier"
+            ):
+                continue
+            receiver = left.child_by_field_name("object")
+            field = left.child_by_field_name("field")
+            parameter_type = parameter_types.get(self._text(right))
+            if (
+                receiver is not None
+                and self._text(receiver) == "this"
+                and field is not None
+                and parameter_type is not None
+            ):
+                dependencies[self._text(field)] = parameter_type
+        return dependencies
+
+    def _service_invocations(
+        self,
+        method: object,
+        dependencies: dict[str, str],
+    ) -> list[dict[str, str]]:
+        invocations: list[dict[str, str]] = []
+        for descendant in self._descendants(method):
+            if descendant.kind() != "method_invocation":
+                continue
+            object_node = descendant.child_by_field_name("object")
+            name_node = descendant.child_by_field_name("name")
+            if (
+                object_node is None
+                or object_node.kind() != "identifier"
+                or name_node is None
+            ):
+                continue
+            qualifier = self._text(object_node)
+            receiver_type = dependencies.get(qualifier)
+            if receiver_type is None:
+                continue
+            invocations.append(
+                {
+                    "qualifier": qualifier,
+                    "method": self._text(name_node),
+                    "receiver_type": receiver_type,
+                }
+            )
+        return invocations
 
     def _add_api(
         self,
@@ -314,3 +420,12 @@ class _JavaExtractor:
             node.named_child(index)
             for index in range(node.named_child_count())
         ]
+
+    def _descendants(self, node: object) -> list[object]:
+        descendants: list[object] = []
+        for child in self._named_children(node):
+            if child.kind() == "class_declaration":
+                continue
+            descendants.append(child)
+            descendants.extend(self._descendants(child))
+        return descendants

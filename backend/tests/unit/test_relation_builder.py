@@ -112,3 +112,225 @@ def test_parser_relations_are_combined_and_deduplicated() -> None:
     relations = build_relations([], [existing, existing])
 
     assert relations == (existing,)
+
+
+def test_repeated_api_candidates_create_one_request_relation() -> None:
+    frontend = entity(
+        "frontend:get-alert",
+        "frontend_api_call",
+        "GET",
+        "/api/alerts/{param}",
+    )
+    backend = entity(
+        "backend:get-alert",
+        "backend_api",
+        "GET",
+        "/api/alerts/{param}",
+    )
+
+    relations = build_relations(
+        [frontend, frontend, backend, backend]
+    )
+
+    assert relations == (
+        RelationCandidate(
+            source_key=frontend.local_key,
+            target_key=backend.local_key,
+            relation_type="REQUESTS_API",
+            confidence=1.0,
+            metadata={},
+        ),
+    )
+
+
+def java_entity(
+    local_key: str,
+    entity_type: str,
+    name: str,
+    qualified_name: str,
+    metadata: dict[str, object],
+    *,
+    file_path: str,
+) -> EntityCandidate:
+    return EntityCandidate(
+        local_key=local_key,
+        entity_type=entity_type,
+        name=name,
+        qualified_name=qualified_name,
+        file_path=file_path,
+        start_line=1,
+        end_line=1,
+        content="",
+        metadata=metadata,
+    )
+
+
+def service_entities(
+    class_name: str,
+    method_name: str,
+    *,
+    prefix: str,
+) -> tuple[EntityCandidate, EntityCandidate]:
+    service_class = java_entity(
+        f"{prefix}:class",
+        "java_class",
+        class_name,
+        class_name,
+        {"is_service": True},
+        file_path=f"{prefix}/{class_name}.java",
+    )
+    service_method = java_entity(
+        f"{prefix}:method",
+        "java_method",
+        method_name,
+        f"{class_name}.{method_name}",
+        {
+            "declaring_class": class_name,
+            "invocations": [],
+        },
+        file_path=f"{prefix}/{class_name}.java",
+    )
+    return service_class, service_method
+
+
+def controller_method(
+    invocations: list[dict[str, str]],
+) -> EntityCandidate:
+    return java_entity(
+        "controller:get-alert",
+        "java_method",
+        "getAlert",
+        "AlertController.getAlert",
+        {
+            "declaring_class": "AlertController",
+            "invocations": invocations,
+        },
+        file_path="controller/AlertController.java",
+    )
+
+
+def test_receiver_type_resolves_cross_file_service_call() -> None:
+    service_class, service_method = service_entities(
+        "AlertService",
+        "findById",
+        prefix="service",
+    )
+    controller = controller_method(
+        [
+            {
+                "qualifier": "alertService",
+                "method": "findById",
+                "receiver_type": "AlertService",
+            }
+        ]
+    )
+
+    relations = build_relations(
+        [controller, service_method, service_class]
+    )
+
+    assert relations == (
+        RelationCandidate(
+            source_key=controller.local_key,
+            target_key=service_method.local_key,
+            relation_type="CALLS_METHOD",
+            confidence=0.8,
+            metadata={
+                "qualifier": "alertService",
+                "resolution": "receiver_type",
+            },
+        ),
+    )
+
+
+def test_unique_method_name_fallback_has_lower_confidence() -> None:
+    service_class, service_method = service_entities(
+        "AlertService",
+        "findById",
+        prefix="service",
+    )
+    controller = controller_method(
+        [{"qualifier": "service", "method": "findById"}]
+    )
+
+    relations = build_relations(
+        [controller, service_class, service_method]
+    )
+
+    assert relations[0].target_key == service_method.local_key
+    assert relations[0].confidence == 0.6
+    assert relations[0].metadata["resolution"] == "unique_method_name"
+
+
+def test_ambiguous_method_name_fallback_creates_no_relation() -> None:
+    alert_class, alert_method = service_entities(
+        "AlertService",
+        "findById",
+        prefix="alert",
+    )
+    audit_class, audit_method = service_entities(
+        "AuditService",
+        "findById",
+        prefix="audit",
+    )
+    controller = controller_method(
+        [{"qualifier": "service", "method": "findById"}]
+    )
+
+    relations = build_relations(
+        [
+            controller,
+            alert_class,
+            alert_method,
+            audit_class,
+            audit_method,
+        ]
+    )
+
+    assert relations == ()
+
+
+def test_non_service_method_is_not_a_call_target() -> None:
+    helper_class = java_entity(
+        "helper:class",
+        "java_class",
+        "AlertHelper",
+        "AlertHelper",
+        {"is_service": False},
+        file_path="helper/AlertHelper.java",
+    )
+    helper_method = java_entity(
+        "helper:method",
+        "java_method",
+        "findById",
+        "AlertHelper.findById",
+        {"declaring_class": "AlertHelper", "invocations": []},
+        file_path="helper/AlertHelper.java",
+    )
+    controller = controller_method(
+        [{"qualifier": "helper", "method": "findById"}]
+    )
+
+    assert build_relations(
+        [controller, helper_class, helper_method]
+    ) == ()
+
+
+def test_duplicate_invocation_evidence_creates_one_call_edge() -> None:
+    service_class, service_method = service_entities(
+        "AlertService",
+        "findById",
+        prefix="service",
+    )
+    invocation = {
+        "qualifier": "alertService",
+        "method": "findById",
+        "receiver_type": "AlertService",
+    }
+    controller = controller_method([invocation, invocation])
+
+    relations = build_relations(
+        [controller, service_class, service_method]
+    )
+
+    assert len(relations) == 1
