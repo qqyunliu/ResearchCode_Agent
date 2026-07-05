@@ -239,11 +239,11 @@ Expected: the new `CALLS_METHOD` relation is persisted with `0.8` confidence.
 - Create: `backend/app/graph/query_service.py`
 - Create: `backend/tests/unit/test_graph_query_service.py`
 
-- [ ] **Step 1: Define immutable internal contracts**
+- [x] **Step 1: Define immutable internal contracts**
 
 Create `GraphNode`, `GraphEdge`, and `GraphResult`. A node contains `entity_id`, `label`, `entity_type`, `qualified_name`, `file_path`, `start_line`, `end_line`, and `content`. An edge contains `relation_id`, `source_id`, `target_id`, `relation_type`, `confidence`, and parsed metadata. `GraphResult` contains tuples of nodes and edges.
 
-- [ ] **Step 2: Write failing BFS tests**
+- [x] **Step 2: Write failing BFS tests**
 
 Using SQLite test rows, cover:
 
@@ -256,11 +256,11 @@ Using SQLite test rows, cover:
 - nonexistent seed returns `ENTITY_NOT_FOUND`;
 - invalid depth outside `0..2` is rejected by the public schema.
 
-- [ ] **Step 3: Implement deterministic BFS**
+- [x] **Step 3: Implement deterministic BFS**
 
 Fetch adjacency in bounded batches, maintain `visited_node_ids` and `seen_edge_ids`, and sort output by `(depth, entity_id)` for nodes and `(source_id, target_id, relation_type, relation_id)` for edges.
 
-- [ ] **Step 4: Add exact API-chain lookup**
+- [x] **Step 4: Add exact API-chain lookup**
 
 Add `find_api_chain(project_id, method, api_path)`:
 
@@ -273,7 +273,7 @@ Add `find_api_chain(project_id, method, api_path)`:
 7. return deterministic nodes/edges;
 8. return `API_NOT_FOUND` with 404 if no backend API matches.
 
-- [ ] **Step 5: Run graph service tests**
+- [x] **Step 5: Run graph service tests**
 
 ```cmd
 .venv\python.exe -m pytest tests\unit\test_graph_query_service.py
@@ -291,7 +291,7 @@ Add `find_api_chain(project_id, method, api_path)`:
 - Modify: `backend/app/main.py`
 - Create: `backend/tests/integration/test_graph_api.py`
 
-- [ ] **Step 1: Define stable HTTP schemas**
+- [x] **Step 1: Define stable HTTP schemas**
 
 Create:
 
@@ -302,7 +302,7 @@ Create:
 
 References must contain file path and line range and be deduplicated by entity ID.
 
-- [ ] **Step 2: Write exact API-chain endpoint tests**
+- [x] **Step 2: Write exact API-chain endpoint tests**
 
 Test:
 
@@ -312,19 +312,19 @@ GET /api/graph/api-chain?project_id=1&method=GET&api_path=/api/alerts/123
 
 Assert the response contains frontend request, backend API, controller handler, and observed service method, plus the three edge types. Also test 404, invalid query parameters, and project isolation.
 
-- [ ] **Step 3: Implement and register `graph_router`**
+- [x] **Step 3: Implement and register `graph_router`**
 
 Mount the router under `/api/graph`. Build `GraphQueryService` from the request-scoped database session. Do not cache a SQLAlchemy session globally.
 
-- [ ] **Step 4: Write natural-language search-chain endpoint tests**
+- [x] **Step 4: Write natural-language search-chain endpoint tests**
 
 Override the hybrid-search dependency with a fake returning known seed hits. Assert `/api/graph/search-chain` expands each seed with BFS, merges graphs, deduplicates nodes/edges, and never calls a real embedding model or Qdrant.
 
-- [ ] **Step 5: Implement search-chain orchestration**
+- [x] **Step 5: Implement search-chain orchestration**
 
 Run existing hybrid search, treat ranked hits as seeds, expand each up to `max_depth`, and merge results. Seed ordering follows retrieval rank; remaining graph nodes follow depth then entity ID.
 
-- [ ] **Step 6: Run graph API tests**
+- [x] **Step 6: Run graph API tests**
 
 ```cmd
 .venv\python.exe -m pytest tests\integration\test_graph_api.py
