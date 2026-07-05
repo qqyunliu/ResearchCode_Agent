@@ -43,3 +43,9 @@ export interface ProjectEntity {
   end_line: number
   content: string
 }
+
+export interface VectorIndexSummary {
+  project_id: number
+  collection_name: string
+  chunks_indexed: number
+}

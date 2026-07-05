@@ -6,6 +6,7 @@ import type {
   ProjectEntity,
   ProjectStats,
   ScanSummary,
+  VectorIndexSummary,
 } from "@/types/project"
 
 export async function createProject(data: ProjectCreate): Promise<Project> {
@@ -35,6 +36,15 @@ export async function getProjectStats(
 ): Promise<ProjectStats> {
   const response = await axios.get<ProjectStats>(
     `/api/projects/${projectId}/stats`,
+  )
+  return response.data
+}
+
+export async function buildVectorIndex(
+  projectId: number,
+): Promise<VectorIndexSummary> {
+  const response = await axios.post<VectorIndexSummary>(
+    `/api/projects/${projectId}/build-vector-index`,
   )
   return response.data
 }

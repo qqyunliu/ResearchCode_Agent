@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import ProjectView from "../ProjectView.vue"
 
 const api = vi.hoisted(() => ({
+  buildVectorIndex: vi.fn(),
   createProject: vi.fn(),
   getProjectStats: vi.fn(),
   scanProject: vi.fn(),
@@ -22,6 +23,34 @@ const stats = {
   skipped_files: 1,
   parse_errors: 0,
   last_scan_at: "2026-07-05T12:00:00Z",
+}
+
+function configureSuccessfulScan() {
+  api.createProject.mockResolvedValue({
+    id: 7,
+    name: "Demo",
+    root_path: "F:/demo",
+    status: "created",
+  })
+  api.scanProject.mockResolvedValue({
+    project_id: 7,
+    status: "ready",
+    files_indexed: 12,
+    entities_indexed: 20,
+    relations_indexed: 9,
+    files_skipped: 1,
+    parse_errors: 0,
+  })
+  api.getProjectStats.mockResolvedValue(stats)
+}
+
+async function registerAndScan(wrapper: ReturnType<typeof mount>) {
+  await wrapper.get('[data-test="project-name"]').setValue("Demo")
+  await wrapper.get('[data-test="root-path"]').setValue("F:/demo")
+  await wrapper.get('[data-test="register-form"]').trigger("submit")
+  await flushPromises()
+  await wrapper.get('[data-test="scan"]').trigger("click")
+  await flushPromises()
 }
 
 describe("ProjectView", () => {
@@ -108,5 +137,92 @@ describe("ProjectView", () => {
     )
     expect(wrapper.get('[data-test="register"]').attributes("disabled"))
       .toBeUndefined()
+  })
+
+  it("enables indexing after scan and displays the index summary", async () => {
+    configureSuccessfulScan()
+    api.buildVectorIndex.mockResolvedValue({
+      project_id: 7,
+      collection_name: "project_7_code_chunks",
+      chunks_indexed: 31,
+    })
+    const wrapper = mount(ProjectView)
+    await wrapper.get('[data-test="project-name"]').setValue("Demo")
+    await wrapper.get('[data-test="root-path"]').setValue("F:/demo")
+    await wrapper.get('[data-test="register-form"]').trigger("submit")
+    await flushPromises()
+    expect(wrapper.get('[data-test="build-index"]').attributes("disabled"))
+      .toBeDefined()
+
+    await wrapper.get('[data-test="scan"]').trigger("click")
+    await flushPromises()
+    expect(wrapper.get('[data-test="build-index"]').attributes("disabled"))
+      .toBeUndefined()
+    await wrapper.get('[data-test="build-index"]').trigger("click")
+    await flushPromises()
+
+    expect(api.buildVectorIndex).toHaveBeenCalledWith(7)
+    expect(wrapper.get('[data-test="index-result"]').text()).toContain("31")
+    expect(wrapper.get('[data-test="index-result"]').text()).toContain(
+      "project_7_code_chunks",
+    )
+  })
+
+  it("shows indexing progress and disables conflicting actions", async () => {
+    configureSuccessfulScan()
+    let finish!: (value: {
+      project_id: number
+      collection_name: string
+      chunks_indexed: number
+    }) => void
+    api.buildVectorIndex.mockReturnValue(new Promise((resolve) => {
+      finish = resolve
+    }))
+    const wrapper = mount(ProjectView)
+    await registerAndScan(wrapper)
+    await wrapper.get('[data-test="build-index"]').trigger("click")
+
+    expect(wrapper.get('[data-test="build-index"]').text()).toContain(
+      "Building index",
+    )
+    expect(wrapper.get('[data-test="build-index"]').attributes("disabled"))
+      .toBeDefined()
+    expect(wrapper.get('[data-test="scan"]').attributes("disabled"))
+      .toBeDefined()
+
+    finish({
+      project_id: 7,
+      collection_name: "project_7_code_chunks",
+      chunks_indexed: 31,
+    })
+    await flushPromises()
+  })
+
+  it("keeps scan results and permits retry after index failure", async () => {
+    configureSuccessfulScan()
+    api.buildVectorIndex
+      .mockRejectedValueOnce(new Error("embedding unavailable"))
+      .mockResolvedValueOnce({
+        project_id: 7,
+        collection_name: "project_7_code_chunks",
+        chunks_indexed: 31,
+      })
+    const wrapper = mount(ProjectView)
+    await registerAndScan(wrapper)
+    await wrapper.get('[data-test="build-index"]').trigger("click")
+    await flushPromises()
+
+    expect(wrapper.get('[data-test="error"]').text()).toContain(
+      "Unable to build the vector index",
+    )
+    expect(wrapper.find('[data-test="stats"]').exists()).toBe(true)
+    expect(wrapper.get('[data-test="build-index"]').attributes("disabled"))
+      .toBeUndefined()
+
+    await wrapper.get('[data-test="build-index"]').trigger("click")
+    await flushPromises()
+    expect(api.buildVectorIndex).toHaveBeenCalledTimes(2)
+    expect(wrapper.find('[data-test="error"]').exists()).toBe(false)
+    expect(wrapper.get('[data-test="index-result"]').text()).toContain("31")
   })
 })
