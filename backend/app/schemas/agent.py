@@ -43,3 +43,19 @@ class TraceResponse(BaseModel):
     graph_nodes: list[GraphNodeRead]
     graph_edges: list[GraphEdgeRead]
     uncertainties: list[str]
+
+
+class AffectedFileRead(BaseModel):
+    entity_id: int
+    file_path: str
+    reason: str
+    suggested_changes: list[str]
+
+
+class ChangePlanResponse(BaseModel):
+    answer: str
+    affected_files: list[AffectedFileRead]
+    references: list[ContextReferenceRead]
+    graph_nodes: list[GraphNodeRead]
+    graph_edges: list[GraphEdgeRead]
+    uncertainties: list[str]

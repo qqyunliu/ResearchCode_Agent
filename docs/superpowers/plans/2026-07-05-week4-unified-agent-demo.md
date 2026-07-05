@@ -216,7 +216,7 @@ git push
 - Modify: `backend/app/schemas/agent.py`
 - Create: `backend/tests/unit/test_change_plan_service.py`
 
-- [ ] **Step 1: Define structured change-plan contracts**
+- [x] **Step 1: Define structured change-plan contracts**
 
 Add:
 
@@ -238,7 +238,7 @@ class ChangePlanResponse(BaseModel):
 
 The LLM JSON payload uses `summary`, `affected_files`, `risks`, and `uncertainties`. Every affected file includes an `entity_id`.
 
-- [ ] **Step 2: Write failing service tests with fake collaborators**
+- [x] **Step 2: Write failing service tests with fake collaborators**
 
 Cover:
 
@@ -252,13 +252,13 @@ Cover:
 - unexpected LLM failure becomes `LLM_REQUEST_FAILED`;
 - source references remain available even if the model omits them.
 
-- [ ] **Step 3: Run tests and observe RED**
+- [x] **Step 3: Run tests and observe RED**
 
 ```cmd
 .venv\python.exe -m pytest tests\unit\test_change_plan_service.py -v
 ```
 
-- [ ] **Step 4: Implement evidence gathering and one-call generation**
+- [x] **Step 4: Implement evidence gathering and one-call generation**
 
 Inject a hybrid-search-compatible object, `GraphQueryService`, `GraphContextBuilder`, and `LlmClient`. Search once, expand at most two hops, construct bounded context, and make at most one LLM call.
 
@@ -273,14 +273,14 @@ Put unsupported assumptions in uncertainties.
 
 Validate the returned entity ID/path pairs against retrieved graph and search evidence before constructing the response.
 
-- [ ] **Step 5: Run focused and regression tests**
+- [x] **Step 5: Run focused and regression tests**
 
 ```cmd
 .venv\python.exe -m pytest tests\unit\test_change_plan_service.py
 .venv\python.exe -m pytest
 ```
 
-- [ ] **Step 6: User manual test gate**
+- [x] **Step 6: User manual test gate**
 
 No paid call is needed. Ask the user to run the focused fake-LLM tests with `-v` and inspect the grounded-file and invented-file rejection cases.
 
