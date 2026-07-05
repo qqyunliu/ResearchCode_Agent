@@ -500,7 +500,7 @@ Expected: component tests pass and TypeScript production build succeeds.
 - Modify: `.env.example`
 - Modify: `.gitignore` only if frontend artifacts are not already covered
 
-- [ ] **Step 1: Add an end-to-end offline acceptance test**
+- [x] **Step 1: Add an end-to-end offline acceptance test**
 
 Using temporary SQLite, in-memory Qdrant/fake hybrid search where appropriate, and a fake LLM:
 
@@ -512,7 +512,7 @@ Using temporary SQLite, in-memory Qdrant/fake hybrid search where appropriate, a
 6. invoke trace service;
 7. assert graph/reference consistency and no cross-project leakage.
 
-- [ ] **Step 2: Add a CMD-friendly inspection script**
+- [x] **Step 2: Add a CMD-friendly inspection script**
 
 Support:
 
@@ -522,11 +522,11 @@ Support:
 
 Print nodes in chain order, edges with confidence, file/line references, and missing segments. This script must not call an LLM.
 
-- [ ] **Step 3: Document operation and limitations**
+- [x] **Step 3: Document operation and limitations**
 
 Explain backend endpoints, frontend startup, relation semantics, confidence levels, why static analysis can miss dynamic calls, how to run offline tests, and how to perform the optional paid trace test. Do not put a real API key in tracked files.
 
-- [ ] **Step 4: Run complete offline verification**
+- [x] **Step 4: Run complete offline verification**
 
 From `backend`:
 
@@ -545,7 +545,7 @@ npm run build
 
 Expected: all suites pass, backend coverage remains at least 80%, compilation succeeds, and no real LLM/embedding request is made.
 
-- [ ] **Step 5: User manual test gate**
+- [x] **Step 5: User manual test gate**
 
 Start the backend and frontend, then ask the user to verify:
 
@@ -573,16 +573,16 @@ At each checkpoint, explain the concepts involved and provide a CMD command for 
 
 ## Definition of done
 
-- [ ] Existing Week 1/2 behavior remains green.
-- [ ] Sample scan creates one honest `CALLS_METHOD` edge from controller handler to service method.
-- [ ] Exact API lookup returns frontend request, backend API, handler, and observed service call.
-- [ ] Natural-language search expands hybrid hits by at most two graph hops.
-- [ ] GraphRAG results are deterministic, deduplicated, bounded, and explain why each neighbor was included.
-- [ ] `/api/agent/trace` returns grounded text, references, graph nodes, graph edges, and uncertainty information.
-- [ ] Vue/Cytoscape graph renders and node details match backend references.
-- [ ] Backend full suite, coverage, compileall, frontend tests, and frontend build pass offline.
-- [ ] No credentials, local database, Qdrant data, model cache, `.venv`, `node_modules`, or frontend build output are committed.
-- [ ] User completes the manual test gate before branch commit/push.
+- [x] Existing Week 1/2 behavior remains green.
+- [x] Sample scan creates one honest `CALLS_METHOD` edge from controller handler to service method.
+- [x] Exact API lookup returns frontend request, backend API, handler, and observed service call.
+- [x] Natural-language search expands hybrid hits by at most two graph hops.
+- [x] GraphRAG results are deterministic, deduplicated, bounded, and explain why each neighbor was included.
+- [x] `/api/agent/trace` returns grounded text, references, graph nodes, graph edges, and uncertainty information.
+- [x] Vue/Cytoscape graph renders and node details match backend references.
+- [x] Backend full suite, coverage, compileall, frontend tests, and frontend build pass offline.
+- [x] No credentials, local database, Qdrant data, model cache, `.venv`, `node_modules`, or frontend build output are committed.
+- [x] User completes the manual test gate before branch commit/push.
 
 ## Self-audit against `plan.md`
 
