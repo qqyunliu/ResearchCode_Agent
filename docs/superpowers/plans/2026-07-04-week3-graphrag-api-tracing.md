@@ -338,7 +338,7 @@ Run existing hybrid search, treat ranked hits as seeds, expand each up to `max_d
 - Create: `backend/app/rag/graph_retriever.py`
 - Create: `backend/tests/unit/test_graph_retriever.py`
 
-- [ ] **Step 1: Define graph-aware retrieval records**
+- [x] **Step 1: Define graph-aware retrieval records**
 
 Each result contains the original entity payload plus:
 
@@ -347,7 +347,7 @@ Each result contains the original entity payload plus:
 - `relation_reason`: `direct hybrid-search hit` or a concrete explanation such as `AlertController.getAlert CALLS_METHOD AlertService.findById`;
 - `seed_entity_id`: the direct hit that introduced the neighbor.
 
-- [ ] **Step 2: Write failing ranking/deduplication tests**
+- [x] **Step 2: Write failing ranking/deduplication tests**
 
 Cover:
 
@@ -358,7 +358,7 @@ Cover:
 - relation filters prevent unrelated `CONTAINS` expansion when requested;
 - expansion respects result and depth limits.
 
-- [ ] **Step 3: Implement `GraphRagRetriever`**
+- [x] **Step 3: Implement `GraphRagRetriever`**
 
 Inject a `HybridSearchService`-compatible search object and `GraphQueryService`. Do not subclass or modify Week 2 hybrid ranking. Use relation types:
 
@@ -368,7 +368,7 @@ Inject a `HybridSearchService`-compatible search object and `GraphQueryService`.
 
 for chain retrieval by default.
 
-- [ ] **Step 4: Run GraphRAG tests**
+- [x] **Step 4: Run GraphRAG tests**
 
 ```cmd
 .venv\python.exe -m pytest tests\unit\test_graph_retriever.py
@@ -388,15 +388,15 @@ for chain retrieval by default.
 - Create: `backend/tests/unit/test_trace_service.py`
 - Create: `backend/tests/integration/test_trace_api.py`
 
-- [ ] **Step 1: Write graph-context tests**
+- [x] **Step 1: Write graph-context tests**
 
 Require deterministic citation numbering, a configurable total character budget, explicit edge evidence, retained file/line references, and omission of unrelated nodes when the budget is reached.
 
-- [ ] **Step 2: Implement `GraphContextBuilder`**
+- [x] **Step 2: Implement `GraphContextBuilder`**
 
 Format compact evidence blocks containing node citation, qualified name, file/lines, relevant code, graph depth/reason, and stored edges. Never synthesize an edge that is absent from `CodeRelation`.
 
-- [ ] **Step 3: Define trace contracts**
+- [x] **Step 3: Define trace contracts**
 
 `TraceRequest` contains `project_id`, nonblank `question`, `limit=5`, and `max_depth=2`. `TraceResponse` contains:
 
@@ -406,7 +406,7 @@ Format compact evidence blocks containing node citation, qualified name, file/li
 - `graph_edges`;
 - `uncertainties`.
 
-- [ ] **Step 4: Write trace-service tests with a fake LLM**
+- [x] **Step 4: Write trace-service tests with a fake LLM**
 
 Assert:
 
@@ -417,15 +417,15 @@ Assert:
 - references and graph data are returned unchanged;
 - fake-LLM failure follows the existing domain-error policy.
 
-- [ ] **Step 5: Implement grounded trace orchestration**
+- [x] **Step 5: Implement grounded trace orchestration**
 
 Reuse `LlmClient`. The prompt must prohibit claiming controller-to-service calls unless a `CALLS_METHOD` edge or explicit code snippet supports the claim. It must ask the model to label missing segments as “cannot be determined from indexed code.”
 
-- [ ] **Step 6: Add `POST /api/agent/trace`**
+- [x] **Step 6: Add `POST /api/agent/trace`**
 
 Wire dependencies with override-friendly factories. Automated endpoint tests inject fake search/graph/LLM components and consume zero paid tokens.
 
-- [ ] **Step 7: Run trace tests**
+- [x] **Step 7: Run trace tests**
 
 ```cmd
 .venv\python.exe -m pytest tests\unit\test_graph_context_builder.py tests\unit\test_trace_service.py tests\integration\test_trace_api.py
