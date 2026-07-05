@@ -1,8 +1,12 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from enum import Enum
+from typing import TYPE_CHECKING
 
-from app.schemas.agent import ContextReferenceRead
-from app.schemas.graph import GraphEdgeRead, GraphNodeRead
+if TYPE_CHECKING:
+    from app.schemas.agent import ContextReferenceRead
+    from app.schemas.graph import GraphEdgeRead, GraphNodeRead
 
 
 class TaskType(str, Enum):

@@ -56,6 +56,16 @@ class ConversationService:
             )
         return conversation
 
+    def validate_target(
+        self,
+        project_id: int,
+        conversation_id: int | None,
+    ) -> None:
+        if conversation_id is None:
+            self._require_project(project_id)
+        else:
+            self.get_for_project(conversation_id, project_id)
+
     def save_exchange(
         self,
         project_id: int,

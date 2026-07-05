@@ -2,6 +2,7 @@ from functools import lru_cache
 
 from qdrant_client import QdrantClient
 
+from app.agent.planner import SimpleAgentPlanner
 from app.core.config import get_settings
 from app.llm.client import OpenAICompatibleLlmClient
 from app.rag.context_builder import RagContextBuilder
@@ -72,3 +73,8 @@ def get_rag_context_builder() -> RagContextBuilder:
 @lru_cache
 def get_graph_context_builder() -> GraphContextBuilder:
     return GraphContextBuilder(get_settings().rag_max_context_chars)
+
+
+@lru_cache
+def get_agent_planner() -> SimpleAgentPlanner:
+    return SimpleAgentPlanner()
