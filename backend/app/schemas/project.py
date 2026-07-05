@@ -15,3 +15,13 @@ class ProjectRead(BaseModel):
     status: str
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ProjectEntityRead(BaseModel):
+    entity_id: int
+    entity_type: str
+    qualified_name: str
+    file_path: str
+    start_line: int
+    end_line: int
+    content: str

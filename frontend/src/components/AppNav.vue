@@ -9,6 +9,7 @@ import { RouterLink } from "vue-router"
       <RouterLink to="/projects">Projects</RouterLink>
       <RouterLink to="/search">Search</RouterLink>
       <RouterLink to="/graph">Graph</RouterLink>
+      <RouterLink to="/chat">Chat</RouterLink>
     </div>
   </nav>
 </template>

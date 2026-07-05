@@ -33,3 +33,13 @@ export interface ProjectStats {
   parse_errors: number
   last_scan_at: string | null
 }
+
+export interface ProjectEntity {
+  entity_id: number
+  entity_type: string
+  qualified_name: string
+  file_path: string
+  start_line: number
+  end_line: number
+  content: string
+}

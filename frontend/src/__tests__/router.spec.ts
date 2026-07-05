@@ -27,6 +27,7 @@ describe("application router", () => {
       "/projects",
       "/search",
       "/graph",
+      "/chat",
     ])
   })
 
@@ -43,5 +44,6 @@ describe("application router", () => {
     expect(wrapper.get('[data-test="app-nav"]').text()).toContain("Projects")
     expect(wrapper.get('[data-test="app-nav"]').text()).toContain("Search")
     expect(wrapper.get('[data-test="app-nav"]').text()).toContain("Graph")
+    expect(wrapper.get('[data-test="app-nav"]').text()).toContain("Chat")
   })
 })

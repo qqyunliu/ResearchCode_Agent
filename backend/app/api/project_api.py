@@ -2,7 +2,11 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_session
-from app.schemas.project import ProjectCreate, ProjectRead
+from app.schemas.project import (
+    ProjectCreate,
+    ProjectEntityRead,
+    ProjectRead,
+)
 from app.schemas.scan import ScanSummary
 from app.schemas.stats import ProjectStats
 from app.services.index_service import IndexService
@@ -38,3 +42,24 @@ def project_stats(
     session: Session = Depends(get_session),
 ) -> ProjectStats:
     return IndexService(session).get_stats(project_id)
+
+
+@router.get(
+    "/{project_id}/entities/{entity_id}",
+    response_model=ProjectEntityRead,
+)
+def read_project_entity(
+    project_id: int,
+    entity_id: int,
+    session: Session = Depends(get_session),
+) -> ProjectEntityRead:
+    entity = ProjectService(session).get_entity(project_id, entity_id)
+    return ProjectEntityRead(
+        entity_id=entity.id,
+        entity_type=entity.entity_type,
+        qualified_name=entity.qualified_name,
+        file_path=entity.file_path,
+        start_line=entity.start_line,
+        end_line=entity.end_line,
+        content=entity.content,
+    )
