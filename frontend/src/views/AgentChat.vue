@@ -11,11 +11,11 @@ import type {
 } from "@/types/agent"
 
 const demoQuestions = [
-  "Where is the alert-list API implemented?",
-  "Where does the alert-trend data flow come from?",
-  "Which backend APIs are used by the device-status page?",
-  "Where is the anomaly-detection entry function?",
-  "Which files need changes to add a risk_score field?",
+  "告警列表 API 在哪里实现？",
+  "告警趋势数据的调用链是什么？",
+  "设备状态页面使用了哪些后端 API？",
+  "异常检测的入口函数在哪里？",
+  "增加 risk_score 字段需要修改哪些文件？",
 ]
 
 const projectId = ref(1)
@@ -86,8 +86,7 @@ async function submit() {
     question.value = ""
   } catch {
     errorMessage.value = (
-      "Unable to get an Agent answer. Confirm the backend, project, "
-      + "vector index, and LLM configuration."
+      "无法获取 Agent 回答，请检查后端服务、项目、向量索引和 LLM 配置。"
     )
   } finally {
     loading.value = false
@@ -106,7 +105,7 @@ async function restore() {
     conversationId.value = conversation.id
     messages.value = conversation.messages
   } catch {
-    errorMessage.value = "Unable to restore that conversation for this project."
+    errorMessage.value = "无法恢复该项目的指定会话。"
   } finally {
     loading.value = false
   }
@@ -124,7 +123,7 @@ async function openReference(reference: AgentReference) {
     )
     referenceContent.value = entity.content
   } catch {
-    referenceError.value = "Unable to load code for this reference."
+    referenceError.value = "无法加载该引用对应的代码。"
   } finally {
     referenceLoading.value = false
   }
@@ -135,30 +134,30 @@ async function openReference(reference: AgentReference) {
   <main class="page">
     <header class="hero">
       <div>
-        <p class="eyebrow">Unified code agent</p>
-        <h1>Ask, trace, and plan with grounded evidence.</h1>
-        <p>One conversation routes code questions, call-chain traces, and change plans.</p>
+        <p class="eyebrow">统一代码 Agent</p>
+        <h1 class="single-line-title">基于代码证据进行问答、追踪与规划</h1>
+        <p>在一个会话中处理代码问答、调用链追踪和修改计划。</p>
       </div>
       <strong v-if="conversationId" class="conversation-chip">
-        Conversation {{ conversationId }}
+        会话 {{ conversationId }}
       </strong>
     </header>
 
     <section class="controls">
       <label>
-        Project ID
+        项目 ID
         <input v-model.number="projectId" data-test="project-id" min="1" type="number" />
       </label>
       <label>
-        Restore conversation
+        恢复会话
         <input v-model.number="restoreId" data-test="restore-id" min="1" type="number" />
       </label>
       <button data-test="restore" type="button" :disabled="!canRestore" @click="restore">
-        Restore
+        恢复
       </button>
     </section>
 
-    <section class="demos" aria-label="Demo questions">
+    <section class="demos" aria-label="示例问题">
       <button
         v-for="demo in demoQuestions"
         :key="demo"
@@ -180,7 +179,7 @@ async function openReference(reference: AgentReference) {
         :class="message.role"
       >
         <div class="message-heading">
-          <strong>{{ message.role === "user" ? "You" : "Agent" }}</strong>
+          <strong>{{ message.role === "user" ? "你" : "Agent" }}</strong>
           <span v-if="message.task_type">{{ message.task_type }}</span>
         </div>
         <p class="answer">{{ message.content }}</p>
@@ -192,7 +191,7 @@ async function openReference(reference: AgentReference) {
           class="empty-evidence"
           data-test="empty-evidence"
         >
-          No indexed references or graph evidence accompanied this answer.
+          此回答未附带已索引引用或图谱证据。
         </p>
 
         <div v-if="message.references.length" class="references">
@@ -212,7 +211,7 @@ async function openReference(reference: AgentReference) {
         </div>
 
         <div v-if="message.uncertainties.length" class="uncertainties">
-          <strong>Uncertainties</strong>
+          <strong>不确定性</strong>
           <ul>
             <li v-for="item in message.uncertainties" :key="item">{{ item }}</li>
           </ul>
@@ -226,7 +225,7 @@ async function openReference(reference: AgentReference) {
         </div>
       </article>
       <p v-if="messages.length === 0" class="welcome">
-        Choose a demo question or ask about an indexed project.
+        选择一个示例问题，或针对已索引项目提问。
       </p>
     </section>
 
@@ -234,10 +233,10 @@ async function openReference(reference: AgentReference) {
       <input
         v-model="question"
         data-test="question"
-        placeholder="Ask where code lives, trace a flow, or plan a change…"
+        placeholder="询问代码位置、追踪调用链或规划修改……"
       />
       <button data-test="send" :disabled="!canSend">
-        {{ loading ? "Working…" : "Send" }}
+        {{ loading ? "正在处理……" : "发送" }}
       </button>
     </form>
 
@@ -257,6 +256,7 @@ async function openReference(reference: AgentReference) {
 .hero { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
 .eyebrow { color: #0f766e; font-size: .76rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
 h1 { max-width: 780px; margin: 8px 0; color: #0f172a; font-size: clamp(2.2rem, 5vw, 4rem); letter-spacing: -.05em; }
+.single-line-title { max-width: none; font-size: clamp(2.2rem, 4vw, 3.4rem); white-space: nowrap; }
 .hero p:last-child, .welcome { color: #64748b; }
 .conversation-chip { padding: 9px 12px; border-radius: 999px; background: #ccfbf1; color: #115e59; white-space: nowrap; }
 .controls { display: grid; grid-template-columns: 150px 190px auto; gap: 12px; margin-top: 28px; padding: 16px; border: 1px solid #dbe4ea; border-radius: 16px; background: white; }
@@ -281,5 +281,5 @@ button:disabled { background: #94a3b8; cursor: not-allowed; }
 .composer { position: sticky; bottom: 16px; display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 14px; border: 1px solid #dbe4ea; border-radius: 16px; background: rgba(255,255,255,.95); box-shadow: 0 16px 50px rgba(15,23,42,.14); }
 .notice { padding: 12px; border-radius: 10px; }
 .error { background: #fff1f2; color: #be123c; }
-@media (max-width: 700px) { .hero, .references button { align-items: flex-start; flex-direction: column; } .controls { grid-template-columns: 1fr; } .message.user { margin-left: 0; } }
+@media (max-width: 700px) { .hero, .references button { align-items: flex-start; flex-direction: column; } .single-line-title { white-space: normal; } .controls { grid-template-columns: 1fr; } .message.user { margin-left: 0; } }
 </style>

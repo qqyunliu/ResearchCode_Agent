@@ -132,6 +132,22 @@ def test_answer_routes_only_current_question_and_persists_result() -> None:
     assert response.references[0].entity_id == 5
 
 
+def test_chinese_question_is_preserved_for_planning_execution_and_storage() -> None:
+    service, planner, executor, conversations = make_service()
+    question = "告警列表 API 在哪里实现？"
+
+    service.answer(
+        project_id=3,
+        question=question,
+        conversation_id=None,
+        limit=5,
+    )
+
+    assert planner.questions == [question]
+    assert executor.calls == [(TaskType.CODE_QA, 3, question, 5)]
+    assert conversations.saved[0][1] == question
+
+
 def test_answer_does_not_persist_when_executor_fails() -> None:
     executor = RecordingExecutor(failure=RuntimeError("LLM unavailable"))
     service, _, _, conversations = make_service(executor=executor)

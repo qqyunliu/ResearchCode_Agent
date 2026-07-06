@@ -1,6 +1,6 @@
 import pytest
 
-from app.retrieval.hybrid_search import fuse_search_hits
+from app.retrieval.hybrid_search import HybridSearchService, fuse_search_hits
 from app.retrieval.types import SearchHit
 
 
@@ -78,3 +78,42 @@ def test_empty_or_non_positive_inputs_are_supported(
         assert len(results) == 1
         assert results[0].score == 0.0
         assert results[0].source == "hybrid"
+
+
+def test_rewritten_query_is_used_by_both_retrieval_branches() -> None:
+    calls = {}
+
+    class Embeddings:
+        def embed_query(self, text):
+            calls["embedding"] = text
+            return [1.0]
+
+    class Store:
+        def has_collection(self, project_id):
+            return True
+
+        def search(self, project_id, query_vector, limit):
+            return []
+
+    class Keywords:
+        def search(self, project_id, query, limit):
+            calls["keyword"] = query
+            return []
+
+    class Rewriter:
+        def rewrite(self, query):
+            calls["original"] = query
+            return "alert list API controller"
+
+    HybridSearchService(
+        embeddings=Embeddings(),
+        vector_store=Store(),
+        keyword_search=Keywords(),
+        rewriter=Rewriter(),
+    ).search(1, "告警列表接口在哪里", 5)
+
+    assert calls == {
+        "original": "告警列表接口在哪里",
+        "embedding": "alert list API controller",
+        "keyword": "alert list API controller",
+    }

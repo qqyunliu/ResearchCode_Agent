@@ -190,6 +190,7 @@ def test_change_plan_uses_search_graph_and_one_llm_call() -> None:
     assert graph.expand_calls == [(1, (5,), 2)]
     assert len(llm.calls) == 1
     system_prompt, user_prompt = llm.calls[0]
+    assert "same language as the user's original question" in system_prompt
     assert system_prompt == CHANGE_PLAN_SYSTEM_PROMPT
     assert "Question:\nAdd risk_score" in user_prompt
     assert "AlertController.java" in user_prompt

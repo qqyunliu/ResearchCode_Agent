@@ -3,6 +3,7 @@ from pathlib import Path
 
 from app.core.dependencies import (
     get_embedding_service,
+    get_query_rewriter,
     get_vector_store,
 )
 from app.main import app
@@ -183,3 +184,27 @@ def test_hybrid_search_requires_vector_index(client, tmp_path) -> None:
     assert response.status_code == 409
     assert response.json()["detail"]["code"] == "VECTOR_INDEX_NOT_FOUND"
     assert embeddings.queries == []
+
+
+def test_hybrid_endpoint_rewrites_chinese_for_retrieval(
+    client, tmp_path
+) -> None:
+    project_id = create_scanned_project(client, tmp_path)
+    embeddings = FakeEmbeddings()
+    vector_store = FakeVectorStore([])
+
+    class Rewriter:
+        def rewrite(self, query):
+            assert query == "告警列表接口在哪里"
+            return "getAlert AlertController"
+
+    app.dependency_overrides[get_embedding_service] = lambda: embeddings
+    app.dependency_overrides[get_vector_store] = lambda: vector_store
+    app.dependency_overrides[get_query_rewriter] = lambda: Rewriter()
+    response = client.post("/api/search/hybrid", json={
+        "project_id": project_id,
+        "query": "告警列表接口在哪里",
+        "limit": 5,
+    })
+    assert response.status_code == 200
+    assert embeddings.queries == ["getAlert AlertController"]

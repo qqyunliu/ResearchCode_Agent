@@ -6,12 +6,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     database_url: str = "sqlite+pysqlite:///./research_code_agent.db"
     max_source_bytes: int = 2 * 1024 * 1024
-    embedding_provider: str = "local"
-    embedding_model: str = (
-        "sentence-transformers/all-MiniLM-L6-v2"
-    )
+    embedding_provider: str = "api"
+    embedding_model: str = "embedding-3"
     embedding_api_key: str | None = None
-    embedding_base_url: str | None = None
+    embedding_base_url: str | None = "https://open.bigmodel.cn/api/paas/v4"
+    embedding_dimensions: int | None = 1024
     qdrant_url: str | None = None
     qdrant_api_key: str | None = None
     qdrant_path: str = "./qdrant_storage"

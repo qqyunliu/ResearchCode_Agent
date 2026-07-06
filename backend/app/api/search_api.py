@@ -6,12 +6,14 @@ from app.core.dependencies import (
     get_chunk_builder,
     get_embedding_service,
     get_vector_store,
+    get_query_rewriter,
 )
 from app.retrieval.chunk_builder import CodeChunkBuilder
 from app.retrieval.embedding_service import EmbeddingService
 from app.retrieval.hybrid_search import HybridSearchService
 from app.retrieval.keyword_search import KeywordSearchService
 from app.retrieval.vector_store import QdrantVectorStore
+from app.retrieval.query_rewriter import LlmQueryRewriter
 from app.schemas.retrieval import (
     SearchHitRead,
     SearchRequest,
@@ -65,11 +67,13 @@ def hybrid_search(
     session: Session = Depends(get_session),
     embeddings: EmbeddingService = Depends(get_embedding_service),
     vector_store: QdrantVectorStore = Depends(get_vector_store),
+    rewriter: LlmQueryRewriter = Depends(get_query_rewriter),
 ) -> list[SearchHitRead]:
     return HybridSearchService(
         embeddings=embeddings,
         vector_store=vector_store,
         keyword_search=KeywordSearchService(session),
+        rewriter=rewriter,
     ).search(
         data.project_id,
         data.query,

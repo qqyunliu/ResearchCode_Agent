@@ -2,6 +2,7 @@ import { flushPromises, mount } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import SearchView from "../SearchView.vue"
+import searchViewSource from "../SearchView.vue?raw"
 
 const hybridSearch = vi.hoisted(() => vi.fn())
 vi.mock("@/api/search", () => ({ hybridSearch }))
@@ -9,6 +10,20 @@ vi.mock("@/api/search", () => ({ hybridSearch }))
 describe("SearchView", () => {
   beforeEach(() => {
     hybridSearch.mockReset()
+  })
+
+  it("renders Chinese search copy", () => {
+    const wrapper = mount(SearchView)
+
+    expect(wrapper.text()).toContain("按语义和关键词查找代码")
+    expect(wrapper.text()).toContain("项目 ID")
+    expect(wrapper.get('[data-test="search"]').text()).toContain("搜索代码")
+  })
+
+  it("keeps form inputs inside their grid columns", () => {
+    expect(searchViewSource).toMatch(
+      /input\s*\{[^}]*box-sizing:\s*border-box;[^}]*min-width:\s*0;[^}]*width:\s*100%;[^}]*\}/s,
+    )
   })
 
   it("requires a positive project ID and nonblank query", async () => {
@@ -70,7 +85,7 @@ describe("SearchView", () => {
     await wrapper.get("form").trigger("submit")
     await flushPromises()
     expect(wrapper.get('[data-test="error"]').text()).toContain(
-      "Unable to search",
+      "无法搜索",
     )
   })
 })

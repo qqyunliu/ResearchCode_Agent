@@ -25,6 +25,7 @@ from app.schemas.agent import (
 from app.schemas.graph import GraphResponse
 
 CHANGE_PLAN_SYSTEM_PROMPT = """Use only supplied indexed-code evidence.
+Write all JSON text values in the same language as the user's original question.
 Return one JSON object with summary, affected_files, risks, and uncertainties.
 Each affected_files item must contain entity_id, file_path, reason, and suggested_changes.
 Never name a file or entity absent from the evidence.

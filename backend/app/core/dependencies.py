@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from fastapi import Depends
 from qdrant_client import QdrantClient
 
 from app.agent.planner import SimpleAgentPlanner
@@ -14,6 +15,7 @@ from app.retrieval.embedding_service import (
     OpenAICompatibleEmbeddingProvider,
 )
 from app.retrieval.vector_store import QdrantVectorStore
+from app.retrieval.query_rewriter import LlmQueryRewriter
 
 
 @lru_cache
@@ -34,6 +36,7 @@ def get_embedding_service() -> EmbeddingService:
             settings.embedding_model,
             settings.embedding_api_key,
             base_url=settings.embedding_base_url,
+            dimensions=settings.embedding_dimensions,
         )
     else:
         raise ValueError(
@@ -78,3 +81,9 @@ def get_graph_context_builder() -> GraphContextBuilder:
 @lru_cache
 def get_agent_planner() -> SimpleAgentPlanner:
     return SimpleAgentPlanner()
+
+
+def get_query_rewriter(
+    llm: OpenAICompatibleLlmClient = Depends(get_llm_client),
+) -> LlmQueryRewriter:
+    return LlmQueryRewriter(llm)

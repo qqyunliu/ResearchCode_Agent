@@ -28,6 +28,9 @@ describe("ReferenceDialog", () => {
     expect(wrapper.text()).toContain("backend/src/AlertController.java")
     expect(wrapper.text()).toContain("10–13")
     expect(wrapper.text()).toContain("return alertService.find()")
+    expect(wrapper.text()).toContain("行号")
+    expect(wrapper.get('[data-test="close-reference"]').attributes("aria-label"))
+      .toBe("关闭引用详情")
   })
 
   it("emits close and exposes loading and error states", async () => {
@@ -41,9 +44,9 @@ describe("ReferenceDialog", () => {
     })
     expect(wrapper.find('[data-test="reference-loading"]').exists()).toBe(true)
 
-    await wrapper.setProps({ loading: false, error: "Unable to load code." })
+    await wrapper.setProps({ loading: false, error: "无法加载引用代码。" })
     expect(wrapper.get('[data-test="reference-error"]').text()).toContain(
-      "Unable to load code",
+      "无法加载引用代码",
     )
     await wrapper.get('[data-test="close-reference"]').trigger("click")
     expect(wrapper.emitted("close")).toHaveLength(1)

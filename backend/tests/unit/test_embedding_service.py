@@ -57,6 +57,24 @@ class FakeEmbeddingsResource:
         )
 
 
+class BatchAwareEmbeddingsResource:
+    def __init__(self) -> None:
+        self.calls: list[dict[str, object]] = []
+
+    def create(self, **kwargs):
+        self.calls.append(kwargs)
+        texts = kwargs["input"]
+        return SimpleNamespace(
+            data=[
+                SimpleNamespace(
+                    index=index,
+                    embedding=[float(text[1:])],
+                )
+                for index, text in reversed(list(enumerate(texts)))
+            ]
+        )
+
+
 def test_embedding_service_preserves_batch_order() -> None:
     provider = FakeProvider()
     service = EmbeddingService(provider)
@@ -131,6 +149,37 @@ def test_openai_provider_restores_response_order() -> None:
     ]
 
 
+def test_openai_provider_sends_configured_dimensions() -> None:
+    embeddings = FakeEmbeddingsResource()
+    provider = OpenAICompatibleEmbeddingProvider(
+        "embedding-3", "key", dimensions=1024,
+        client=SimpleNamespace(embeddings=embeddings),
+    )
+    provider.embed_query("告警接口")
+    assert embeddings.calls == [{
+        "model": "embedding-3",
+        "input": ["告警接口"],
+        "dimensions": 1024,
+    }]
+
+
+def test_openai_provider_batches_documents_at_64_and_preserves_order() -> None:
+    embeddings = BatchAwareEmbeddingsResource()
+    provider = OpenAICompatibleEmbeddingProvider(
+        "embedding-3",
+        "key",
+        dimensions=1024,
+        client=SimpleNamespace(embeddings=embeddings),
+    )
+    texts = [f"t{index}" for index in range(130)]
+
+    vectors = provider.embed_documents(texts)
+
+    assert [len(call["input"]) for call in embeddings.calls] == [64, 64, 2]
+    assert [vector[0] for vector in vectors] == list(map(float, range(130)))
+    assert all(call["dimensions"] == 1024 for call in embeddings.calls)
+
+
 def test_openai_provider_requires_api_key() -> None:
     with pytest.raises(
         ValueError,
@@ -140,3 +189,24 @@ def test_openai_provider_requires_api_key() -> None:
             model_name="embedding-model",
             api_key=None,
         )
+
+
+def test_openai_provider_maps_external_failure_to_domain_error() -> None:
+    from app.errors import DomainError
+
+    class FailingEmbeddings:
+        def create(self, **kwargs):
+            raise RuntimeError("secret provider detail")
+
+    provider = OpenAICompatibleEmbeddingProvider(
+        "embedding-3",
+        "test-key",
+        dimensions=1024,
+        client=SimpleNamespace(embeddings=FailingEmbeddings()),
+    )
+
+    with pytest.raises(DomainError) as error:
+        provider.embed_query("告警接口")
+    assert error.value.code == "EMBEDDING_REQUEST_FAILED"
+    assert error.value.status_code == 502
+    assert "secret provider detail" not in error.value.message

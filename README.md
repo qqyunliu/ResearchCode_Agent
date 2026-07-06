@@ -1,211 +1,629 @@
 # ResearchCode-Agent
 
-ResearchCode-Agent is a four-week MVP for indexing a mixed Java, Vue, and
-Python repository and answering grounded questions about its code. It combines
-static parsing, SQLite relationships, hybrid retrieval, a lightweight graph,
-and an OpenAI-compatible LLM behind one Agent API and a four-route Vue demo.
+ResearchCode-Agent is a full-stack MVP for understanding mixed Java, Vue, and
+Python repositories. It scans source code, extracts code entities and static
+relationships, builds project-scoped search indexes, expands evidence through a
+lightweight code graph, and answers code questions through one Agent API.
 
-## What the MVP does
+The project is designed around a simple rule: generated answers and change
+plans must remain tied to indexed source evidence. Responses therefore include
+file paths, line ranges, graph relationships, and explicit uncertainty where
+the static index cannot prove a claim.
+
+## Key capabilities
+
+- Register a local source repository and scan supported text files.
+- Parse Java, Vue, and Python with Tree-sitter and Python's built-in AST.
+- Extract classes, methods, functions, backend APIs, and frontend API calls.
+- Persist code entities and directed relationships in SQLite.
+- Build one Qdrant vector collection per registered project.
+- Run keyword search or weighted keyword/vector hybrid search.
+- Expand retrieved entities through a one- or two-hop code graph.
+- Trace frontend request calls through backend APIs, controllers, and services.
+- Route questions to code QA, call-chain tracing, or grounded change planning.
+- Return citations, graph evidence, affected files, risks, and uncertainties.
+- Save and reload Agent conversations without using history as hidden reasoning
+  context.
+- Explore projects, search results, graph relationships, and conversations
+  through a four-route Vue application.
+
+## End-to-end architecture
 
 ```text
-source project
-  -> scan Java / Vue / Python
-  -> store files, entities, APIs, and relations in SQLite
-  -> build vector chunks in Qdrant
-  -> keyword + vector hybrid retrieval
-  -> one/two-hop graph expansion
-  -> deterministic Agent planning
-  -> code QA, call-chain trace, or grounded change plan
-  -> cited answer, graph evidence, uncertainties, and saved conversation
+local source repository
+        |
+        v
+safe file discovery and UTF-8 reading
+        |
+        v
+Java / Vue / Python parsers
+        |
+        +--> SQLite code files, entities, scan issues, and relations
+        |
+        +--> entity-based code chunks
+                  |
+                  v
+          embedding provider
+                  |
+                  v
+       project-scoped Qdrant collection
+                  |
+                  v
+     keyword + vector hybrid retrieval
+                  |
+                  v
+       one/two-hop graph expansion
+                  |
+                  v
+       deterministic Agent planner
+          /           |            \
+      CODE_QA    TRACE_CHAIN    CHANGE_PLAN
+          \           |            /
+                  LLM
+                   |
+                   v
+cited answer + graph evidence + uncertainty + saved conversation
 ```
 
-The Agent planner is deterministic. It routes questions to:
+SQLite is the source of truth for the static code graph:
 
-- `CODE_QA` for implementation and location questions;
-- `TRACE_CHAIN` for frontend-to-backend and call-flow questions;
-- `CHANGE_PLAN` for requests asking what code must change.
+```text
+code_entities  = graph nodes
+code_relations = directed graph edges
+```
 
-Saved conversations are for display and reload only. Earlier messages are not
-inserted into later LLM prompts.
+No separate graph database is required. Qdrant is used only for semantic
+retrieval.
 
-## Four-week architecture
+## Technology stack
 
-| Week | Delivered capability |
+| Area | Technologies |
 | --- | --- |
-| 1 | Project registration, scanning, Java/Vue/Python entities, APIs, and relations |
-| 2 | Code chunks, embeddings, Qdrant, keyword/vector/hybrid search, grounded code QA |
-| 3 | Graph traversal, GraphRAG retrieval, frontend/API/controller/service tracing |
-| 4 | Unified Agent, grounded change plans, conversations, and four-page Vue demo |
+| Backend API | Python 3.11, FastAPI, Pydantic v2 |
+| Persistence | SQLAlchemy, SQLite |
+| Parsing | Python `ast`, Tree-sitter, `tree-sitter-language-pack` |
+| Retrieval | keyword search, sentence-transformers or an OpenAI-compatible embedding API |
+| Vector storage | Qdrant local storage or remote Qdrant |
+| LLM | OpenAI-compatible chat API |
+| Frontend | Vue 3, TypeScript, Vue Router, Axios, Vite |
+| Graph UI | Cytoscape |
+| Verification | pytest, pytest-cov, Vitest, Vue Test Utils |
+
+## Source scanning and parsing
+
+The scanner recognizes these extensions:
+
+| Extensions | Recorded language |
+| --- | --- |
+| `.java` | Java |
+| `.py` | Python |
+| `.vue` | Vue |
+| `.js`, `.jsx` | JavaScript |
+| `.ts`, `.tsx` | TypeScript |
+| `.sql` | SQL |
+| `.xml` | XML |
+| `.yml`, `.yaml` | YAML |
+| `.json` | JSON |
+
+Only Java, Vue, and Python currently have entity parsers. Other recognized
+files contribute to scan statistics but do not produce searchable entities.
+The system does not currently index arbitrary Markdown or project
+documentation.
+
+The scanner:
+
+- skips common generated, dependency, IDE, virtual-environment, and Git
+  directories;
+- does not follow directory or file symbolic links;
+- rejects files larger than `RCA_MAX_SOURCE_BYTES`;
+- detects likely binary files from NUL bytes;
+- accepts UTF-8 and UTF-8 with BOM;
+- records skipped files and parser failures as structured scan issues;
+- computes a SHA-256 hash and line count for every accepted file;
+- replaces a project's previous static index atomically on a successful scan;
+- prevents two scans of the same project from running concurrently.
+
+### Parsed entity types
+
+| Entity type | Source | Meaning |
+| --- | --- | --- |
+| `java_class` | Java | Parsed class declaration |
+| `java_method` | Java | Parsed method with source range and invocation metadata |
+| `backend_api` | Java | Spring-style HTTP endpoint associated with a method |
+| `frontend_api_call` | Vue | Static HTTP request found in a Vue script block |
+| `python_class` | Python | Python class parsed with the built-in AST |
+| `python_function` | Python | Module-level function or class method |
+
+Each entity stores its project, file path, qualified name, entity type, source
+line range, indexed source content, and parser-specific metadata.
+
+### Static relation model
+
+| Relation | Meaning | Typical confidence |
+| --- | --- | --- |
+| `CONTAINS` | A class contains a method or function | `1.0` |
+| `DEFINES_API` | A Java method defines a backend HTTP endpoint | `1.0` |
+| `REQUESTS_API` | A frontend request matches a backend method and normalized path | `1.0`; `0.8` for an `ANY`-method fallback |
+| `CALLS_METHOD` | A Java method invokes a resolved service method | `0.8` for receiver-type resolution; `0.6` for a unique-name fallback |
+
+Ambiguous method-name fallbacks do not create an edge. This intentionally
+favours missing evidence over a guessed relationship.
+
+## Retrieval and GraphRAG
+
+### Code chunks and vector isolation
+
+Every parsed entity becomes one code chunk containing:
+
+- entity type and name;
+- qualified name;
+- file path and line range;
+- parser metadata;
+- at most `RCA_CHUNK_MAX_CONTENT_CHARS` characters of source.
+
+Each project uses a separate Qdrant collection:
+
+```text
+project_{project_id}_code_chunks
+```
+
+This keeps vector results isolated between registered repositories. The same
+embedding model and vector dimension must be used for indexing and querying.
+External document embeddings are sent sequentially in batches of at most 64
+texts to satisfy the Zhipu `embedding-3` request limit; vectors are merged back
+in entity order before the Qdrant collection is rebuilt.
+
+### Search modes
+
+Keyword search queries the SQLite entity index and does not need Qdrant or an
+embedding model.
+
+Hybrid search requires a built vector index. It retrieves twice the requested
+limit from both sources, normalizes positive scores independently, deduplicates
+entities, and computes:
+
+```text
+hybrid_score = 0.7 * normalized_vector_score
+             + 0.3 * normalized_keyword_score
+```
+
+GraphRAG uses the hybrid results as seed entities and expands their incoming
+and outgoing SQLite relationships to a maximum depth of two. Traversal remains
+within one project and deduplicates cycles.
+
+## Agent behavior
+
+### Deterministic planning
+
+`SimpleAgentPlanner` classifies each normalized question by keywords:
+
+| Task | Purpose |
+| --- | --- |
+| `CODE_QA` | Locate or explain indexed implementation details |
+| `TRACE_CHAIN` | Explain data flow or frontend-to-backend call chains |
+| `CHANGE_PLAN` | Identify evidence-backed files and risks for a requested change |
+
+Change-planning keywords take precedence over trace keywords, which take
+precedence over code-QA keywords. Questions that match no keyword default to
+`CODE_QA`.
+
+This is deterministic task routing, not autonomous LLM planning. The current
+Agent does not ask an LLM to decompose a question into multiple tasks or select
+tools. A `ToolRegistry` exposes named internal callables such as hybrid search
+and graph traversal, but it is not currently an LLM function-calling loop.
+
+### Task execution
+
+- `CODE_QA` performs hybrid retrieval, builds a bounded cited context, and asks
+  the configured LLM to answer only from that evidence.
+- `TRACE_CHAIN` combines hybrid retrieval, graph expansion, a bounded graph
+  context, and an LLM explanation. Its response also returns deterministic
+  nodes, edges, and missing-chain uncertainties.
+- `CHANGE_PLAN` retrieves and expands evidence, asks the LLM for structured
+  JSON, validates it with Pydantic, and removes affected files that cannot be
+  matched to an indexed reference. It produces a plan, not a code patch.
+
+All three real task types can consume provider tokens. Automated tests inject
+deterministic fake LLM and embedding implementations.
+
+### Conversations
+
+`POST /api/agent/chat` stores a user message and its successful assistant
+response in one transaction. A failed task does not save a partial exchange.
+Conversation IDs are checked against their project to prevent cross-project
+access.
+
+Saved messages are for display and reload. Earlier messages are deliberately
+not inserted into later LLM prompts, so the current MVP does not provide
+context-aware conversational reasoning.
+
+## Repository structure
+
+```text
+ResearchCode_Agent/
+|-- backend/
+|   |-- app/
+|   |   |-- agent/       # task types, deterministic planner, executor, tools
+|   |   |-- api/         # FastAPI route definitions
+|   |   |-- core/        # settings, database, dependency factories
+|   |   |-- graph/       # project-scoped graph queries and traversal types
+|   |   |-- llm/         # OpenAI-compatible chat client
+|   |   |-- models/      # SQLAlchemy persistence models
+|   |   |-- parsers/     # Java, Vue, Python parsers and relation builder
+|   |   |-- rag/         # cited text/graph context and GraphRAG retrieval
+|   |   |-- retrieval/   # chunks, embeddings, search, Qdrant adapter
+|   |   |-- schemas/     # Pydantic request and response contracts
+|   |   `-- services/    # application workflows
+|   |-- scripts/         # offline indexing and inspection utilities
+|   `-- tests/           # unit, integration, and acceptance tests
+|-- frontend/
+|   `-- src/
+|       |-- api/         # typed Axios clients
+|       |-- components/  # navigation, graph, and reference UI
+|       |-- types/       # frontend API contracts
+|       `-- views/       # project, search, graph, and Agent pages
+`-- docs/superpowers/    # implementation designs and plans
+```
 
 ## Prerequisites
 
-- Windows CMD or PowerShell;
-- Python 3.11 environment available as `backend\.venv\python.exe`;
-- Node.js 22 and npm;
-- an OpenAI-compatible chat API for real Agent calls;
-- either a local sentence-transformer or compatible embedding API;
-- Qdrant local storage or remote Qdrant.
+- Windows PowerShell or Command Prompt
+- Python 3.11
+- Node.js 22 and npm
+- an OpenAI-compatible chat endpoint for real Agent requests
+- a Zhipu AI API key for the default `embedding-3` model
+- local or remote Qdrant
 
-Automated tests use deterministic substitutes and do not require paid APIs.
+Automated tests do not require credentials, paid APIs, Docker, or network
+access.
 
 ## Configuration
 
-From `backend`, copy `.env.example` to `.env` and fill credentials locally.
-Never commit `.env`.
+From `backend`, copy `.env.example` to `.env`. Never commit `.env`.
 
-```dotenv
-RCA_DATABASE_URL=sqlite+pysqlite:///./research_code_agent.db
-
-RCA_EMBEDDING_PROVIDER=local
-RCA_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
-RCA_EMBEDDING_API_KEY=
-RCA_EMBEDDING_BASE_URL=
-
-RCA_QDRANT_URL=
-RCA_QDRANT_API_KEY=
-RCA_QDRANT_PATH=./qdrant_storage
-
-RCA_LLM_API_KEY=
-RCA_LLM_BASE_URL=https://api.xiaomimimo.com/v1
-RCA_LLM_MODEL=mimo-v2.5
+```powershell
+Set-Location F:\LIUQINGYUN\ResearchCode_Agent\backend
+Copy-Item .env.example .env
 ```
 
-Real `/api/agent/*` calls consume provider tokens. Do not expose API keys in
-commands, screenshots, logs, or commits.
+Settings use the `RCA_` prefix:
 
-## Start the application
+| Variable | Default/example | Purpose |
+| --- | --- | --- |
+| `RCA_DATABASE_URL` | `sqlite+pysqlite:///./research_code_agent.db` | SQLAlchemy database URL |
+| `RCA_MAX_SOURCE_BYTES` | `2097152` | Maximum accepted source-file size |
+| `RCA_EMBEDDING_PROVIDER` | `api` | Default external embedding mode |
+| `RCA_EMBEDDING_MODEL` | `embedding-3` | Zhipu multilingual embedding model |
+| `RCA_EMBEDDING_API_KEY` | empty | Required for API embeddings |
+| `RCA_EMBEDDING_BASE_URL` | `https://open.bigmodel.cn/api/paas/v4` | Zhipu API base URL |
+| `RCA_EMBEDDING_DIMENSIONS` | `1024` | Vector dimension sent to the provider |
+| `RCA_QDRANT_URL` | empty | Remote URL; empty selects local storage |
+| `RCA_QDRANT_API_KEY` | empty | Remote Qdrant credential |
+| `RCA_QDRANT_PATH` | `./qdrant_storage` | Local Qdrant directory |
+| `RCA_SEARCH_DEFAULT_LIMIT` | `10` | Configured default search limit |
+| `RCA_SEARCH_MAX_LIMIT` | `50` | Configured maximum search limit |
+| `RCA_CHUNK_MAX_CONTENT_CHARS` | `4000` | Maximum source characters per chunk |
+| `RCA_LLM_API_KEY` | empty | Required for real Agent calls |
+| `RCA_LLM_BASE_URL` | provider URL | OpenAI-compatible chat base URL |
+| `RCA_LLM_MODEL` | provider model | Chat model name |
+| `RCA_RAG_MAX_CONTEXT_CHARS` | `12000` | Maximum generated evidence context |
 
-Backend, from CMD:
+Chinese queries are rewritten once by the configured chat LLM into concise
+English code-search keywords. The rewrite is used only for keyword/vector
+retrieval; routing, final prompts, and saved conversations retain the original
+question. English queries bypass rewriting. Rewrite failures fall back to the
+original query, and answers are instructed to use the original question's
+language. This adds one chat-model call for Chinese hybrid/Agent queries.
 
-```cmd
-cd /d F:\LIUQINGYUN\ResearchCode_Agent\.worktrees\week4-unified-agent-demo\backend
-.venv\python.exe -m uvicorn app.main:app --reload
+There is no local embedding fallback. If Zhipu is unavailable, keyword-only
+search remains available. Changing model or dimension requires rebuilding all
+vector indexes.
+
+Keep credentials only in `backend/.env` or process environment variables. Do
+not expose keys in commands, logs, screenshots, commits, or issue reports.
+
+## Installation and startup
+
+### Backend
+
+Create a conventional virtual environment:
+
+```powershell
+Set-Location F:\LIUQINGYUN\ResearchCode_Agent\backend
+py -3.11 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+Copy-Item .env.example .env
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
 ```
 
-Frontend, in another CMD:
+This repository may also be used with an existing Conda-prefix-style
+environment whose interpreter is `backend\.venv\python.exe`:
 
-```cmd
-cd /d F:\LIUQINGYUN\ResearchCode_Agent\.worktrees\week4-unified-agent-demo\frontend
+```powershell
+Set-Location F:\LIUQINGYUN\ResearchCode_Agent\backend
+.\.venv\python.exe -m uvicorn app.main:app --reload
+```
+
+The API runs at `http://127.0.0.1:8000`. FastAPI documentation is available at
+`http://127.0.0.1:8000/docs`, and `GET /health` returns `{"status":"ok"}`.
+Database tables are created during application startup.
+
+### Frontend
+
+In another terminal:
+
+```powershell
+Set-Location F:\LIUQINGYUN\ResearchCode_Agent\frontend
 npm.cmd install
 npm.cmd run dev
 ```
 
-Open `http://127.0.0.1:5173`.
+Open `http://127.0.0.1:5173`. Vite proxies `/api` requests to
+`http://127.0.0.1:8000`.
 
 ## Prepare a project
 
-The Projects page supports the full workflow:
+The indexed target must be an existing local directory accessible to the
+backend process.
 
-1. enter a project name and absolute source path;
-2. register the project;
-3. scan it;
-4. build its vector index;
-5. note the returned project ID and indexed chunk count.
+```powershell
+curl.exe -X POST http://127.0.0.1:8000/api/projects `
+  -H "Content-Type: application/json" `
+  -d '{"name":"Demo","root_path":"F:/absolute/path/to/project"}'
 
-Equivalent CMD calls:
-
-```cmd
-curl.exe -X POST http://127.0.0.1:8000/api/projects -H "Content-Type: application/json" -d "{\"name\":\"Demo\",\"root_path\":\"F:\\absolute\\path\\to\\project\"}"
 curl.exe -X POST http://127.0.0.1:8000/api/projects/1/scan
 curl.exe -X POST http://127.0.0.1:8000/api/projects/1/build-vector-index
 curl.exe http://127.0.0.1:8000/api/projects/1/stats
 ```
 
-In PowerShell, use `curl.exe`; plain `curl` may resolve to a PowerShell alias
-with different argument behavior.
+The required order is:
+
+1. register the project;
+2. scan files and build the SQLite entity/relationship index;
+3. build the Qdrant vector index;
+4. use hybrid search, GraphRAG, or Agent endpoints.
+
+Running a new static scan replaces the SQLite index. Rebuild the vector index
+after source changes so semantic retrieval matches the latest entities.
+
+In PowerShell, use `curl.exe`; `curl` may resolve to a PowerShell alias.
 
 ## Frontend routes
 
 | Route | Purpose |
 | --- | --- |
 | `/projects` | Register, scan, index, and inspect project statistics |
-| `/search` | Run hybrid code search and inspect ranked entities |
+| `/search` | Run hybrid search and inspect ranked code entities |
 | `/graph` | Search and visualize code relationships |
-| `/chat` | Ask unified Agent questions and restore saved conversations |
+| `/chat` | Ask Agent questions and reload saved conversations |
 
-## Core APIs
+`/` redirects to `/projects`.
+
+## API reference
+
+### Projects and indexing
 
 ```http
 POST /api/projects
 POST /api/projects/{project_id}/scan
 GET  /api/projects/{project_id}/stats
-POST /api/projects/{project_id}/build-vector-index
 GET  /api/projects/{project_id}/entities/{entity_id}
+POST /api/projects/{project_id}/build-vector-index
+```
 
+Project creation body:
+
+```json
+{
+  "name": "Demo",
+  "root_path": "F:/absolute/path/to/project"
+}
+```
+
+The entity endpoint returns indexed source for one entity, including its
+qualified name, file path, and line range.
+
+### Search
+
+```http
 POST /api/search/keyword
 POST /api/search/hybrid
+```
 
-GET  /api/graph/api-chain
+Both accept:
+
+```json
+{
+  "project_id": 1,
+  "query": "where is alert lookup implemented",
+  "limit": 5
+}
+```
+
+Hybrid search returns HTTP `409` with `VECTOR_INDEX_NOT_FOUND` if the project
+has no vector collection.
+
+### Graph
+
+Query a known HTTP API without embeddings:
+
+```http
+GET /api/graph/api-chain?project_id=1&method=GET&api_path=/api/alerts/123
+```
+
+Search for seed entities and expand their graph:
+
+```http
 POST /api/graph/search-chain
+```
 
+```json
+{
+  "project_id": 1,
+  "query": "alert API",
+  "limit": 5,
+  "max_depth": 2
+}
+```
+
+Graph responses contain structured `nodes`, `edges`, and numbered source
+`references`.
+
+### Agent
+
+```http
 POST /api/agent/code-qa
 POST /api/agent/trace
 POST /api/agent/chat
 GET  /api/agent/conversations/{conversation_id}?project_id={project_id}
 ```
 
-Unified chat example:
+Direct code QA:
 
-```cmd
-curl.exe -X POST http://127.0.0.1:8000/api/agent/chat -H "Content-Type: application/json" -d "{\"project_id\":1,\"question\":\"Where is the alert API implemented?\",\"limit\":5}"
+```json
+{
+  "project_id": 1,
+  "question": "Where is the alert API implemented?",
+  "limit": 5
+}
 ```
 
-Continue a conversation by sending the returned ID:
+Direct trace requests also accept `max_depth`, from `1` to `2`.
 
-```cmd
-curl.exe -X POST http://127.0.0.1:8000/api/agent/chat -H "Content-Type: application/json" -d "{\"project_id\":1,\"question\":\"Trace the alert request chain.\",\"conversation_id\":1,\"limit\":5}"
+Unified chat chooses the task type:
+
+```powershell
+curl.exe -X POST http://127.0.0.1:8000/api/agent/chat `
+  -H "Content-Type: application/json" `
+  -d '{"project_id":1,"question":"Trace the alert request chain.","limit":5}'
 ```
 
-## Stable demo questions
+Continue saving messages to the same conversation by including the returned
+ID:
 
-1. `Where is the alert-list API implemented?`
-2. `Where does the alert-trend data flow come from?`
-3. `Which backend APIs are used by the device-status page?`
-4. `Where is the anomaly-detection entry function?`
-5. `Which files need changes to add a risk_score field?`
+```json
+{
+  "project_id": 1,
+  "question": "Which files need changes to add a risk_score field?",
+  "conversation_id": 1,
+  "limit": 5
+}
+```
 
-Answers are limited by indexed evidence. A correct result may explicitly say
-that a requested feature is absent from the repository.
+The conversation is continuous for storage and display, but the earlier
+messages are not supplied to the later LLM request.
 
-## Verification
+## Offline scripts
 
-Backend:
+Run scripts from `backend` with the environment's Python interpreter:
 
-```cmd
-cd /d F:\LIUQINGYUN\ResearchCode_Agent\.worktrees\week4-unified-agent-demo\backend
-.venv\python.exe -m pytest
-.venv\python.exe -m pytest --cov=app --cov-report=term-missing
-.venv\python.exe -m compileall -q app scripts tests
-.venv\python.exe -m pytest tests\integration\test_week4_acceptance.py -v
+```powershell
+.\.venv\python.exe -m scripts.scan_project F:\absolute\path\to\project
+.\.venv\python.exe -m scripts.index_project F:\absolute\path\to\project --name Demo
+.\.venv\python.exe -m scripts.search_vectors 1 "alert API"
+.\.venv\python.exe -m scripts.trace_api_chain 1 GET /api/alerts/123
+.\.venv\python.exe -m scripts.show_conversation 1
+```
+
+`scan_project` only reports file statistics and issues. `index_project`
+registers the path when necessary and rebuilds its SQLite static index; it does
+not build the Qdrant vector collection. Additional scripts can inspect parsed
+entities, chunks, RAG context, API relations, and request classification.
+Read-only SQLite inspection scripts do not invoke an LLM. Vector and RAG
+scripts may initialize the configured embedding provider.
+
+## Testing and verification
+
+Backend tests use temporary SQLite databases, deterministic fake embeddings,
+in-memory Qdrant, and fake LLM responses where appropriate.
+
+Using the repository's existing Conda-prefix-style environment:
+
+```powershell
+Set-Location F:\LIUQINGYUN\ResearchCode_Agent\backend
+.\.venv\python.exe -m pytest
+.\.venv\python.exe -m pytest --cov=app --cov-report=term-missing
+.\.venv\python.exe -m compileall -q app scripts tests
+```
+
+Focused offline acceptance flows:
+
+```powershell
+.\.venv\python.exe -m pytest tests\integration\test_week2_acceptance.py -v
+.\.venv\python.exe -m pytest tests\integration\test_week3_acceptance.py -v
+.\.venv\python.exe -m pytest tests\integration\test_week4_acceptance.py -v
 ```
 
 Frontend:
 
-```cmd
-cd /d F:\LIUQINGYUN\ResearchCode_Agent\.worktrees\week4-unified-agent-demo\frontend
+```powershell
+Set-Location F:\LIUQINGYUN\ResearchCode_Agent\frontend
 npm.cmd test -- --run
 npm.cmd run build
 ```
 
-Inspect a saved conversation without an LLM call:
+The backend coverage configuration requires at least 80% branch coverage.
 
-```cmd
-cd /d F:\LIUQINGYUN\ResearchCode_Agent\.worktrees\week4-unified-agent-demo\backend
-.venv\python.exe -m scripts.show_conversation 1
-```
+## Reliability and safety properties
 
-## Current limitations
+- Database and vector queries are scoped by `project_id`.
+- Duplicate project root paths are rejected.
+- Concurrent scans of the same project return a conflict instead of racing.
+- Unsupported, oversized, binary, linked, unreadable, or invalid UTF-8 files
+  become scan issues rather than silent index corruption.
+- Ambiguous service-method calls are omitted instead of guessed.
+- RAG contexts have a configurable character limit.
+- Code-QA prompts require source-grounded answers and structured references.
+- Change-plan output is schema-validated and ungrounded files are removed.
+- Conversation writes are transactional and roll back on task failure.
+- Real provider credentials are not needed by the automated tests.
 
-- Static parsing does not prove runtime behavior, reflection, dynamic dispatch,
-  framework proxies, or arbitrary computed URLs.
-- Change planning produces grounded recommendations, not patches.
-- Conversation history is not reasoning memory; context-aware follow-up is a
-  future milestone requiring bounded summaries and explicit grounding.
-- Index builds are synchronous and have no background progress or cancellation.
+## Known limitations
+
+- Static analysis cannot prove runtime behavior.
+- Reflection, dynamic dispatch, custom dependency-injection factories,
+  inherited methods, generated constructors, framework proxies, and arbitrary
+  computed URLs may not produce relationships.
+- Java method-call resolution focuses on service methods and a limited set of
+  Spring dependency-injection patterns.
+- Vue request extraction targets statically recognizable request expressions.
+- Only Java, Vue, and Python produce entities; recognized configuration and
+  data files are not searchable chunks.
+- Graph traversal is limited to two hops and four relation types.
+- A code entity is truncated to the configured character limit before
+  embedding and RAG use.
+- Change planning generates recommendations, not patches.
+- Stored conversation history is not reasoning memory.
+- Indexing is synchronous and provides no background progress, cancellation,
+  or incremental update API.
 - The frontend does not list every saved project or conversation.
-- Local embedding startup may download a model if it is not already cached.
-- The production bundle includes Cytoscape and currently emits a non-blocking
-  large-chunk warning.
+- External embedding depends on network availability, account balance, and
+  provider rate limits.
+- The Cytoscape production bundle may emit a non-blocking large-chunk warning.
+- No large-repository throughput or maximum-line-count claim has been
+  benchmark-validated.
 
-Detailed backend behavior and additional API examples are documented in
+## Roadmap
+
+The following ideas are not implemented in the current MVP:
+
+- import/module dependency entities and relationships;
+- Markdown and project-documentation indexing;
+- bounded conversation summaries for context-aware follow-up questions;
+- LLM-selected tool calling and multi-step task decomposition;
+- background indexing with progress, cancellation, and incremental updates;
+- broader language support and stronger symbol resolution;
+- runtime trace ingestion to complement static evidence;
+- repository-scale performance benchmarks.
+
+## Project evolution
+
+| Milestone | Delivered capability |
+| --- | --- |
+| Week 1 | Registration, safe scanning, Java/Vue/Python entities, APIs, and relations |
+| Week 2 | Code chunks, embeddings, Qdrant, keyword/vector/hybrid search, cited code QA |
+| Week 3 | Graph traversal, GraphRAG, API-chain tracing, graph visualization |
+| Week 4 | Unified Agent routing, grounded change plans, conversations, four-page demo |
+
+Detailed backend notes and additional examples are available in
 [`backend/README.md`](backend/README.md).

@@ -3,6 +3,7 @@ from typing import Protocol
 
 from app.errors import DomainError
 from app.retrieval.types import SearchHit
+from app.retrieval.query_rewriter import QueryRewriter
 
 
 class QueryEmbedder(Protocol):
@@ -36,10 +37,12 @@ class HybridSearchService:
         embeddings: QueryEmbedder,
         vector_store: VectorSearcher,
         keyword_search: KeywordSearcher,
+        rewriter: QueryRewriter | None = None,
     ) -> None:
         self.embeddings = embeddings
         self.vector_store = vector_store
         self.keyword_search = keyword_search
+        self.rewriter = rewriter
 
     def search(
         self,
@@ -58,7 +61,8 @@ class HybridSearchService:
             )
 
         candidate_limit = limit * 2
-        query_vector = self.embeddings.embed_query(query)
+        effective_query = self.rewriter.rewrite(query) if self.rewriter else query
+        query_vector = self.embeddings.embed_query(effective_query)
         vector_hits = self.vector_store.search(
             project_id,
             query_vector,
@@ -66,7 +70,7 @@ class HybridSearchService:
         )
         keyword_hits = self.keyword_search.search(
             project_id,
-            query,
+            effective_query,
             candidate_limit,
         )
         return fuse_search_hits(vector_hits, keyword_hits, limit)

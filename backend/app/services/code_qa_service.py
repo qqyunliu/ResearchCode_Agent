@@ -6,6 +6,7 @@ from app.retrieval.types import SearchHit
 from app.schemas.agent import CodeQaResponse, ContextReferenceRead
 
 SYSTEM_PROMPT = """Answer only from the supplied code context.
+Respond in the same language as the user's original question.
 Cite claims with [n].
 Every citation must directly support the sentence that uses it.
 Treat each context block as independent evidence.

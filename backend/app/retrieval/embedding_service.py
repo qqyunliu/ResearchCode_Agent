@@ -1,6 +1,9 @@
 from collections.abc import Sequence
 from typing import Any, Protocol
 
+from app.errors import DomainError
+
+API_EMBEDDING_BATCH_SIZE = 64
 
 class EmbeddingProvider(Protocol):
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
@@ -72,11 +75,15 @@ class OpenAICompatibleEmbeddingProvider:
         api_key: str | None,
         *,
         base_url: str | None = None,
+        dimensions: int | None = None,
         client: Any | None = None,
     ) -> None:
         if not api_key:
             raise ValueError("RCA_EMBEDDING_API_KEY is required")
         self.model_name = model_name
+        if dimensions is not None and dimensions < 1:
+            raise ValueError("embedding dimensions must be positive")
+        self.dimensions = dimensions
         if client is None:
             from openai import OpenAI
 
@@ -84,20 +91,41 @@ class OpenAICompatibleEmbeddingProvider:
         self.client = client
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
-        response = self.client.embeddings.create(
-            model=self.model_name,
-            input=texts,
-        )
-        ordered = sorted(response.data, key=lambda item: item.index)
-        return [_float_vector(item.embedding) for item in ordered]
+        vectors: list[list[float]] = []
+        for start in range(0, len(texts), API_EMBEDDING_BATCH_SIZE):
+            batch = texts[start : start + API_EMBEDDING_BATCH_SIZE]
+            request = {
+                "model": self.model_name,
+                "input": batch,
+            }
+            if self.dimensions is not None:
+                request["dimensions"] = self.dimensions
+            response = self._create(request)
+            ordered = sorted(response.data, key=lambda item: item.index)
+            vectors.extend(
+                _float_vector(item.embedding) for item in ordered
+            )
+        return vectors
 
     def embed_query(self, text: str) -> list[float]:
-        response = self.client.embeddings.create(
-            model=self.model_name,
-            input=[text],
-        )
+        request = {"model": self.model_name, "input": [text]}
+        if self.dimensions is not None:
+            request["dimensions"] = self.dimensions
+        response = self._create(request)
         first = min(response.data, key=lambda item: item.index)
         return _float_vector(first.embedding)
+
+    def _create(self, request: dict[str, object]) -> Any:
+        try:
+            return self.client.embeddings.create(**request)
+        except DomainError:
+            raise
+        except Exception as error:
+            raise DomainError(
+                code="EMBEDDING_REQUEST_FAILED",
+                message="The external embedding request failed.",
+                status_code=502,
+            ) from error
 
 
 def _as_list(value: Any) -> Any:

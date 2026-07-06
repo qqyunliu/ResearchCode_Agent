@@ -38,8 +38,7 @@ async function submitSearch() {
     nodes.value = []
     edges.value = []
     errorMessage.value = (
-      "Unable to load the graph. Confirm the backend, project ID, "
-      + "and vector index are available."
+      "无法加载关系图谱，请确认后端服务、项目 ID 和向量索引可用。"
     )
   } finally {
     hasSearched.value = true
@@ -49,25 +48,24 @@ async function submitSearch() {
 </script>
 
 <template>
-  <main class="page-shell">
+  <main class="page">
     <header class="hero">
       <div>
         <p class="eyebrow">ResearchCode-Agent · GraphRAG</p>
-        <h1>Trace code from request to implementation.</h1>
+        <h1>从请求追踪到代码实现</h1>
         <p class="subtitle">
-          Search an indexed project, inspect its API chain, and open the exact
-          code behind every node.
+          搜索已索引项目，查看 API 调用链，并打开每个节点对应的源码。
         </p>
       </div>
       <div class="status-pill">
         <span class="status-dot" />
-        Week 3 graph explorer
+        代码关系浏览器
       </div>
     </header>
 
     <form class="search-bar" @submit.prevent="submitSearch">
       <label>
-        <span>Project</span>
+        <span>项目 ID</span>
         <input
           v-model.number="projectId"
           data-test="project-id"
@@ -76,11 +74,11 @@ async function submitSearch() {
         />
       </label>
       <label class="query-field">
-        <span>Code or feature</span>
+        <span>代码或功能</span>
         <input
           v-model="query"
           data-test="query"
-          placeholder="Where is the alert API implemented?"
+          placeholder="例如：告警 API 在哪里实现？"
           type="search"
         />
       </label>
@@ -89,7 +87,7 @@ async function submitSearch() {
         type="submit"
         :disabled="!canSearch"
       >
-        {{ loading ? "Tracing…" : "Trace chain" }}
+        {{ loading ? "正在追踪……" : "追踪调用链" }}
       </button>
     </form>
 
@@ -101,24 +99,24 @@ async function submitSearch() {
       class="notice"
       data-test="empty"
     >
-      No connected code entities were found for this query.
+      没有找到与该查询关联的代码实体。
     </p>
 
     <section class="workspace">
       <article class="graph-card">
         <div class="card-heading">
           <div>
-            <p class="section-label">Relationship map</p>
-            <h2>{{ nodes.length }} nodes · {{ edges.length }} edges</h2>
+            <p class="section-label">关系图</p>
+            <h2>{{ nodes.length }} 个节点 · {{ edges.length }} 条边</h2>
           </div>
-          <div class="legend" aria-label="Graph legend">
-            <span><i class="frontend" />Frontend</span>
+          <div class="legend" aria-label="图谱图例">
+            <span><i class="frontend" />前端</span>
             <span><i class="api" />API</span>
-            <span><i class="method" />Method</span>
-            <span><i class="klass" />Class</span>
+            <span><i class="method" />方法</span>
+            <span><i class="klass" />类</span>
           </div>
         </div>
-        <div v-if="loading" class="graph-placeholder">Building graph…</div>
+        <div v-if="loading" class="graph-placeholder">正在构建图谱……</div>
         <GraphPanel
           v-else-if="nodes.length"
           :nodes="nodes"
@@ -126,33 +124,32 @@ async function submitSearch() {
           @select-node="selectedNode = $event"
         />
         <div v-else class="graph-placeholder">
-          Run a search to reveal the code chain.
+          运行搜索以展示代码调用链。
         </div>
       </article>
 
       <aside class="detail-card">
         <template v-if="selectedNode">
-          <p class="section-label">Selected entity</p>
+          <p class="section-label">已选实体</p>
           <span class="type-chip">{{ selectedNode.entity_type }}</span>
           <h2>{{ selectedNode.qualified_name }}</h2>
           <dl>
             <div>
-              <dt>File</dt>
+              <dt>文件</dt>
               <dd>{{ selectedNode.file_path }}</dd>
             </div>
             <div>
-              <dt>Lines</dt>
+              <dt>行号</dt>
               <dd>{{ selectedNode.start_line }}–{{ selectedNode.end_line }}</dd>
             </div>
           </dl>
           <pre><code>{{ selectedNode.content }}</code></pre>
         </template>
         <template v-else>
-          <p class="section-label">Entity inspector</p>
-          <h2>Select a node</h2>
+          <p class="section-label">实体详情</p>
+          <h2>请选择节点</h2>
           <p class="detail-hint">
-            Click any node to inspect its source path, line range, and indexed
-            code.
+            点击任意节点，查看其源码路径、行号范围和已索引代码。
           </p>
         </template>
       </aside>
@@ -161,10 +158,10 @@ async function submitSearch() {
 </template>
 
 <style scoped>
-.page-shell {
-  max-width: 1480px;
+.page {
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 52px 32px 72px;
+  padding: 48px 32px 72px;
 }
 
 .hero {
@@ -187,19 +184,15 @@ async function submitSearch() {
 
 h1 {
   max-width: 780px;
-  margin: 0;
+  margin: 8px 0;
   color: #0f172a;
-  font-size: clamp(2.3rem, 5vw, 4.7rem);
-  line-height: 0.98;
-  letter-spacing: -0.055em;
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  letter-spacing: -0.045em;
 }
 
 .subtitle {
   max-width: 700px;
-  margin: 22px 0 0;
   color: #64748b;
-  font-size: 1.08rem;
-  line-height: 1.65;
 }
 
 .status-pill {
@@ -437,7 +430,7 @@ pre {
 }
 
 @media (max-width: 640px) {
-  .page-shell {
+  .page {
     padding: 32px 16px 48px;
   }
 

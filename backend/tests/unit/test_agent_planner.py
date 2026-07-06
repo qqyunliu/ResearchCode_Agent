@@ -9,15 +9,18 @@ from app.agent.types import TaskType
     [
         ("Where is getAlert implemented?", TaskType.CODE_QA),
         ("getAlert 在哪个文件里实现？", TaskType.CODE_QA),
+        ("告警列表 API 在哪里实现？", TaskType.CODE_QA),
         ("Explain AlertController", TaskType.CODE_QA),
         ("Where does the alert trend data come from?", TaskType.TRACE_CHAIN),
         ("告警趋势图的数据从哪里来？", TaskType.TRACE_CHAIN),
+        ("告警趋势数据的调用链是什么？", TaskType.TRACE_CHAIN),
         ("Show the frontend backend call chain", TaskType.TRACE_CHAIN),
         (
             "Add risk_score; which files need changes?",
             TaskType.CHANGE_PLAN,
         ),
         ("新增 risk_score 需要改哪些文件？", TaskType.CHANGE_PLAN),
+        ("增加 risk_score 字段需要修改哪些文件？", TaskType.CHANGE_PLAN),
         ("What is the impact and risk of changing this API?", TaskType.CHANGE_PLAN),
     ],
 )

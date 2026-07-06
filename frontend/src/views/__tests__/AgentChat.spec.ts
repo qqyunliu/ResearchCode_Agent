@@ -76,6 +76,18 @@ describe("AgentChat", () => {
     vi.clearAllMocks()
   })
 
+  it("renders Chinese Agent copy and demo questions", () => {
+    const wrapper = mountChat()
+
+    const title = wrapper.get("h1")
+    expect(title.text()).toBe("基于代码证据进行问答、追踪与规划")
+    expect(title.classes()).toContain("single-line-title")
+    expect(wrapper.text()).toContain("恢复会话")
+    expect(wrapper.get('[data-test="send"]').text()).toContain("发送")
+    expect(wrapper.findAll('[data-test="demo-question"]')[0].text())
+      .toContain("告警列表 API")
+  })
+
   it("disables blank submission and provides five demo questions", async () => {
     const wrapper = mountChat()
     expect(wrapper.get('[data-test="send"]').attributes("disabled"))
@@ -146,7 +158,7 @@ describe("AgentChat", () => {
     const wrapper = mountChat()
     await submit(wrapper, "Question")
     expect(wrapper.get('[data-test="error"]').text()).toContain(
-      "Unable to get an Agent answer",
+      "无法获取 Agent 回答",
     )
 
     api.sendChat.mockResolvedValueOnce({

@@ -140,7 +140,7 @@ onBeforeUnmount(destroyGraph)
   <div
     ref="container"
     class="graph-canvas"
-    aria-label="Code relationship graph"
+    aria-label="代码关系图"
   />
 </template>
 

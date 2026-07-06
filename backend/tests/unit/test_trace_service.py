@@ -152,6 +152,7 @@ def test_trace_uses_grounded_graph_context_and_returns_graph() -> None:
     assert graph.calls == [(1, (5,), 2)]
     assert len(llm.calls) == 1
     system_prompt, user_prompt = llm.calls[0]
+    assert "same language as the user's original question" in system_prompt
     assert "stored CALLS_METHOD edge" in system_prompt
     assert "cannot be determined from indexed code" in system_prompt
     assert "chain, involved files, and uncertain" in system_prompt

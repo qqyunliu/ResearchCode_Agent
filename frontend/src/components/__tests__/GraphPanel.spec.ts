@@ -64,6 +64,16 @@ const edges: GraphEdge[] = [
 ]
 
 describe("GraphPanel", () => {
+  it("provides a Chinese accessible graph label", () => {
+    const wrapper = mount(GraphPanel, {
+      props: { nodes: [], edges: [] },
+    })
+
+    expect(wrapper.get(".graph-canvas").attributes("aria-label")).toBe(
+      "代码关系图",
+    )
+  })
+
   it("maps graph data and emits the selected node", async () => {
     const wrapper = mount(GraphPanel, {
       props: { nodes, edges },

@@ -45,6 +45,16 @@ describe("GraphView", () => {
     searchChain.mockReset()
   })
 
+  it("renders Chinese graph-explorer copy", () => {
+    const wrapper = mountView()
+
+    expect(wrapper.get("main").classes()).toContain("page")
+    expect(wrapper.get("main").classes()).not.toContain("page-shell")
+    expect(wrapper.text()).toContain("从请求追踪到代码实现")
+    expect(wrapper.text()).toContain("代码或功能")
+    expect(wrapper.get('[data-test="search"]').text()).toContain("追踪调用链")
+  })
+
   it("disables search for a blank query", async () => {
     const wrapper = mountView()
     const button = wrapper.get('[data-test="search"]')
@@ -92,7 +102,7 @@ describe("GraphView", () => {
     await wrapper.get("form").trigger("submit")
     await flushPromises()
     expect(wrapper.get('[data-test="error"]').text()).toContain(
-      "Unable to load the graph",
+      "无法加载关系图谱",
     )
   })
 })

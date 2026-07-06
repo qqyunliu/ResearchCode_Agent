@@ -27,7 +27,7 @@ async function search() {
     })
   } catch {
     results.value = []
-    errorMessage.value = "Unable to search. Confirm the backend and vector index are ready."
+    errorMessage.value = "无法搜索，请确认后端服务和向量索引已就绪。"
   } finally {
     searched.value = true
     loading.value = false
@@ -38,28 +38,28 @@ async function search() {
 <template>
   <main class="page">
     <header>
-      <p class="eyebrow">Hybrid retrieval</p>
-      <h1>Find code by meaning and keywords.</h1>
-      <p>Search indexed entities and inspect their source location and score.</p>
+      <p class="eyebrow">混合检索</p>
+      <h1>按语义和关键词查找代码</h1>
+      <p>搜索已索引的代码实体，并查看源码位置与相关性得分。</p>
     </header>
 
     <form @submit.prevent="search">
       <label>
-        Project ID
+        项目 ID
         <input v-model.number="projectId" data-test="project-id" min="1" type="number" />
       </label>
       <label class="query">
-        Query
-        <input v-model="query" data-test="query" placeholder="alert controller" type="search" />
+        查询内容
+        <input v-model="query" data-test="query" placeholder="例如：告警接口实现" type="search" />
       </label>
       <button data-test="search" :disabled="!canSearch">
-        {{ loading ? "Searching…" : "Search code" }}
+        {{ loading ? "正在搜索……" : "搜索代码" }}
       </button>
     </form>
 
     <p v-if="errorMessage" class="notice error" data-test="error">{{ errorMessage }}</p>
     <p v-else-if="searched && !loading && results.length === 0" class="notice" data-test="empty">
-      No indexed code matched this query.
+      没有找到与该查询匹配的索引代码。
     </p>
 
     <section class="results">
@@ -81,9 +81,9 @@ async function search() {
 .eyebrow { color: #0f766e; font-size: .76rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
 h1 { margin: 8px 0; color: #0f172a; font-size: clamp(2.2rem, 5vw, 4rem); letter-spacing: -.045em; }
 header > p:last-child { color: #64748b; }
-form { display: grid; grid-template-columns: 150px 1fr auto; gap: 14px; margin-top: 30px; padding: 20px; border: 1px solid #dbe4ea; border-radius: 20px; background: white; }
+form { display: grid; grid-template-columns: 150px minmax(0, 1fr) auto; gap: 14px; margin-top: 30px; padding: 20px; border: 1px solid #dbe4ea; border-radius: 20px; background: white; }
 label { display: grid; gap: 7px; color: #475569; font-size: .78rem; font-weight: 700; }
-input { padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 10px; background: #f8fafc; }
+input { box-sizing: border-box; min-width: 0; width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 10px; background: #f8fafc; }
 button { align-self: end; padding: 13px 20px; border: 0; border-radius: 10px; background: #0f766e; color: white; font-weight: 800; cursor: pointer; }
 button:disabled { background: #94a3b8; cursor: not-allowed; }
 .results { display: grid; gap: 14px; margin-top: 20px; }

@@ -44,7 +44,7 @@ async function register() {
     scanCompleted.value = false
     indexSummary.value = null
   } catch {
-    errorMessage.value = "Unable to register the project. Check the path and backend."
+    errorMessage.value = "无法注册项目，请检查项目路径和后端服务。"
   } finally {
     activeOperation.value = null
   }
@@ -61,7 +61,7 @@ async function scan() {
     scanCompleted.value = true
   } catch {
     scanCompleted.value = false
-    errorMessage.value = "Unable to scan the project or load its statistics."
+    errorMessage.value = "无法扫描项目或加载统计信息。"
   } finally {
     activeOperation.value = null
   }
@@ -76,8 +76,7 @@ async function buildIndex() {
     indexSummary.value = await buildVectorIndex(project.value.id)
   } catch {
     errorMessage.value = (
-      "Unable to build the vector index. Confirm the embedding "
-      + "configuration and vector store are available."
+      "无法构建向量索引，请检查 Embedding 配置和向量存储是否可用。"
     )
   } finally {
     activeOperation.value = null
@@ -88,23 +87,23 @@ async function buildIndex() {
 <template>
   <main class="page">
     <header>
-      <p class="eyebrow">Project workspace</p>
-      <h1>Register and inspect a codebase.</h1>
-      <p>Store an absolute source path, scan its files, and review indexed totals.</p>
+      <p class="eyebrow">项目工作区</p>
+      <h1>注册并分析代码库</h1>
+      <p>保存源码绝对路径，扫描项目文件并查看索引统计。</p>
     </header>
 
     <section class="panel">
       <form data-test="register-form" @submit.prevent="register">
         <label>
-          Project name
+          项目名称
           <input
             v-model="name"
             data-test="project-name"
-            placeholder="Alert platform"
+            placeholder="例如：告警平台"
           />
         </label>
         <label class="wide">
-          Absolute root path
+          绝对根路径
           <input
             v-model="rootPath"
             data-test="root-path"
@@ -112,7 +111,7 @@ async function buildIndex() {
           />
         </label>
         <button data-test="register" :disabled="!canRegister">
-          {{ activeOperation === "register" ? "Registering…" : "Register project" }}
+          {{ activeOperation === "register" ? "正在注册……" : "注册项目" }}
         </button>
       </form>
 
@@ -122,21 +121,21 @@ async function buildIndex() {
 
       <article v-if="project" class="project-card">
         <div>
-          <span>Registered project</span>
+          <span>已注册项目</span>
           <h2>{{ project.name }}</h2>
           <p>{{ project.root_path }}</p>
-          <strong data-test="project-id">Project ID {{ project.id }}</strong>
+          <strong data-test="project-id">项目 ID {{ project.id }}</strong>
         </div>
         <div class="project-actions">
           <button data-test="scan" :disabled="busy" @click="scan">
-            {{ activeOperation === "scan" ? "Scanning…" : "Scan and refresh stats" }}
+            {{ activeOperation === "scan" ? "正在扫描……" : "扫描并刷新统计" }}
           </button>
           <button
             data-test="build-index"
             :disabled="busy || !scanCompleted"
             @click="buildIndex"
           >
-            {{ activeOperation === "index" ? "Building index…" : "Build vector index" }}
+            {{ activeOperation === "index" ? "正在构建索引……" : "构建向量索引" }}
           </button>
         </div>
       </article>
@@ -145,19 +144,19 @@ async function buildIndex() {
         class="index-result"
         data-test="index-result"
       >
-        <strong>Vector index ready</strong>
-        <span>{{ indexSummary.chunks_indexed }} chunks indexed</span>
-        <span>Collection: {{ indexSummary.collection_name }}</span>
+        <strong>向量索引已就绪</strong>
+        <span>已索引 {{ indexSummary.chunks_indexed }} 个代码块</span>
+        <span>集合：{{ indexSummary.collection_name }}</span>
       </article>
     </section>
 
     <section v-if="stats" class="stats" data-test="stats">
-      <article><span>Files</span><strong>{{ stats.total_files }}</strong></article>
-      <article><span>Lines</span><strong>{{ stats.total_lines }}</strong></article>
-      <article><span>Backend APIs</span><strong>{{ stats.backend_api_count }}</strong></article>
-      <article><span>Frontend calls</span><strong>{{ stats.frontend_api_call_count }}</strong></article>
-      <article><span>Skipped</span><strong>{{ stats.skipped_files }}</strong></article>
-      <article><span>Parse errors</span><strong>{{ stats.parse_errors }}</strong></article>
+      <article><span>文件数</span><strong>{{ stats.total_files }}</strong></article>
+      <article><span>代码行数</span><strong>{{ stats.total_lines }}</strong></article>
+      <article><span>后端 API</span><strong>{{ stats.backend_api_count }}</strong></article>
+      <article><span>前端调用</span><strong>{{ stats.frontend_api_call_count }}</strong></article>
+      <article><span>跳过文件</span><strong>{{ stats.skipped_files }}</strong></article>
+      <article><span>解析错误</span><strong>{{ stats.parse_errors }}</strong></article>
     </section>
   </main>
 </template>

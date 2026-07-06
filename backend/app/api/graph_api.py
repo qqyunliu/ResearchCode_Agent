@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.core.database import get_session
-from app.core.dependencies import get_embedding_service, get_vector_store
+from app.core.dependencies import get_embedding_service, get_vector_store, get_query_rewriter
+from app.retrieval.query_rewriter import LlmQueryRewriter
 from app.graph.query_service import GraphQueryService
 from app.retrieval.embedding_service import EmbeddingService
 from app.retrieval.hybrid_search import HybridSearchService
@@ -29,11 +30,13 @@ def get_graph_search_service(
     session: Session = Depends(get_session),
     embeddings: EmbeddingService = Depends(get_embedding_service),
     vector_store: QdrantVectorStore = Depends(get_vector_store),
+    rewriter: LlmQueryRewriter = Depends(get_query_rewriter),
 ) -> GraphSearch:
     return HybridSearchService(
         embeddings=embeddings,
         vector_store=vector_store,
         keyword_search=KeywordSearchService(session),
+        rewriter=rewriter,
     )
 
 

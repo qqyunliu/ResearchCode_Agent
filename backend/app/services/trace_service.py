@@ -10,6 +10,7 @@ from app.schemas.agent import ContextReferenceRead, TraceResponse
 from app.schemas.graph import GraphResponse
 
 TRACE_SYSTEM_PROMPT = """Answer only from the supplied indexed-code evidence.
+Respond in the same language as the user's original question.
 Describe the request chain, involved files, and uncertain or missing links.
 Cite code claims with [n], and make every citation directly support its claim.
 Treat the Stored graph edges section as authoritative relationship evidence.

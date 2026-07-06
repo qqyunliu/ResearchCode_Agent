@@ -20,7 +20,7 @@ defineEmits<{
     role="presentation"
     @click.self="$emit('close')"
   >
-    <article class="dialog" role="dialog" aria-modal="true" aria-label="Reference code">
+    <article class="dialog" role="dialog" aria-modal="true" aria-label="引用代码">
       <header>
         <div>
           <span>{{ reference.entity_type }}</span>
@@ -29,15 +29,15 @@ defineEmits<{
         <button
           data-test="close-reference"
           type="button"
-          aria-label="Close reference"
+          aria-label="关闭引用详情"
           @click="$emit('close')"
         >
           ×
         </button>
       </header>
       <p>{{ reference.file_path }}</p>
-      <p>Lines {{ reference.start_line }}–{{ reference.end_line }}</p>
-      <p v-if="loading" data-test="reference-loading">Loading indexed code…</p>
+      <p>行号 {{ reference.start_line }}–{{ reference.end_line }}</p>
+      <p v-if="loading" data-test="reference-loading">正在加载索引代码……</p>
       <p v-else-if="error" class="error" data-test="reference-error">{{ error }}</p>
       <pre v-else><code>{{ content }}</code></pre>
     </article>

@@ -58,6 +58,15 @@ describe("ProjectView", () => {
     vi.clearAllMocks()
   })
 
+  it("renders Chinese project-management copy", () => {
+    const wrapper = mount(ProjectView)
+
+    expect(wrapper.text()).toContain("注册并分析代码库")
+    expect(wrapper.text()).toContain("项目名称")
+    expect(wrapper.text()).toContain("绝对根路径")
+    expect(wrapper.get('[data-test="register"]').text()).toContain("注册项目")
+  })
+
   it("requires a name and root path before registration", async () => {
     const wrapper = mount(ProjectView)
     expect(wrapper.get('[data-test="register"]').attributes("disabled"))
@@ -133,7 +142,7 @@ describe("ProjectView", () => {
     await flushPromises()
 
     expect(wrapper.get('[data-test="error"]').text()).toContain(
-      "Unable to register",
+      "无法注册项目",
     )
     expect(wrapper.get('[data-test="register"]').attributes("disabled"))
       .toBeUndefined()
@@ -183,7 +192,7 @@ describe("ProjectView", () => {
     await wrapper.get('[data-test="build-index"]').trigger("click")
 
     expect(wrapper.get('[data-test="build-index"]').text()).toContain(
-      "Building index",
+      "正在构建索引",
     )
     expect(wrapper.get('[data-test="build-index"]').attributes("disabled"))
       .toBeDefined()
@@ -213,7 +222,7 @@ describe("ProjectView", () => {
     await flushPromises()
 
     expect(wrapper.get('[data-test="error"]').text()).toContain(
-      "Unable to build the vector index",
+      "无法构建向量索引",
     )
     expect(wrapper.find('[data-test="stats"]').exists()).toBe(true)
     expect(wrapper.get('[data-test="build-index"]').attributes("disabled"))

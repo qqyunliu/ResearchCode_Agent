@@ -68,6 +68,7 @@ def test_answers_from_cited_retrieval_context() -> None:
     assert search.calls == [(1, question, 5)]
     assert len(llm.calls) == 1
     system_prompt, user_prompt = llm.calls[0]
+    assert "same language as the user's original question" in system_prompt
     assert "Answer only from the supplied code context." in system_prompt
     assert "Cite claims with [n]." in system_prompt
     assert "Do not invent files, symbols, APIs, or behavior." in system_prompt
@@ -125,6 +126,23 @@ def test_no_hits_returns_deterministic_answer_without_calling_llm() -> None:
     )
     assert response.references == []
     assert llm.calls == []
+
+
+def test_chinese_original_question_is_kept_in_final_prompt() -> None:
+    search = FakeSearch([alert_hit()])
+    llm = FakeLlm("告警接口位于 AlertController [1]。")
+    service = CodeQaService(
+        search=search,
+        context_builder=RagContextBuilder(),
+        llm=llm,
+    )
+    question = "告警列表 API 在哪里实现？"
+
+    response = service.answer(1, question, 5)
+
+    assert search.calls == [(1, question, 5)]
+    assert f"Question:\n{question}" in llm.calls[0][1]
+    assert response.answer.startswith("告警接口")
 
 
 def test_openai_compatible_client_sends_deterministic_chat_request() -> None:

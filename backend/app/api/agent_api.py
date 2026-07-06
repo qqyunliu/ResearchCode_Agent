@@ -11,6 +11,7 @@ from app.core.dependencies import (
     get_llm_client,
     get_rag_context_builder,
     get_vector_store,
+    get_query_rewriter,
 )
 from app.agent.executor import AgentExecutor
 from app.agent.planner import SimpleAgentPlanner
@@ -24,6 +25,7 @@ from app.retrieval.embedding_service import EmbeddingService
 from app.retrieval.hybrid_search import HybridSearchService
 from app.retrieval.keyword_search import KeywordSearchService
 from app.retrieval.vector_store import QdrantVectorStore
+from app.retrieval.query_rewriter import LlmQueryRewriter
 from app.schemas.agent import (
     AgentChatRequest,
     AgentChatResponse,
@@ -54,11 +56,13 @@ def get_code_qa_service(
     vector_store: QdrantVectorStore = Depends(get_vector_store),
     context_builder: RagContextBuilder = Depends(get_rag_context_builder),
     llm: LlmClient = Depends(get_llm_client),
+    rewriter: LlmQueryRewriter = Depends(get_query_rewriter),
 ) -> CodeQaService:
     search = HybridSearchService(
         embeddings=embeddings,
         vector_store=vector_store,
         keyword_search=KeywordSearchService(session),
+        rewriter=rewriter,
     )
     return CodeQaService(
         search=search,
@@ -87,11 +91,13 @@ def get_trace_service(
         get_graph_context_builder
     ),
     llm: LlmClient = Depends(get_llm_client),
+    rewriter: LlmQueryRewriter = Depends(get_query_rewriter),
 ) -> TraceService:
     search = HybridSearchService(
         embeddings=embeddings,
         vector_store=vector_store,
         keyword_search=KeywordSearchService(session),
+        rewriter=rewriter,
     )
     graph = GraphQueryService(session)
     return TraceService(
@@ -127,11 +133,13 @@ def get_agent_chat_service(
     ),
     llm: LlmClient = Depends(get_llm_client),
     planner: SimpleAgentPlanner = Depends(get_agent_planner),
+    rewriter: LlmQueryRewriter = Depends(get_query_rewriter),
 ) -> AgentChatService:
     search = HybridSearchService(
         embeddings=embeddings,
         vector_store=vector_store,
         keyword_search=KeywordSearchService(session),
+        rewriter=rewriter,
     )
     graph = GraphQueryService(session)
     code_qa = CodeQaService(

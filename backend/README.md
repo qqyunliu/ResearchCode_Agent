@@ -30,7 +30,7 @@ project_{project_id}_code_chunks
 
 - Python 3.11
 - Windows Command Prompt
-- Network access for the first local embedding-model download
+- Network access and a Zhipu embedding API key for vector operations
 - An OpenAI-compatible API key only when making real code-QA requests
 
 ## Local setup
@@ -64,10 +64,11 @@ Settings use the `RCA_` prefix and can be placed in `backend/.env`.
 | --- | --- | --- |
 | `RCA_DATABASE_URL` | `sqlite+pysqlite:///./research_code_agent.db` | SQLAlchemy database URL |
 | `RCA_MAX_SOURCE_BYTES` | `2097152` | Maximum source-file size |
-| `RCA_EMBEDDING_PROVIDER` | `local` | `local` or OpenAI-compatible `api` embeddings |
-| `RCA_EMBEDDING_MODEL` | `sentence-transformers/all-MiniLM-L6-v2` | Embedding model name |
+| `RCA_EMBEDDING_PROVIDER` | `api` | Default external embedding mode |
+| `RCA_EMBEDDING_MODEL` | `embedding-3` | Zhipu multilingual model |
 | `RCA_EMBEDDING_API_KEY` | empty | API embedding credential |
-| `RCA_EMBEDDING_BASE_URL` | empty | API embedding base URL |
+| `RCA_EMBEDDING_BASE_URL` | `https://open.bigmodel.cn/api/paas/v4` | Zhipu API base URL |
+| `RCA_EMBEDDING_DIMENSIONS` | `1024` | Requested vector dimension |
 | `RCA_QDRANT_URL` | empty | Remote Qdrant URL; empty uses local storage |
 | `RCA_QDRANT_API_KEY` | empty | Remote Qdrant credential |
 | `RCA_QDRANT_PATH` | `./qdrant_storage` | Local Qdrant directory |
@@ -79,18 +80,26 @@ Settings use the `RCA_` prefix and can be placed in `backend/.env`.
 | `RCA_LLM_MODEL` | `gpt-4.1-mini` | Chat model name |
 | `RCA_RAG_MAX_CONTEXT_CHARS` | `12000` | Maximum RAG context size |
 
-### Local embeddings and Qdrant
+### Default Zhipu embeddings and Qdrant
 
-The default mode runs `sentence-transformers` on CPU and stores vectors under
-`RCA_QDRANT_PATH`. The first embedding request downloads the configured model
-and can take substantially longer than later requests. Subsequent requests use
-the local model cache.
+The default mode calls Zhipu `embedding-3` and stores vectors under
+`RCA_QDRANT_PATH`. It requires a separate embedding API key.
 
 ```dotenv
-RCA_EMBEDDING_PROVIDER=local
-RCA_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+RCA_EMBEDDING_PROVIDER=api
+RCA_EMBEDDING_MODEL=embedding-3
+RCA_EMBEDDING_API_KEY=your-zhipu-key
+RCA_EMBEDDING_BASE_URL=https://open.bigmodel.cn/api/paas/v4
+RCA_EMBEDDING_DIMENSIONS=1024
 RCA_QDRANT_PATH=./qdrant_storage
 ```
+
+Chinese hybrid and Agent queries use one additional chat-model call to rewrite
+the query as English code-search keywords. The original question remains in
+planning, final prompts, and conversation storage, and answers are requested in
+the same language. There is no local embedding fallback; use keyword search if
+the external embedding service is unavailable. Rebuild vector indexes after
+changing the model or dimension.
 
 ### API embeddings and remote Qdrant
 
@@ -107,6 +116,10 @@ RCA_QDRANT_API_KEY=your-qdrant-key
 
 The document and query embedding model must be the same and must return vectors
 with the same dimension.
+
+Vector-index builds send external document embeddings in sequential batches of
+at most 64 texts, then restore response order and merge the vectors before
+rebuilding the Qdrant collection.
 
 ### OpenAI-compatible code QA
 

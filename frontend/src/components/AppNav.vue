@@ -3,13 +3,13 @@ import { RouterLink } from "vue-router"
 </script>
 
 <template>
-  <nav class="app-nav" data-test="app-nav" aria-label="Primary navigation">
+  <nav class="app-nav" data-test="app-nav" aria-label="主导航">
     <RouterLink class="brand" to="/projects">ResearchCode-Agent</RouterLink>
     <div class="links">
-      <RouterLink to="/projects">Projects</RouterLink>
-      <RouterLink to="/search">Search</RouterLink>
-      <RouterLink to="/graph">Graph</RouterLink>
-      <RouterLink to="/chat">Chat</RouterLink>
+      <RouterLink to="/projects">项目</RouterLink>
+      <RouterLink to="/search">代码搜索</RouterLink>
+      <RouterLink to="/graph">关系图谱</RouterLink>
+      <RouterLink to="/chat">Agent 对话</RouterLink>
     </div>
   </nav>
 </template>
