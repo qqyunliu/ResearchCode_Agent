@@ -299,6 +299,30 @@ Run the complete backend checks:
 .venv\python.exe -m compileall -q app scripts tests
 ```
 
+## Week 4 offline acceptance
+
+Run the unified Agent acceptance without network access or paid model calls:
+
+```cmd
+.venv\python.exe -m pytest tests\integration\test_week4_acceptance.py -v
+```
+
+The test scans the sample project, builds an in-memory deterministic vector
+index, asks code-QA, trace, and change-plan questions through the real unified
+chat API, reloads the saved conversation, checks project isolation, proves
+stored history is absent from later Fake-LLM prompts, and verifies that an
+injected task failure saves no partial exchange.
+
+Inspect a conversation already stored in the configured SQLite database:
+
+```cmd
+.venv\python.exe -m scripts.show_conversation 1
+```
+
+The script prints chronological roles, task types, content, reference counts,
+graph counts, and uncertainties. It only reads SQLite and never invokes an LLM
+or embedding provider.
+
 ## Static-analysis limitations
 
 - Java parsing currently targets common Spring annotations, constructor
