@@ -6,12 +6,14 @@ from fastapi.responses import JSONResponse
 
 from app.api import agent_router, graph_router, project_router, search_router
 from app.core.database import engine
+from app.core.schema_migrations import upgrade_schema
 from app.errors import DomainError
 from app.models import Base
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    upgrade_schema(engine)
     Base.metadata.create_all(bind=engine)
     yield
 

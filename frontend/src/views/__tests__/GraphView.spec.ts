@@ -41,6 +41,12 @@ function mountView() {
 }
 
 describe("GraphView", () => {
+  it("prefills project ID from the URL query", () => {
+    window.history.pushState({}, "", "/graph?project_id=18")
+    const wrapper = mount(GraphView)
+    expect((wrapper.get('[data-test="project-id"]').element as HTMLInputElement).value).toBe("18")
+    window.history.pushState({}, "", "/")
+  })
   beforeEach(() => {
     searchChain.mockReset()
   })

@@ -159,6 +159,13 @@ a Fake LLM. It requires no network, Docker, credentials, or paid tokens.
 
 ## Manual API flow
 
+Project management also supports `GET /api/projects`,
+`PUT /api/projects/order`, and `DELETE /api/projects/{project_id}`. The list
+response includes path accessibility and persisted manual order. At startup,
+older SQLite databases receive an idempotent `sort_order` compatibility
+upgrade. Project deletion removes the Qdrant collection before committing the
+database cascade, so a vector-store failure leaves relational data intact.
+
 Register and scan a project first:
 
 ```cmd

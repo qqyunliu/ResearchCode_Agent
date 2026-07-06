@@ -3,7 +3,17 @@ import { resolve } from "node:path"
 
 import { mount } from "@vue/test-utils"
 import { createMemoryHistory, createRouter } from "vue-router"
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
+
+vi.mock("@/api/projects", () => ({
+  listProjects: vi.fn().mockResolvedValue([]),
+  createProject: vi.fn(),
+  scanProject: vi.fn(),
+  getProjectStats: vi.fn(),
+  buildVectorIndex: vi.fn(),
+  reorderProjects: vi.fn(),
+  deleteProject: vi.fn(),
+}))
 
 import App from "@/App.vue"
 import { routes } from "@/router"
@@ -22,6 +32,11 @@ describe("application router", () => {
     expect(html).toContain('<html lang="zh-CN">')
     expect(html).toContain("<title>ResearchCode-Agent 代码理解助手</title>")
     expect(html).toContain("科研代码库理解与关系分析")
+  })
+
+  it("only shows the page scrollbar when content overflows", () => {
+    const css = readFileSync(resolve(process.cwd(), "src/style.css"), "utf8")
+    expect(css).toMatch(/html\s*\{[^}]*overflow-y:\s*auto;/s)
   })
 
   it("redirects the root route to projects", async () => {

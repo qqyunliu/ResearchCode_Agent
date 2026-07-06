@@ -3,8 +3,9 @@ import { computed, ref } from "vue"
 
 import { hybridSearch } from "@/api/search"
 import type { SearchHit } from "@/types/search"
+import { projectIdFromQuery } from "@/utils/projectRoute"
 
-const projectId = ref(1)
+const projectId = ref(projectIdFromQuery(new URLSearchParams(window.location.search).get("project_id")))
 const query = ref("")
 const results = ref<SearchHit[]>([])
 const loading = ref(false)

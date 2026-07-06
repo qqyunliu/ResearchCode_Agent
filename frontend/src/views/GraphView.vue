@@ -4,8 +4,9 @@ import { computed, ref } from "vue"
 import { searchChain } from "@/api/graph"
 import GraphPanel from "@/components/GraphPanel.vue"
 import type { GraphEdge, GraphNode } from "@/types/graph"
+import { projectIdFromQuery } from "@/utils/projectRoute"
 
-const projectId = ref(1)
+const projectId = ref(projectIdFromQuery(new URLSearchParams(window.location.search).get("project_id")))
 const query = ref("")
 const nodes = ref<GraphNode[]>([])
 const edges = ref<GraphEdge[]>([])

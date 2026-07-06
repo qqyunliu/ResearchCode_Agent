@@ -12,6 +12,13 @@ describe("SearchView", () => {
     hybridSearch.mockReset()
   })
 
+  it("prefills project ID from the URL query", () => {
+    window.history.pushState({}, "", "/search?project_id=17")
+    const wrapper = mount(SearchView)
+    expect((wrapper.get('[data-test="project-id"]').element as HTMLInputElement).value).toBe("17")
+    window.history.pushState({}, "", "/")
+  })
+
   it("renders Chinese search copy", () => {
     const wrapper = mount(SearchView)
 

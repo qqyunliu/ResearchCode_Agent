@@ -9,6 +9,7 @@ import type {
   AgentMessage,
   AgentReference,
 } from "@/types/agent"
+import { projectIdFromQuery } from "@/utils/projectRoute"
 
 const demoQuestions = [
   "告警列表 API 在哪里实现？",
@@ -18,7 +19,7 @@ const demoQuestions = [
   "增加 risk_score 字段需要修改哪些文件？",
 ]
 
-const projectId = ref(1)
+const projectId = ref(projectIdFromQuery(new URLSearchParams(window.location.search).get("project_id")))
 const question = ref("")
 const conversationId = ref<number | null>(null)
 const restoreId = ref<number | null>(null)

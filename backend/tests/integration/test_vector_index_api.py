@@ -46,6 +46,9 @@ class FakeVectorStore:
         self.chunks = list(chunks)
         self.vectors = list(vectors)
 
+    def has_collection(self, project_id: int) -> bool:
+        return self.project_id == project_id
+
 
 @pytest.fixture(autouse=True)
 def fake_retrieval_dependencies(
@@ -103,6 +106,17 @@ def test_build_vector_index_endpoint(
     assert fake_embeddings.document_texts == [
         chunk.searchable_text for chunk in fake_store.chunks
     ]
+
+
+def test_vector_index_status_changes_after_build(
+    client, tmp_path
+) -> None:
+    project_id = create_project(client, tmp_path, scan=True)
+    before = client.get(f"/api/projects/{project_id}/vector-index-status")
+    client.post(f"/api/projects/{project_id}/build-vector-index")
+    after = client.get(f"/api/projects/{project_id}/vector-index-status")
+    assert before.json() == {"project_id": project_id, "ready": False}
+    assert after.json() == {"project_id": project_id, "ready": True}
 
 
 def test_build_vector_index_returns_project_not_found(client) -> None:

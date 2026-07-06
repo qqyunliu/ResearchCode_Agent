@@ -72,6 +72,11 @@ class QdrantVectorStore:
             self.collection_name(project_id)
         )
 
+    def delete_project_collection(self, project_id: int) -> None:
+        collection_name = self.collection_name(project_id)
+        if self._client.collection_exists(collection_name):
+            self._client.delete_collection(collection_name)
+
     @staticmethod
     def _validate_rebuild_input(
         chunks: Sequence[CodeChunk],

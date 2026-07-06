@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -15,6 +17,17 @@ class ProjectRead(BaseModel):
     status: str
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ProjectListItem(ProjectRead):
+    created_at: datetime
+    last_scan_at: datetime | None
+    sort_order: int
+    path_accessible: bool
+
+
+class ProjectOrderUpdate(BaseModel):
+    project_ids: list[int] = Field(min_length=1)
 
 
 class ProjectEntityRead(BaseModel):

@@ -19,6 +19,9 @@ def test_metadata_contains_all_application_tables() -> None:
         "messages",
         "scan_issues",
     }
+    assert "sort_order" in {
+        column["name"] for column in inspect(engine).get_columns("projects")
+    }
 
 
 def test_conversation_orders_messages_and_project_delete_cascades() -> None:

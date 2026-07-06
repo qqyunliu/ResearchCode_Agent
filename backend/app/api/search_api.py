@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.core.database import get_session
+from app.errors import DomainError
+from app.models import Project
 from app.core.dependencies import (
     get_chunk_builder,
     get_embedding_service,
@@ -18,10 +20,32 @@ from app.schemas.retrieval import (
     SearchHitRead,
     SearchRequest,
     VectorIndexSummary,
+    VectorIndexStatus,
 )
 from app.services.vector_index_service import VectorIndexService
 
 router = APIRouter()
+
+
+@router.get(
+    "/projects/{project_id}/vector-index-status",
+    response_model=VectorIndexStatus,
+)
+def vector_index_status(
+    project_id: int,
+    session: Session = Depends(get_session),
+    vector_store: QdrantVectorStore = Depends(get_vector_store),
+) -> VectorIndexStatus:
+    if session.get(Project, project_id) is None:
+        raise DomainError(
+            code="PROJECT_NOT_FOUND",
+            message=f"Project {project_id} does not exist.",
+            status_code=404,
+        )
+    return VectorIndexStatus(
+        project_id=project_id,
+        ready=vector_store.has_collection(project_id),
+    )
 
 
 @router.post(

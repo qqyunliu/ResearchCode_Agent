@@ -6,7 +6,11 @@ import ProjectView from "../ProjectView.vue"
 const api = vi.hoisted(() => ({
   buildVectorIndex: vi.fn(),
   createProject: vi.fn(),
+  deleteProject: vi.fn(),
   getProjectStats: vi.fn(),
+  getVectorIndexStatus: vi.fn(),
+  listProjects: vi.fn(),
+  reorderProjects: vi.fn(),
   scanProject: vi.fn(),
 }))
 vi.mock("@/api/projects", () => api)
@@ -56,6 +60,45 @@ async function registerAndScan(wrapper: ReturnType<typeof mount>) {
 describe("ProjectView", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    api.listProjects.mockResolvedValue([])
+    api.getVectorIndexStatus.mockResolvedValue({ project_id: 1, ready: false })
+  })
+
+  it("loads history and selects an existing project", async () => {
+    api.listProjects.mockResolvedValue([{
+      id: 9, name: "Existing", root_path: "F:/existing", status: "ready",
+      created_at: "2026-01-01", last_scan_at: "2026-01-02",
+      sort_order: 0, path_accessible: true,
+    }])
+    api.getProjectStats.mockResolvedValue({ ...stats, project_id: 9 })
+    const wrapper = mount(ProjectView)
+    await flushPromises()
+    expect(api.listProjects).toHaveBeenCalled()
+    expect(wrapper.text()).toContain("Existing")
+    expect(api.getProjectStats).toHaveBeenCalledWith(9)
+  })
+
+  it("requires confirmation before rebuilding an existing vector index", async () => {
+    api.listProjects.mockResolvedValue([{
+      id: 9, name: "Indexed", root_path: "F:/indexed", status: "ready",
+      created_at: "2026-01-01", last_scan_at: "2026-01-02",
+      sort_order: 0, path_accessible: true,
+    }])
+    api.getProjectStats.mockResolvedValue({ ...stats, project_id: 9 })
+    api.getVectorIndexStatus.mockResolvedValue({ project_id: 9, ready: true })
+    api.buildVectorIndex.mockResolvedValue({
+      project_id: 9, collection_name: "project_9_code_chunks",
+      chunks_indexed: 12,
+    })
+    const wrapper = mount(ProjectView)
+    await flushPromises()
+    expect(wrapper.get('[data-test="build-index"]').text()).toContain("重新构建")
+    await wrapper.get('[data-test="build-index"]').trigger("click")
+    expect(wrapper.get('[data-test="rebuild-confirm"]').text()).toContain("Embedding")
+    expect(api.buildVectorIndex).not.toHaveBeenCalled()
+    await wrapper.get('[data-test="confirm-rebuild"]').trigger("click")
+    await flushPromises()
+    expect(api.buildVectorIndex).toHaveBeenCalledWith(9)
   })
 
   it("renders Chinese project-management copy", () => {

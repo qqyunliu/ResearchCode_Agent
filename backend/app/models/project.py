@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, String
+from sqlalchemy import DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin
@@ -19,6 +19,11 @@ class Project(TimestampMixin, Base):
     status: Mapped[str] = mapped_column(
         String(32),
         default="created",
+        nullable=False,
+    )
+    sort_order: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
         nullable=False,
     )
     last_scan_at: Mapped[datetime | None] = mapped_column(

@@ -128,3 +128,11 @@ def test_search_missing_project_collection_returns_empty_list() -> None:
         query_vector=[1.0, 0.0],
         limit=10,
     ) == []
+
+
+def test_delete_project_collection_is_idempotent() -> None:
+    store = QdrantVectorStore(QdrantClient(":memory:"))
+    store.rebuild(7, [chunk(1, "demo")], [[1.0, 0.0]])
+    store.delete_project_collection(7)
+    store.delete_project_collection(7)
+    assert not store.has_collection(7)

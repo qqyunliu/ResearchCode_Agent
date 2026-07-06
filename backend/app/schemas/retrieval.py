@@ -7,6 +7,11 @@ class VectorIndexSummary(BaseModel):
     chunks_indexed: int
 
 
+class VectorIndexStatus(BaseModel):
+    project_id: int
+    ready: bool
+
+
 class SearchRequest(BaseModel):
     project_id: int
     query: str = Field(min_length=1)

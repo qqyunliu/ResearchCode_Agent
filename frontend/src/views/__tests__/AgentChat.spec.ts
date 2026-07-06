@@ -72,6 +72,12 @@ async function submit(wrapper: ReturnType<typeof mountChat>, question: string) {
 }
 
 describe("AgentChat", () => {
+  it("prefills project ID from the URL query", () => {
+    window.history.pushState({}, "", "/chat?project_id=19")
+    const wrapper = mount(AgentChat)
+    expect((wrapper.get('[data-test="project-id"]').element as HTMLInputElement).value).toBe("19")
+    window.history.pushState({}, "", "/")
+  })
   beforeEach(() => {
     vi.clearAllMocks()
   })

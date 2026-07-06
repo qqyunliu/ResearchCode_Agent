@@ -7,7 +7,11 @@ export interface Project {
   id: number
   name: string
   root_path: string
-  status: string
+  status: "created" | "scanning" | "ready" | "failed"
+  created_at: string
+  last_scan_at: string | null
+  sort_order: number
+  path_accessible: boolean
 }
 
 export interface ScanSummary {
@@ -48,4 +52,9 @@ export interface VectorIndexSummary {
   project_id: number
   collection_name: string
   chunks_indexed: number
+}
+
+export interface VectorIndexStatus {
+  project_id: number
+  ready: boolean
 }

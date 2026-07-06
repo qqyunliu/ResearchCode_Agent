@@ -405,11 +405,25 @@ In PowerShell, use `curl.exe`; `curl` may resolve to a PowerShell alias.
 
 ```http
 POST /api/projects
+GET  /api/projects
+PUT  /api/projects/order
+DELETE /api/projects/{project_id}
 POST /api/projects/{project_id}/scan
 GET  /api/projects/{project_id}/stats
 GET  /api/projects/{project_id}/entities/{entity_id}
 POST /api/projects/{project_id}/build-vector-index
+GET  /api/projects/{project_id}/vector-index-status
 ```
+
+The Projects page loads the complete registered-project history and provides
+client-side filtering, sorting, and pagination. Manual drag order is persisted
+in SQLite. Existing databases are upgraded automatically with the required
+`sort_order` column. Deleting a project is irreversible: its database-owned
+scan data and conversations are cascade-deleted after its Qdrant collection is
+removed.
+
+Projects-page shortcuts pass `project_id` to `/search`, `/graph`, and `/chat`;
+those pages use a valid positive query value as their initial project ID.
 
 Project creation body:
 
