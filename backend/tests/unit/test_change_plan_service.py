@@ -206,6 +206,41 @@ def test_change_plan_uses_search_graph_and_one_llm_call() -> None:
     ]
 
 
+def test_change_plan_normalizes_common_mimo_field_shapes() -> None:
+    payload = json.loads(llm_json(affected_files=[{
+        "entity_id": "Entity 5",
+        "file_path": "backend/src/AlertController.java",
+        "reason": "The controller exposes the alert API.",
+        "suggested_changes": "Return the risk_score field.",
+    }]))
+    payload["risks"] = "Clients may require compatibility handling."
+    payload["uncertainties"] = "The persistence model was not retrieved."
+    service, _, _, _ = make_service(
+        "```json\n" + json.dumps(payload) + "\n```"
+    )
+
+    response = service.answer(1, "Add risk_score", 5)
+
+    assert response.affected_files[0].entity_id == 5
+    assert response.affected_files[0].suggested_changes == [
+        "Return the risk_score field."
+    ]
+
+
+def test_change_plan_resolves_named_entity_ids_from_evidence() -> None:
+    payload = json.loads(llm_json(affected_files=[{
+        "entity_id": "AlertController.getAlert",
+        "file_path": "backend/src/AlertController.java",
+        "reason": "The controller exposes the alert API.",
+        "suggested_changes": ["Return the risk_score field."],
+    }]))
+    service, _, _, _ = make_service(json.dumps(payload))
+
+    response = service.answer(1, "Add risk_score", 5)
+
+    assert [item.entity_id for item in response.affected_files] == [5]
+
+
 def test_ungrounded_affected_file_is_removed_and_reported() -> None:
     service, _, _, _ = make_service(
         llm_json(

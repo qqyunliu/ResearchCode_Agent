@@ -1,6 +1,14 @@
+import logging
+import re
 from typing import Protocol
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationError,
+    field_validator,
+)
 
 from app.errors import DomainError
 from app.graph.types import GraphResult
@@ -26,6 +34,7 @@ Put unsupported assumptions in uncertainties."""
 NO_CHANGE_PLAN_EVIDENCE_ANSWER = (
     "No supporting code evidence was found for this change plan."
 )
+logger = logging.getLogger(__name__)
 
 
 class ChangePlanSearch(Protocol):
@@ -57,12 +66,28 @@ class ChangePlanGraph(Protocol):
 
 
 class _LlmAffectedFile(BaseModel):
-    entity_id: int
+    entity_id: int | str
     file_path: str = Field(min_length=1)
     reason: str = Field(min_length=1)
     suggested_changes: list[str]
 
     model_config = ConfigDict(str_strip_whitespace=True)
+
+    @field_validator("entity_id", mode="before")
+    @classmethod
+    def normalize_entity_id(cls, value):
+        if isinstance(value, str):
+            match = re.search(r"(\d+)\s*$", value)
+            if match:
+                return int(match.group(1))
+        return value
+
+    @field_validator("suggested_changes", mode="before")
+    @classmethod
+    def normalize_suggested_changes(cls, value):
+        if isinstance(value, str):
+            return [value]
+        return value
 
 
 class _LlmChangePlan(BaseModel):
@@ -72,6 +97,13 @@ class _LlmChangePlan(BaseModel):
     uncertainties: list[str]
 
     model_config = ConfigDict(str_strip_whitespace=True)
+
+    @field_validator("risks", "uncertainties", mode="before")
+    @classmethod
+    def normalize_text_lists(cls, value):
+        if isinstance(value, str):
+            return [value]
+        return value
 
 
 class ChangePlanService:
@@ -168,8 +200,21 @@ class ChangePlanService:
             ) from error
 
         try:
-            return _LlmChangePlan.model_validate_json(raw_response)
+            normalized_response = raw_response.strip()
+            if normalized_response.startswith("```"):
+                first_newline = normalized_response.find("\n")
+                if first_newline != -1:
+                    normalized_response = normalized_response[
+                        first_newline + 1:
+                    ]
+                if normalized_response.endswith("```"):
+                    normalized_response = normalized_response[:-3].rstrip()
+            return _LlmChangePlan.model_validate_json(normalized_response)
         except ValidationError as error:
+            logger.warning(
+                "Invalid change-plan response schema: %s",
+                error.errors(include_input=False),
+            )
             raise DomainError(
                 code="CHANGE_PLAN_RESPONSE_INVALID",
                 message=(
@@ -192,7 +237,12 @@ class ChangePlanService:
         uncertainties: list[str] = []
         seen: set[tuple[int, str]] = set()
         for item in plan.affected_files:
-            key = (item.entity_id, item.file_path)
+            entity_id = ChangePlanService._resolve_entity_id(
+                item.entity_id,
+                item.file_path,
+                context,
+            )
+            key = (entity_id, item.file_path)
             if key not in evidence:
                 uncertainties.append(
                     (
@@ -207,13 +257,33 @@ class ChangePlanService:
             seen.add(key)
             grounded.append(
                 AffectedFileRead(
-                    entity_id=item.entity_id,
+                    entity_id=entity_id,
                     file_path=item.file_path,
                     reason=item.reason,
                     suggested_changes=item.suggested_changes,
                 )
             )
         return grounded, uncertainties
+
+    @staticmethod
+    def _resolve_entity_id(
+        value: int | str,
+        file_path: str,
+        context: RagContext,
+    ) -> int | None:
+        if isinstance(value, int):
+            return value
+
+        identifier = value.casefold()
+        candidates = {
+            reference.entity_id
+            for reference in context.references
+            if reference.file_path == file_path
+            and reference.qualified_name.casefold() in identifier
+        }
+        if len(candidates) == 1:
+            return candidates.pop()
+        return None
 
     @staticmethod
     def _answer_text(

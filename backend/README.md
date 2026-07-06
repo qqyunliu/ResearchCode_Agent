@@ -1,5 +1,8 @@
 # ResearchCode-Agent Backend
 
+For the complete four-week architecture, frontend routes, setup sequence, and
+demo walkthrough, see the repository root [`README.md`](../README.md).
+
 The backend registers and scans local source-code projects, extracts code
 entities and relationships into SQLite, builds project-scoped vector indexes,
 and answers code questions with file-and-line citations.

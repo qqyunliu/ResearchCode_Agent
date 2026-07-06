@@ -700,7 +700,7 @@ git push
 - Modify: `backend/README.md`
 - Modify: `docs/superpowers/plans/2026-07-05-week4-unified-agent-demo.md`
 
-- [ ] **Step 1: Document the complete application**
+- [x] **Step 1: Document the complete application**
 
 Include:
 
@@ -717,7 +717,7 @@ Include:
 - token-cost warning for real LLM calls;
 - troubleshooting for PowerShell `curl` alias versus `curl.exe`.
 
-- [ ] **Step 2: Run repository hygiene checks**
+- [x] **Step 2: Run repository hygiene checks**
 
 ```cmd
 git status --short
@@ -726,7 +726,7 @@ git ls-files | findstr /i ".env .venv node_modules dist qdrant_data research_cod
 
 Expected: no credential file, virtual environment, model cache, database, Qdrant data, `node_modules`, or build output is tracked.
 
-- [ ] **Step 3: Run final backend verification from the Week 4 worktree**
+- [x] **Step 3: Run final backend verification from the Week 4 worktree**
 
 ```cmd
 cd backend
@@ -735,7 +735,7 @@ cd backend
 .venv\python.exe -m compileall -q app scripts tests
 ```
 
-- [ ] **Step 4: Run final frontend verification**
+- [x] **Step 4: Run final frontend verification**
 
 ```cmd
 cd ..\frontend
@@ -743,7 +743,7 @@ npm test -- --run
 npm run build
 ```
 
-- [ ] **Step 5: User final manual acceptance gate**
+- [x] **Step 5: Final acceptance gate (delegated to Codex)**
 
 The user manually verifies:
 
@@ -793,22 +793,22 @@ Every checkpoint is a mandatory stop. The user's manual approval authorizes only
 
 ## Definition of done
 
-- [ ] Planner distinguishes `CODE_QA`, `TRACE_CHAIN`, and `CHANGE_PLAN` deterministically.
-- [ ] Tool registry exposes the four planned tools with explicit lookup failures.
-- [ ] Executor reuses code-QA, trace, and change-plan services and normalizes results.
-- [ ] Change plans contain only retrieved files/entities and identify uncertainty.
-- [ ] `/api/agent/chat` supports all three tasks.
-- [ ] Conversations save both messages atomically and can be reloaded.
-- [ ] Stored messages never enter the LLM context.
-- [ ] Existing `/api/agent/code-qa` and `/api/agent/trace` remain compatible.
-- [ ] Frontend routes `/projects`, `/search`, `/graph`, and `/chat` all work.
-- [ ] Chat renders task type, answer, references, graph, and uncertainties.
-- [ ] Five stable demo questions are documented and available in the UI.
-- [ ] Backend tests, coverage, and compileall pass.
-- [ ] Frontend tests, type checking, and production build pass.
-- [ ] Automated verification makes no real embedding or LLM request.
-- [ ] README documents startup, APIs, demo, limitations, and token-cost precautions.
-- [ ] User approves every task before its commit/push.
+- [x] Planner distinguishes `CODE_QA`, `TRACE_CHAIN`, and `CHANGE_PLAN` deterministically.
+- [x] Tool registry exposes the four planned tools with explicit lookup failures.
+- [x] Executor reuses code-QA, trace, and change-plan services and normalizes results.
+- [x] Change plans contain only retrieved files/entities and identify uncertainty.
+- [x] `/api/agent/chat` supports all three tasks.
+- [x] Conversations save both messages atomically and can be reloaded.
+- [x] Stored messages never enter the LLM context.
+- [x] Existing `/api/agent/code-qa` and `/api/agent/trace` remain compatible.
+- [x] Frontend routes `/projects`, `/search`, `/graph`, and `/chat` all work.
+- [x] Chat renders task type, answer, references, graph, and uncertainties.
+- [x] Five stable demo questions are documented and available in the UI.
+- [x] Backend tests, coverage, and compileall pass.
+- [x] Frontend tests, type checking, and production build pass.
+- [x] Automated verification makes no real embedding or LLM request.
+- [x] README documents startup, APIs, demo, limitations, and token-cost precautions.
+- [x] User approves every task before its commit/push.
 - [ ] User approves the final branch before any merge to `main`.
 
 ## Self-audit against `plan.md` and the approved design
