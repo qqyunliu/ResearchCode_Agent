@@ -2,6 +2,7 @@ import { flushPromises, mount } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import ProjectView from "../ProjectView.vue"
+import projectViewSource from "../ProjectView.vue?raw"
 
 const api = vi.hoisted(() => ({
   buildVectorIndex: vi.fn(),
@@ -120,6 +121,12 @@ describe("ProjectView", () => {
 
     expect(wrapper.get('[data-test="register"]').attributes("disabled"))
       .toBeUndefined()
+  })
+
+  it("matches the search page action button height for registration", () => {
+    expect(projectViewSource).toContain(
+      "form button{align-self:end;padding:13px 20px",
+    )
   })
 
   it("registers a project and enables scanning", async () => {
