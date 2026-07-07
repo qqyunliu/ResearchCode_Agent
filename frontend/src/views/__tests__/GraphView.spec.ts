@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import type { GraphResponse } from "@/types/graph"
 import GraphView from "../GraphView.vue"
+import graphViewSource from "../GraphView.vue?raw"
 
 const searchChain = vi.hoisted(() => vi.fn())
 vi.mock("@/api/graph", () => ({ searchChain }))
@@ -49,6 +50,8 @@ describe("GraphView", () => {
   })
   beforeEach(() => {
     searchChain.mockReset()
+    localStorage.clear()
+    window.history.pushState({}, "", "/")
   })
 
   it("renders Chinese graph-explorer copy", () => {
@@ -68,6 +71,18 @@ describe("GraphView", () => {
     expect(button.attributes("disabled")).toBeDefined()
     await wrapper.get('[data-test="query"]').setValue("alert API")
     expect(button.attributes("disabled")).toBeUndefined()
+  })
+
+  it("renders the focused GraphRAG header without the text-only browser card", () => {
+    const wrapper = mountView()
+
+    expect(wrapper.text()).toContain("GraphRAG")
+    expect(wrapper.text()).not.toContain("ResearchCode-Agent · GraphRAG")
+    expect(wrapper.text()).not.toContain("代码关系浏览器")
+    expect(graphViewSource).toMatch(/\.hero\s*\{[^}]*margin-bottom:\s*30px;[^}]*\}/s)
+    expect(graphViewSource).toMatch(/\.eyebrow\s*\{(?![^}]*margin:)[^}]*font-size:\s*0\.76rem;[^}]*\}/s)
+    expect(graphViewSource).toMatch(/h1\s*\{[^}]*margin:\s*8px 0;[^}]*\}/s)
+    expect(graphViewSource).not.toMatch(/h1\s*\{[^}]*max-width:/s)
   })
 
   it("loads graph data and shows selected node details", async () => {
@@ -90,6 +105,55 @@ describe("GraphView", () => {
     expect(wrapper.text()).toContain("backend/src/AlertController.java")
     expect(wrapper.text()).toContain("10–13")
     expect(wrapper.text()).toContain("alertService.findById")
+  })
+
+  it("records graph searches and reloads the graph from history", async () => {
+    searchChain
+      .mockResolvedValueOnce({ nodes: [], edges: [], references: [] })
+      .mockResolvedValueOnce(graphResponse)
+    const wrapper = mountView()
+    await wrapper.get('[data-test="project-id"]').setValue("6")
+    await wrapper.get('[data-test="query"]').setValue(" alert call chain ")
+    await wrapper.get("form").trigger("submit")
+    await flushPromises()
+
+    const item = wrapper.get('[data-test="history-item"]')
+    expect(item.text()).toContain("alert call chain")
+    expect(item.text()).toContain("项目 ID 6")
+
+    await wrapper.get('[data-test="query"]').setValue("other")
+    await item.trigger("click")
+    await flushPromises()
+
+    expect(searchChain).toHaveBeenCalledTimes(2)
+    expect(searchChain).toHaveBeenLastCalledWith({
+      project_id: 6,
+      query: "alert call chain",
+      limit: 5,
+      max_depth: 2,
+    })
+    expect(wrapper.findComponent(GraphPanelStub).props("nodes")).toEqual(
+      graphResponse.nodes,
+    )
+  })
+
+  it("deletes one graph history item and clears all graph history", async () => {
+    searchChain.mockResolvedValue({ nodes: [], edges: [], references: [] })
+    const wrapper = mountView()
+    await wrapper.get('[data-test="query"]').setValue("alert API")
+    await wrapper.get("form").trigger("submit")
+    await flushPromises()
+    await wrapper.get('[data-test="query"]').setValue("login API")
+    await wrapper.get("form").trigger("submit")
+    await flushPromises()
+
+    expect(wrapper.findAll('[data-test="history-item"]')).toHaveLength(2)
+
+    await wrapper.get('[data-test="delete-history-item"]').trigger("click")
+    expect(wrapper.findAll('[data-test="history-item"]')).toHaveLength(1)
+
+    await wrapper.get('[data-test="clear-history"]').trigger("click")
+    expect(wrapper.find('[data-test="graph-history"]').exists()).toBe(false)
   })
 
   it("shows empty and error states", async () => {

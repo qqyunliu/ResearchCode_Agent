@@ -29,9 +29,9 @@ function isSearchHistoryItem(value: unknown): value is SearchHistoryItem {
   )
 }
 
-function saveSearchHistory(items: SearchHistoryItem[]) {
+function saveSearchHistory(storageKey: string, items: SearchHistoryItem[]) {
   try {
-    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(items))
+    localStorage.setItem(storageKey, JSON.stringify(items))
   } catch {
     // Search history is a convenience feature; storage failures should not break search.
   }
@@ -41,57 +41,69 @@ function itemId(projectId: number, query: string) {
   return `${projectId}:${query.trim().toLowerCase()}`
 }
 
-export function loadSearchHistory(): SearchHistoryItem[] {
-  try {
-    const raw = localStorage.getItem(SEARCH_HISTORY_KEY)
-    if (!raw) return []
-    const parsed = JSON.parse(raw)
-    if (!Array.isArray(parsed)) return []
-    return parsed.filter(isSearchHistoryItem).slice(0, MAX_HISTORY_ITEMS)
-  } catch {
-    return []
+export function createLocalHistoryStore(storageKey: string) {
+  function load(): SearchHistoryItem[] {
+    try {
+      const raw = localStorage.getItem(storageKey)
+      if (!raw) return []
+      const parsed = JSON.parse(raw)
+      if (!Array.isArray(parsed)) return []
+      return parsed.filter(isSearchHistoryItem).slice(0, MAX_HISTORY_ITEMS)
+    } catch {
+      return []
+    }
   }
+
+  function record(input: SearchHistoryInput): SearchHistoryItem[] {
+    const query = input.query.trim()
+    if (!Number.isSafeInteger(input.projectId) || input.projectId <= 0 || !query) {
+      return load()
+    }
+    const id = itemId(input.projectId, query)
+    const next: SearchHistoryItem = {
+      id,
+      projectId: input.projectId,
+      query,
+      searchedAt: new Date().toISOString(),
+    }
+    const history = load().filter((item) => item.id !== id)
+    const updated = [next, ...history].slice(0, MAX_HISTORY_ITEMS)
+    saveSearchHistory(storageKey, updated)
+    return updated
+  }
+
+  function visible(projectId: number): SearchHistoryItem[] {
+    return load()
+      .slice()
+      .sort((left, right) => {
+        if (left.projectId === projectId && right.projectId !== projectId) return -1
+        if (left.projectId !== projectId && right.projectId === projectId) return 1
+        return 0
+      })
+      .slice(0, MAX_VISIBLE_ITEMS)
+  }
+
+  function deleteItem(id: string): SearchHistoryItem[] {
+    const updated = load().filter((item) => item.id !== id)
+    saveSearchHistory(storageKey, updated)
+    return updated
+  }
+
+  function clear() {
+    try {
+      localStorage.removeItem(storageKey)
+    } catch {
+      // Ignore browser storage failures.
+    }
+  }
+
+  return { load, record, visible, deleteItem, clear }
 }
 
-export function recordSearchHistory(input: SearchHistoryInput): SearchHistoryItem[] {
-  const query = input.query.trim()
-  if (!Number.isSafeInteger(input.projectId) || input.projectId <= 0 || !query) {
-    return loadSearchHistory()
-  }
-  const id = itemId(input.projectId, query)
-  const next: SearchHistoryItem = {
-    id,
-    projectId: input.projectId,
-    query,
-    searchedAt: new Date().toISOString(),
-  }
-  const history = loadSearchHistory().filter((item) => item.id !== id)
-  const updated = [next, ...history].slice(0, MAX_HISTORY_ITEMS)
-  saveSearchHistory(updated)
-  return updated
-}
+const searchHistoryStore = createLocalHistoryStore(SEARCH_HISTORY_KEY)
 
-export function getVisibleSearchHistory(projectId: number): SearchHistoryItem[] {
-  return loadSearchHistory()
-    .slice()
-    .sort((left, right) => {
-      if (left.projectId === projectId && right.projectId !== projectId) return -1
-      if (left.projectId !== projectId && right.projectId === projectId) return 1
-      return 0
-    })
-    .slice(0, MAX_VISIBLE_ITEMS)
-}
-
-export function deleteSearchHistoryItem(id: string): SearchHistoryItem[] {
-  const updated = loadSearchHistory().filter((item) => item.id !== id)
-  saveSearchHistory(updated)
-  return updated
-}
-
-export function clearSearchHistory() {
-  try {
-    localStorage.removeItem(SEARCH_HISTORY_KEY)
-  } catch {
-    // Ignore browser storage failures.
-  }
-}
+export const loadSearchHistory = searchHistoryStore.load
+export const recordSearchHistory = searchHistoryStore.record
+export const getVisibleSearchHistory = searchHistoryStore.visible
+export const deleteSearchHistoryItem = searchHistoryStore.deleteItem
+export const clearSearchHistory = searchHistoryStore.clear

@@ -1,9 +1,16 @@
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { computed, onMounted, ref } from "vue"
 
 import { searchChain } from "@/api/graph"
 import GraphPanel from "@/components/GraphPanel.vue"
 import type { GraphEdge, GraphNode } from "@/types/graph"
+import {
+  clearGraphHistory,
+  deleteGraphHistoryItem,
+  loadGraphHistory,
+  recordGraphHistory,
+  type GraphHistoryItem,
+} from "@/utils/graphHistory"
 import { projectIdFromQuery } from "@/utils/projectRoute"
 
 const projectId = ref(projectIdFromQuery(new URLSearchParams(window.location.search).get("project_id")))
@@ -14,10 +21,50 @@ const selectedNode = ref<GraphNode | null>(null)
 const loading = ref(false)
 const errorMessage = ref("")
 const hasSearched = ref(false)
+const history = ref<GraphHistoryItem[]>([])
 
 const canSearch = computed(
   () => query.value.trim().length > 0 && !loading.value,
 )
+const visibleHistory = computed(() => history.value
+  .slice()
+  .sort((left, right) => {
+    if (left.projectId === projectId.value && right.projectId !== projectId.value) return -1
+    if (left.projectId !== projectId.value && right.projectId === projectId.value) return 1
+    return 0
+  })
+  .slice(0, 8),
+)
+
+function refreshHistory() {
+  history.value = loadGraphHistory()
+}
+
+async function fillFromHistory(item: GraphHistoryItem) {
+  projectId.value = item.projectId
+  query.value = item.query
+  await submitSearch()
+}
+
+function removeHistoryItem(id: string) {
+  history.value = deleteGraphHistoryItem(id)
+}
+
+function clearHistory() {
+  clearGraphHistory()
+  history.value = []
+}
+
+function formatHistoryTime(value: string) {
+  const searchedAt = new Date(value).getTime()
+  if (Number.isNaN(searchedAt)) return "时间未知"
+  const diffMinutes = Math.max(0, Math.floor((Date.now() - searchedAt) / 60000))
+  if (diffMinutes < 1) return "刚刚"
+  if (diffMinutes < 60) return `${diffMinutes} 分钟前`
+  const diffHours = Math.floor(diffMinutes / 60)
+  if (diffHours < 24) return `${diffHours} 小时前`
+  return new Date(value).toLocaleString()
+}
 
 async function submitSearch() {
   if (!canSearch.value) {
@@ -35,6 +82,10 @@ async function submitSearch() {
     })
     nodes.value = response.nodes
     edges.value = response.edges
+    history.value = recordGraphHistory({
+      projectId: projectId.value,
+      query: query.value,
+    })
   } catch {
     nodes.value = []
     edges.value = []
@@ -46,21 +97,19 @@ async function submitSearch() {
     loading.value = false
   }
 }
+
+onMounted(refreshHistory)
 </script>
 
 <template>
   <main class="page">
     <header class="hero">
       <div>
-        <p class="eyebrow">ResearchCode-Agent · GraphRAG</p>
+        <p class="eyebrow">GraphRAG</p>
         <h1>从请求追踪到代码实现</h1>
         <p class="subtitle">
           搜索已索引项目，查看 API 调用链，并打开每个节点对应的源码。
         </p>
-      </div>
-      <div class="status-pill">
-        <span class="status-dot" />
-        代码关系浏览器
       </div>
     </header>
 
@@ -91,6 +140,32 @@ async function submitSearch() {
         {{ loading ? "正在追踪……" : "追踪调用链" }}
       </button>
     </form>
+
+    <section v-if="visibleHistory.length > 0" class="history" data-test="graph-history">
+      <div class="history-head">
+        <h2>历史记录</h2>
+        <button type="button" class="ghost" data-test="clear-history" @click="clearHistory">
+          清空历史
+        </button>
+      </div>
+      <ul>
+        <li v-for="item in visibleHistory" :key="item.id">
+          <button type="button" class="history-item" data-test="history-item" @click="fillFromHistory(item)">
+            <strong>{{ item.query }}</strong>
+            <span>项目 ID {{ item.projectId }} · {{ formatHistoryTime(item.searchedAt) }}</span>
+          </button>
+          <button
+            type="button"
+            class="delete-history"
+            data-test="delete-history-item"
+            aria-label="删除该条历史"
+            @click.stop="removeHistoryItem(item.id)"
+          >
+            删除
+          </button>
+        </li>
+      </ul>
+    </section>
 
     <p v-if="errorMessage" class="notice error" data-test="error">
       {{ errorMessage }}
@@ -166,14 +241,17 @@ async function submitSearch() {
 }
 
 .hero {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 32px;
-  margin-bottom: 32px;
+  margin-bottom: 30px;
 }
 
-.eyebrow,
+.eyebrow {
+  color: #0f766e;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
 .section-label {
   margin: 0 0 8px;
   color: #0f766e;
@@ -184,7 +262,6 @@ async function submitSearch() {
 }
 
 h1 {
-  max-width: 780px;
   margin: 8px 0;
   color: #0f172a;
   font-size: clamp(2.2rem, 5vw, 4rem);
@@ -194,27 +271,6 @@ h1 {
 .subtitle {
   max-width: 700px;
   color: #64748b;
-}
-
-.status-pill {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 10px 14px;
-  border: 1px solid #dbe4ea;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.8);
-  color: #475569;
-  font-size: 0.82rem;
-  white-space: nowrap;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
 }
 
 .search-bar {
@@ -266,6 +322,78 @@ button {
 button:disabled {
   background: #94a3b8;
   cursor: not-allowed;
+}
+
+.history {
+  margin-top: 16px;
+  padding: 18px 20px;
+  border: 1px solid #dbe4ea;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.history h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1rem;
+}
+
+.history ul {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.history li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.history-item {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #dbe4ea;
+  background: #f8fafc;
+  color: #0f172a;
+  text-align: left;
+}
+
+.history-item strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-item span {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.ghost,
+.delete-history {
+  padding: 8px 10px;
+  background: #ecfeff;
+  color: #0f766e;
+  font-size: 0.78rem;
+}
+
+.delete-history {
+  background: #fff1f2;
+  color: #be123c;
 }
 
 .workspace {
@@ -409,14 +537,6 @@ pre {
 }
 
 @media (max-width: 980px) {
-  .hero {
-    display: grid;
-  }
-
-  .status-pill {
-    width: fit-content;
-  }
-
   .workspace {
     grid-template-columns: 1fr;
   }
@@ -435,7 +555,8 @@ pre {
     padding: 32px 16px 48px;
   }
 
-  .search-bar {
+  .search-bar,
+  .history li {
     grid-template-columns: 1fr;
   }
 
