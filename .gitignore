@@ -1,4 +1,5 @@
 .worktrees/
+.mimocode/
 .venv/
 .env
 __pycache__/
