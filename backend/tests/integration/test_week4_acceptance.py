@@ -137,8 +137,9 @@ def test_week4_unified_agent_offline_acceptance(client, tmp_path) -> None:
     ).status_code == 409
 
     assert questions[0] in llm.calls[0][1]
-    assert questions[0] not in llm.calls[1][1]
-    assert questions[1] not in llm.calls[2][1]
+    assert questions[0] in llm.calls[1][1]
+    assert questions[1] in llm.calls[2][1]
+    assert "Conversation context (not code evidence):" in llm.calls[1][1]
 
     llm.fail_next = True
     failed = client.post(

@@ -5,6 +5,13 @@ from app.errors import DomainError
 from app.retrieval.types import SearchHit
 from app.retrieval.query_rewriter import QueryRewriter
 
+VECTOR_FALLBACK_UNCERTAINTY = (
+    "Vector retrieval was unavailable; keyword-only fallback was used."
+)
+KEYWORD_FALLBACK_UNCERTAINTY = (
+    "Keyword retrieval was unavailable; vector-only fallback was used."
+)
+
 
 class QueryEmbedder(Protocol):
     def embed_query(self, text: str) -> list[float]: ...
@@ -50,7 +57,14 @@ class HybridSearchService:
         query: str,
         limit: int,
     ) -> list[SearchHit]:
-        if not self.vector_store.has_collection(project_id):
+        vector_unavailable = False
+        try:
+            has_collection = self.vector_store.has_collection(project_id)
+        except Exception:
+            has_collection = True
+            vector_unavailable = True
+
+        if not has_collection:
             raise DomainError(
                 code="VECTOR_INDEX_NOT_FOUND",
                 message=(
@@ -62,18 +76,71 @@ class HybridSearchService:
 
         candidate_limit = limit * 2
         effective_query = self.rewriter.rewrite(query) if self.rewriter else query
-        query_vector = self.embeddings.embed_query(effective_query)
-        vector_hits = self.vector_store.search(
-            project_id,
-            query_vector,
-            candidate_limit,
-        )
-        keyword_hits = self.keyword_search.search(
-            project_id,
-            effective_query,
-            candidate_limit,
-        )
+        vector_hits: list[SearchHit] = []
+        if not vector_unavailable:
+            try:
+                query_vector = self.embeddings.embed_query(effective_query)
+                vector_hits = self.vector_store.search(
+                    project_id,
+                    query_vector,
+                    candidate_limit,
+                )
+            except Exception:
+                vector_unavailable = True
+
+        keyword_unavailable = False
+        try:
+            keyword_hits = self.keyword_search.search(
+                project_id,
+                effective_query,
+                candidate_limit,
+            )
+        except DomainError:
+            raise
+        except Exception:
+            keyword_hits = []
+            keyword_unavailable = True
+
+        if vector_unavailable and not keyword_hits:
+            raise self._retrieval_unavailable()
+        if keyword_unavailable and not vector_hits:
+            raise self._retrieval_unavailable()
+        if vector_unavailable:
+            return [
+                replace(
+                    hit,
+                    source="keyword_fallback",
+                    uncertainties=(
+                        *hit.uncertainties,
+                        VECTOR_FALLBACK_UNCERTAINTY,
+                    ),
+                )
+                for hit in keyword_hits[:limit]
+            ]
+        if keyword_unavailable:
+            return [
+                replace(
+                    hit,
+                    source="vector_fallback",
+                    uncertainties=(
+                        *hit.uncertainties,
+                        KEYWORD_FALLBACK_UNCERTAINTY,
+                    ),
+                )
+                for hit in vector_hits[:limit]
+            ]
         return fuse_search_hits(vector_hits, keyword_hits, limit)
+
+    @staticmethod
+    def _retrieval_unavailable() -> DomainError:
+        return DomainError(
+            code="RETRIEVAL_UNAVAILABLE",
+            message=(
+                "Code retrieval is temporarily unavailable. "
+                "Please try again."
+            ),
+            status_code=503,
+        )
 
 
 def fuse_search_hits(

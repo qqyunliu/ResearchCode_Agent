@@ -30,3 +30,4 @@ class SearchHit:
     metadata: dict[str, object]
     score: float
     source: str
+    uncertainties: tuple[str, ...] = ()

@@ -38,7 +38,7 @@ class RecordingPlanner:
 
 class RecordingExecutor:
     def __init__(self, *, failure: Exception | None = None) -> None:
-        self.calls: list[tuple[TaskType, int, str, int]] = []
+        self.calls: list[tuple[TaskType, int, str, int, str]] = []
         self.failure = failure
 
     def execute(
@@ -48,8 +48,11 @@ class RecordingExecutor:
         project_id: int,
         question: str,
         limit: int,
+        conversation_memory: str,
     ) -> AgentResult:
-        self.calls.append((task_type, project_id, question, limit))
+        self.calls.append(
+            (task_type, project_id, question, limit, conversation_memory)
+        )
         if self.failure is not None:
             raise self.failure
         return result()
@@ -87,6 +90,16 @@ class RecordingConversations:
         self.events.append(("history", conversation_id))
         raise AssertionError("history must not be read while answering")
 
+    def get_working_memory(
+        self,
+        project_id: int,
+        conversation_id: int | None,
+    ) -> str:
+        self.events.append(("memory", project_id, conversation_id))
+        if conversation_id is None:
+            return ""
+        return "Conversation context (not code evidence):\nUser: Alert API"
+
 
 def make_service(
     *,
@@ -117,10 +130,11 @@ def test_answer_routes_only_current_question_and_persists_result() -> None:
 
     assert planner.questions == ["Where is the alert API?"]
     assert executor.calls == [
-        (TaskType.CODE_QA, 3, "Where is the alert API?", 7)
+        (TaskType.CODE_QA, 3, "Where is the alert API?", 7, "Conversation context (not code evidence):\nUser: Alert API")
     ]
     assert conversations.events == [
         ("validate", 3, 8),
+        ("memory", 3, 8),
         ("save",),
     ]
     assert conversations.saved == [
@@ -144,7 +158,7 @@ def test_chinese_question_is_preserved_for_planning_execution_and_storage() -> N
     )
 
     assert planner.questions == [question]
-    assert executor.calls == [(TaskType.CODE_QA, 3, question, 5)]
+    assert executor.calls == [(TaskType.CODE_QA, 3, question, 5, "")]
     assert conversations.saved[0][1] == question
 
 
@@ -160,7 +174,10 @@ def test_answer_does_not_persist_when_executor_fails() -> None:
             limit=5,
         )
 
-    assert conversations.events == [("validate", 3, None)]
+    assert conversations.events == [
+        ("validate", 3, None),
+        ("memory", 3, None),
+    ]
     assert conversations.saved == []
 
 

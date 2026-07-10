@@ -46,6 +46,9 @@ class FixedPlanner:
 
 
 class EchoExecutor:
+    def __init__(self) -> None:
+        self.memories: list[str] = []
+
     def execute(
         self,
         task_type: TaskType,
@@ -53,7 +56,9 @@ class EchoExecutor:
         project_id: int,
         question: str,
         limit: int,
+        conversation_memory: str = "",
     ) -> AgentResult:
+        self.memories.append(conversation_memory)
         return AgentResult(
             task_type=task_type,
             answer=f"Answer to: {question}",
@@ -111,9 +116,10 @@ def test_new_and_continued_chat_can_be_reloaded_chronologically(
         project = Project(name="Demo", root_path=str(tmp_path / "demo"))
         session.add(project)
         session.commit()
+        executor = EchoExecutor()
         service = AgentChatService(
             planner=FixedPlanner(),
-            executor=EchoExecutor(),
+            executor=executor,
             conversations=ConversationService(session),
         )
         app.dependency_overrides[get_agent_chat_service] = lambda: service
@@ -150,6 +156,14 @@ def test_new_and_continued_chat_can_be_reloaded_chronologically(
         "Answer to: Second",
     ]
     assert loaded.json()["messages"][1]["task_type"] == "CODE_QA"
+    assert executor.memories == [
+        "",
+        (
+            "Conversation context (not code evidence):\n"
+            "User: First\n"
+            "Assistant: Answer to: First"
+        ),
+    ]
 
 
 def test_conversation_read_maps_not_found_and_project_mismatch(

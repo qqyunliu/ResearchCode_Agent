@@ -1,5 +1,5 @@
 from collections import deque
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Protocol
 
 from app.graph.types import GraphEdge, GraphNode, GraphResult
@@ -9,6 +9,10 @@ CHAIN_RELATION_TYPES = (
     "REQUESTS_API",
     "DEFINES_API",
     "CALLS_METHOD",
+)
+GRAPH_RETRIEVAL_UNCERTAINTY = (
+    "Graph relationship retrieval was unavailable; "
+    "only direct search evidence was used."
 )
 
 
@@ -27,6 +31,7 @@ class GraphRetrievalResult:
     graph_depth: int
     relation_reason: str
     seed_entity_id: int
+    uncertainties: tuple[str, ...] = ()
 
 
 class CodeSearch(Protocol):
@@ -79,12 +84,27 @@ class GraphRagRetriever:
         }
 
         for hit in hits:
-            graph_result = self.graph.traverse(
-                project_id,
-                hit.entity_id,
-                max_depth=max_depth,
-                relation_types=CHAIN_RELATION_TYPES,
-            )
+            try:
+                graph_result = self.graph.traverse(
+                    project_id,
+                    hit.entity_id,
+                    max_depth=max_depth,
+                    relation_types=CHAIN_RELATION_TYPES,
+                )
+            except Exception:
+                direct = results_by_entity[hit.entity_id]
+                results_by_entity[hit.entity_id] = replace(
+                    direct,
+                    uncertainties=tuple(
+                        dict.fromkeys(
+                            (
+                                *direct.uncertainties,
+                                GRAPH_RETRIEVAL_UNCERTAINTY,
+                            )
+                        )
+                    ),
+                )
+                continue
             for candidate in self._expand(hit, graph_result, max_depth):
                 current = results_by_entity.get(candidate.entity_id)
                 if current is None or self._rank(candidate) < self._rank(
@@ -113,6 +133,7 @@ class GraphRagRetriever:
             graph_depth=0,
             relation_reason="direct hybrid-search hit",
             seed_entity_id=hit.entity_id,
+            uncertainties=hit.uncertainties,
         )
 
     @classmethod
@@ -167,6 +188,7 @@ class GraphRagRetriever:
                         graph_depth=neighbor_depth,
                         relation_reason=cls._reason(edge, nodes),
                         seed_entity_id=hit.entity_id,
+                        uncertainties=hit.uncertainties,
                     )
                 )
         return expanded

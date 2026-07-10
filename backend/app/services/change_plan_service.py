@@ -15,7 +15,7 @@ from app.graph.types import GraphResult
 from app.llm.client import LlmClient
 from app.rag.context_builder import RagContext
 from app.rag.graph_context_builder import GraphContextBuilder
-from app.rag.graph_retriever import GraphRagRetriever
+from app.rag.graph_retriever import GraphRagRetriever, GraphRetrievalResult
 from app.retrieval.types import SearchHit
 from app.schemas.agent import (
     AffectedFileRead,
@@ -23,6 +23,12 @@ from app.schemas.agent import (
     ContextReferenceRead,
 )
 from app.schemas.graph import GraphResponse
+from app.services.evidence_validator import (
+    EVIDENCE_VALIDATION_FAILED_ANSWER,
+    AnswerEvidenceValidator,
+)
+from app.services.relationship_limits import append_relationship_limits
+from app.services.conversation_memory import augment_question_with_memory
 
 CHANGE_PLAN_SYSTEM_PROMPT = """Use only supplied indexed-code evidence.
 Write all JSON text values in the same language as the user's original question.
@@ -34,6 +40,15 @@ Put unsupported assumptions in uncertainties."""
 
 NO_CHANGE_PLAN_EVIDENCE_ANSWER = (
     "No supporting code evidence was found for this change plan."
+)
+EXPECTED_CHAIN_RELATIONS = (
+    "REQUESTS_API",
+    "DEFINES_API",
+    "CALLS_METHOD",
+)
+GRAPH_EXPANSION_UNCERTAINTY = (
+    "Graph expansion was unavailable; "
+    "the answer uses direct search evidence only."
 )
 logger = logging.getLogger(__name__)
 
@@ -115,38 +130,61 @@ class ChangePlanService:
         graph: ChangePlanGraph,
         context_builder: GraphContextBuilder,
         llm: LlmClient,
+        evidence_validator: AnswerEvidenceValidator | None = None,
     ) -> None:
         self.search = search
         self.graph = graph
         self.context_builder = context_builder
         self.llm = llm
+        self.evidence_validator = (
+            evidence_validator or AnswerEvidenceValidator()
+        )
 
     def answer(
         self,
         project_id: int,
         question: str,
         limit: int,
+        conversation_memory: str = "",
     ) -> ChangePlanResponse:
+        effective_question = augment_question_with_memory(
+            question,
+            conversation_memory,
+        )
         results = GraphRagRetriever(
             search=self.search,
             graph=self.graph,
         ).retrieve(
             project_id,
-            question,
+            effective_question,
             limit=limit,
             max_depth=2,
         )
         if not results:
             return self._no_evidence_response()
 
+        retrieval_uncertainties = self._retrieval_uncertainties(results)
         seed_ids = tuple(
             dict.fromkeys(result.seed_entity_id for result in results)
         )
-        graph = self.graph.expand_entities(
-            project_id,
-            seed_ids,
-            max_depth=2,
-        )
+        graph_available = True
+        try:
+            graph = self.graph.expand_entities(
+                project_id,
+                seed_ids,
+                max_depth=2,
+            )
+        except Exception:
+            graph = GraphResult()
+            graph_available = False
+            retrieval_uncertainties = list(
+                dict.fromkeys(
+                    (
+                        *retrieval_uncertainties,
+                        GRAPH_EXPANSION_UNCERTAINTY,
+                    )
+                )
+            )
         context = self.context_builder.build(results, graph)
         graph_response = GraphResponse.from_result(graph)
         if not context.references:
@@ -154,23 +192,87 @@ class ChangePlanService:
                 graph_response=graph_response,
             )
 
-        plan = self._generate(question, context)
+        plan = self._generate(effective_question, context)
         affected_files, grounding_uncertainties = self._ground_files(
             plan,
             context,
         )
+        references = [
+            ContextReferenceRead.model_validate(reference)
+            for reference in context.references
+        ]
+        relationship_uncertainties = self._relationship_uncertainties(
+            graph,
+        ) if graph_available else []
+        answer = append_relationship_limits(
+            self._answer_text(plan, affected_files),
+            relationship_uncertainties,
+        )
+        validation = self.evidence_validator.validate(answer, references)
+        if not validation.is_valid:
+            repaired_plan = self._generate(
+                effective_question,
+                context,
+                previous_response=plan,
+                validation_messages=validation.uncertainties,
+            )
+            affected_files, repair_grounding_uncertainties = (
+                self._ground_files(repaired_plan, context)
+            )
+            repaired_answer = append_relationship_limits(
+                self._answer_text(
+                    repaired_plan,
+                    affected_files,
+                ),
+                relationship_uncertainties,
+            )
+            repaired_validation = self.evidence_validator.validate(
+                repaired_answer,
+                references,
+            )
+            if repaired_validation.is_valid:
+                return ChangePlanResponse(
+                    answer=repaired_answer,
+                    affected_files=affected_files,
+                    references=references,
+                    graph_nodes=graph_response.nodes,
+                    graph_edges=graph_response.edges,
+                    uncertainties=[
+                        *retrieval_uncertainties,
+                        *repaired_plan.uncertainties,
+                        *repair_grounding_uncertainties,
+                        *relationship_uncertainties,
+                    ],
+                )
+
+            return ChangePlanResponse(
+                answer=EVIDENCE_VALIDATION_FAILED_ANSWER,
+                affected_files=affected_files,
+                references=references,
+                graph_nodes=graph_response.nodes,
+                graph_edges=graph_response.edges,
+                uncertainties=[
+                    *retrieval_uncertainties,
+                    *repaired_plan.uncertainties,
+                    *repair_grounding_uncertainties,
+                    *relationship_uncertainties,
+                    *validation.uncertainties,
+                    *repaired_validation.uncertainties,
+                    "Evidence validation repair limit reached.",
+                ],
+            )
+
         return ChangePlanResponse(
-            answer=self._answer_text(plan, affected_files),
+            answer=answer,
             affected_files=affected_files,
-            references=[
-                ContextReferenceRead.model_validate(reference)
-                for reference in context.references
-            ],
+            references=references,
             graph_nodes=graph_response.nodes,
             graph_edges=graph_response.edges,
             uncertainties=[
+                *retrieval_uncertainties,
                 *plan.uncertainties,
                 *grounding_uncertainties,
+                *relationship_uncertainties,
             ],
         )
 
@@ -178,9 +280,26 @@ class ChangePlanService:
         self,
         question: str,
         context: RagContext,
+        *,
+        previous_response: _LlmChangePlan | None = None,
+        validation_messages: tuple[str, ...] = (),
     ) -> _LlmChangePlan:
+        repair_text = ""
+        if previous_response is not None:
+            repair_text = (
+                "Repair the previous JSON response. Use only file paths, "
+                "entity IDs, line ranges, and citation evidence present in "
+                "the indexed-code evidence. Do not mention unsupported "
+                "files in summary, risks, uncertainties, or affected_files."
+                "\n\n"
+                f"Validation failures:\n"
+                f"{self._bullet_list(validation_messages)}\n\n"
+                f"Previous JSON response:\n"
+                f"{previous_response.model_dump_json()}\n\n"
+            )
         user_prompt = (
             f"Question:\n{question}\n\n"
+            f"{repair_text}"
             f"Indexed-code evidence:\n{context.text}\n\n"
             "Return JSON only."
         )
@@ -306,6 +425,36 @@ class ChangePlanService:
                 + "\n".join(f"- {risk}" for risk in plan.risks)
             )
         return "\n\n".join(sections)
+
+    @staticmethod
+    def _bullet_list(items: tuple[str, ...]) -> str:
+        if not items:
+            return "- The answer did not pass evidence validation."
+        return "\n".join(f"- {item}" for item in items)
+
+    @staticmethod
+    def _relationship_uncertainties(graph: GraphResult) -> list[str]:
+        present = {edge.relation_type for edge in graph.edges}
+        return [
+            (
+                f"No stored {relation_type} edge was found; that "
+                "chain segment cannot be determined from indexed code."
+            )
+            for relation_type in EXPECTED_CHAIN_RELATIONS
+            if relation_type not in present
+        ]
+
+    @staticmethod
+    def _retrieval_uncertainties(
+        results: list[GraphRetrievalResult],
+    ) -> list[str]:
+        return list(
+            dict.fromkeys(
+                uncertainty
+                for result in results
+                for uncertainty in result.uncertainties
+            )
+        )
 
     @staticmethod
     def _no_evidence_response(

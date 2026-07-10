@@ -1,5 +1,6 @@
 import pytest
 
+from app.errors import DomainError
 from app.retrieval.hybrid_search import HybridSearchService, fuse_search_hits
 from app.retrieval.types import SearchHit
 
@@ -117,3 +118,130 @@ def test_rewritten_query_is_used_by_both_retrieval_branches() -> None:
         "embedding": "alert list API controller",
         "keyword": "alert list API controller",
     }
+
+
+def test_vector_failure_falls_back_to_keyword_hits() -> None:
+    class Embeddings:
+        def embed_query(self, text):
+            raise TimeoutError("embedding timed out")
+
+    class Store:
+        def has_collection(self, project_id):
+            return True
+
+        def search(self, project_id, query_vector, limit):
+            raise AssertionError("vector search must not run")
+
+    class Keywords:
+        def search(self, project_id, query, limit):
+            return [hit(1, 0.8, "keyword")]
+
+    results = HybridSearchService(
+        embeddings=Embeddings(),
+        vector_store=Store(),
+        keyword_search=Keywords(),
+    ).search(1, "alert", 5)
+
+    assert [result.entity_id for result in results] == [1]
+    assert results[0].source == "keyword_fallback"
+    assert results[0].uncertainties == (
+        "Vector retrieval was unavailable; keyword-only fallback was used.",
+    )
+
+
+def test_keyword_failure_keeps_vector_hits() -> None:
+    class Embeddings:
+        def embed_query(self, text):
+            return [1.0]
+
+    class Store:
+        def has_collection(self, project_id):
+            return True
+
+        def search(self, project_id, query_vector, limit):
+            return [hit(2, 0.9, "vector")]
+
+    class Keywords:
+        def search(self, project_id, query, limit):
+            raise TimeoutError("keyword search timed out")
+
+    results = HybridSearchService(
+        embeddings=Embeddings(),
+        vector_store=Store(),
+        keyword_search=Keywords(),
+    ).search(1, "alert", 5)
+
+    assert [result.entity_id for result in results] == [2]
+    assert results[0].source == "vector_fallback"
+    assert results[0].uncertainties == (
+        "Keyword retrieval was unavailable; vector-only fallback was used.",
+    )
+
+
+def test_missing_vector_index_is_not_hidden_by_fallback() -> None:
+    class Store:
+        def has_collection(self, project_id):
+            return False
+
+    with pytest.raises(DomainError) as raised:
+        HybridSearchService(
+            embeddings=object(),
+            vector_store=Store(),
+            keyword_search=object(),
+        ).search(1, "alert", 5)
+
+    assert raised.value.code == "VECTOR_INDEX_NOT_FOUND"
+
+
+def test_both_retrieval_branches_failing_returns_domain_error() -> None:
+    class Embeddings:
+        def embed_query(self, text):
+            raise TimeoutError("embedding timed out")
+
+    class Store:
+        def has_collection(self, project_id):
+            return True
+
+    class Keywords:
+        def search(self, project_id, query, limit):
+            raise RuntimeError("database unavailable")
+
+    with pytest.raises(DomainError) as raised:
+        HybridSearchService(
+            embeddings=Embeddings(),
+            vector_store=Store(),
+            keyword_search=Keywords(),
+        ).search(1, "alert", 5)
+
+    assert raised.value.code == "RETRIEVAL_UNAVAILABLE"
+    assert raised.value.status_code == 503
+
+
+def test_keyword_domain_error_is_not_hidden_by_vector_fallback() -> None:
+    class Embeddings:
+        def embed_query(self, text):
+            return [1.0]
+
+    class Store:
+        def has_collection(self, project_id):
+            return True
+
+        def search(self, project_id, query_vector, limit):
+            return [hit(2, 0.9, "vector")]
+
+    class Keywords:
+        def search(self, project_id, query, limit):
+            raise DomainError(
+                code="PROJECT_NOT_FOUND",
+                message="Project does not exist.",
+                status_code=404,
+            )
+
+    with pytest.raises(DomainError) as raised:
+        HybridSearchService(
+            embeddings=Embeddings(),
+            vector_store=Store(),
+            keyword_search=Keywords(),
+        ).search(1, "alert", 5)
+
+    assert raised.value.code == "PROJECT_NOT_FOUND"

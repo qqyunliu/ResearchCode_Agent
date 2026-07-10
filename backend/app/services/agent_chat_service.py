@@ -35,6 +35,12 @@ class AgentConversations(Protocol):
         conversation_id: int | None,
     ): ...
 
+    def get_working_memory(
+        self,
+        project_id: int,
+        conversation_id: int | None,
+    ) -> str: ...
+
 class AgentChatService:
     def __init__(
         self,
@@ -65,12 +71,17 @@ class AgentChatService:
             project_id,
             conversation_id,
         )
+        conversation_memory = self.conversations.get_working_memory(
+            project_id,
+            conversation_id,
+        )
         task_type = self.planner.plan(question)
         result = self.executor.execute(
             task_type,
             project_id=project_id,
             question=question,
             limit=limit,
+            conversation_memory=conversation_memory,
         )
         conversation, assistant_message = (
             self.conversations.save_exchange(

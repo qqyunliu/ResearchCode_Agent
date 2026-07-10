@@ -198,6 +198,38 @@ def test_get_history_returns_messages_in_chronological_order(
     ]
 
 
+def test_get_working_memory_returns_saved_messages_for_the_project(
+    conversation_session,
+) -> None:
+    session, project, _ = conversation_session
+    service = ConversationService(session)
+    conversation, _ = service.save_exchange(
+        project.id,
+        "Where is the alert API?",
+        agent_result(),
+        None,
+    )
+
+    memory = service.get_working_memory(project.id, conversation.id)
+
+    assert "Conversation context (not code evidence):" in memory
+    assert "Where is the alert API?" in memory
+    assert "AlertController" in memory
+
+
+def test_get_working_memory_is_empty_for_new_conversation(
+    conversation_session,
+) -> None:
+    session, project, _ = conversation_session
+
+    memory = ConversationService(session).get_working_memory(
+        project.id,
+        None,
+    )
+
+    assert memory == ""
+
+
 def test_continuing_conversation_updates_its_timestamp(
     conversation_session,
 ) -> None:

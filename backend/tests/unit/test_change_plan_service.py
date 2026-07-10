@@ -118,19 +118,27 @@ class FakeGraph:
 
 
 class FakeLlm:
-    def __init__(self, response: str) -> None:
-        self.response = response
+    def __init__(self, response: str | list[str]) -> None:
+        self.responses = (
+            [response] if isinstance(response, str) else list(response)
+        )
         self.calls: list[tuple[str, str]] = []
 
     def complete(self, system_prompt: str, user_prompt: str) -> str:
         self.calls.append((system_prompt, user_prompt))
-        return self.response
+        return self.responses[
+            min(len(self.calls) - 1, len(self.responses) - 1)
+        ]
 
 
-def llm_json(*, affected_files: list[dict] | None = None) -> str:
+def llm_json(
+    *,
+    affected_files: list[dict] | None = None,
+    summary: str = "Add risk_score to the alert flow.",
+) -> str:
     return json.dumps(
         {
-            "summary": "Add risk_score to the alert flow.",
+            "summary": summary,
             "affected_files": affected_files
             if affected_files is not None
             else [
@@ -158,7 +166,7 @@ def llm_json(*, affected_files: list[dict] | None = None) -> str:
 
 
 def make_service(
-    llm_response: str,
+    llm_response: str | list[str],
 ) -> tuple[ChangePlanService, FakeSearch, FakeGraph, FakeLlm]:
     search = FakeSearch([controller_hit()])
     graph = FakeGraph(related_graph())
@@ -202,9 +210,13 @@ def test_change_plan_uses_search_graph_and_one_llm_call() -> None:
     assert len(response.references) == 2
     assert len(response.graph_nodes) == 2
     assert len(response.graph_edges) == 1
-    assert response.uncertainties == [
-        "The persistence model was not retrieved."
-    ]
+    assert "The persistence model was not retrieved." in (
+        response.uncertainties
+    )
+    assert any(
+        "No stored REQUESTS_API edge was found" in item
+        for item in response.uncertainties
+    )
 
 
 def test_change_plan_normalizes_common_mimo_field_shapes() -> None:
@@ -320,6 +332,69 @@ def test_no_evidence_skips_graph_context_and_llm() -> None:
     assert llm.calls == []
 
 
+def test_conversation_memory_augments_change_plan_retrieval_and_prompt() -> None:
+    service, search, _, llm = make_service(llm_json())
+    memory = "Conversation context (not code evidence):\nUser: Change the alert response"
+
+    service.answer(
+        project_id=1,
+        question="Apply the same idea here",
+        limit=5,
+        conversation_memory=memory,
+    )
+
+    assert memory in search.calls[0][1]
+    assert "Current question:\nApply the same idea here" in llm.calls[0][1]
+
+
+def test_graph_expansion_failure_uses_direct_evidence() -> None:
+    class ExpansionFailingGraph(FakeGraph):
+        def expand_entities(
+            self,
+            project_id,
+            entity_ids,
+            *,
+            max_depth,
+        ):
+            raise TimeoutError("sqlite graph query timed out")
+
+    graph = ExpansionFailingGraph(related_graph())
+    llm = FakeLlm(
+        llm_json(
+            affected_files=[
+                {
+                    "entity_id": 5,
+                    "file_path": "backend/src/AlertController.java",
+                    "reason": "The controller is direct evidence.",
+                    "suggested_changes": ["Update the response."],
+                }
+            ]
+        )
+    )
+    service = ChangePlanService(
+        search=FakeSearch([controller_hit()]),
+        graph=graph,
+        context_builder=GraphContextBuilder(),
+        llm=llm,
+    )
+
+    response = service.answer(1, "Add risk_score", 5)
+
+    assert len(llm.calls) == 1
+    assert [item.entity_id for item in response.affected_files] == [5]
+    assert response.references[0].entity_id == 5
+    assert response.graph_nodes == []
+    assert response.graph_edges == []
+    assert (
+        "Graph expansion was unavailable; "
+        "the answer uses direct search evidence only."
+    ) in response.uncertainties
+    assert all(
+        "No stored " not in uncertainty
+        for uncertainty in response.uncertainties
+    )
+
+
 def test_malformed_json_becomes_domain_error() -> None:
     service, _, _, _ = make_service("not-json")
 
@@ -368,3 +443,49 @@ def test_references_are_retained_when_model_lists_no_files() -> None:
         5,
         10,
     ]
+
+
+def test_change_plan_blocks_answer_when_repair_still_fails_validation() -> None:
+    service, _, _, llm = make_service(
+        [
+            llm_json(
+                summary=(
+                    "Add risk_score in "
+                    "backend/src/AlertController.java/Ghost.java."
+                )
+            ),
+            llm_json(
+                summary=(
+                    "Still change "
+                    "backend/src/AlertController.java/Ghost.java."
+                )
+            ),
+        ]
+    )
+
+    response = service.answer(1, "Add risk_score", 5)
+
+    assert len(llm.calls) == 2
+    assert response.answer == (
+        "The model answer did not pass evidence validation, so it was "
+        "not returned. Please ask a narrower question or rebuild the "
+        "index if the evidence looks incomplete."
+    )
+    assert response.references
+    assert response.affected_files
+    assert any(
+        "Evidence validation repair limit reached" in uncertainty
+        for uncertainty in response.uncertainties
+    )
+
+
+def test_change_plan_answer_includes_deterministic_relationship_limits() -> None:
+    service, _, _, _ = make_service(llm_json())
+
+    response = service.answer(1, "Add risk_score", 5)
+
+    assert "Indexed relationship limits:" in response.answer
+    assert (
+        "No stored REQUESTS_API edge was found" in response.answer
+    )
+    assert "No stored DEFINES_API edge was found" in response.answer

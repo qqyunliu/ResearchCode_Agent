@@ -227,3 +227,30 @@ def test_empty_search_returns_no_graph_results() -> None:
 
     assert results == []
     assert graph.calls == []
+
+
+def test_graph_failure_keeps_direct_hits_with_uncertainty() -> None:
+    class FailingGraph:
+        def traverse(
+            self,
+            project_id,
+            entity_id,
+            *,
+            max_depth,
+            relation_types,
+        ):
+            raise TimeoutError("sqlite graph query timed out")
+
+    results = GraphRagRetriever(
+        search=FakeSearch([hit(1, 0.9)]),
+        graph=FailingGraph(),
+    ).retrieve(7, "trace alert", limit=5, max_depth=2)
+
+    assert [result.entity_id for result in results] == [1]
+    assert results[0].graph_depth == 0
+    assert results[0].uncertainties == (
+        (
+            "Graph relationship retrieval was unavailable; "
+            "only direct search evidence was used."
+        ),
+    )

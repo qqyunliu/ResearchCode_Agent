@@ -110,6 +110,7 @@ def test_executor_routes_code_qa_and_normalizes_result() -> None:
         project_id=1,
         question="Where is getAlert?",
         limit=5,
+        conversation_memory="Conversation context (not code evidence):\nUser: Alert API",
     )
 
     assert result == AgentResult(
@@ -122,6 +123,7 @@ def test_executor_routes_code_qa_and_normalizes_result() -> None:
             "project_id": 1,
             "question": "Where is getAlert?",
             "limit": 5,
+            "conversation_memory": "Conversation context (not code evidence):\nUser: Alert API",
         }
     ]
     assert trace.calls == []
@@ -147,9 +149,10 @@ def test_executor_routes_trace_with_two_hop_limit() -> None:
     assert trace.calls == [
         {
             "project_id": 2,
-            "question": "Trace the alert data",
-            "limit": 7,
-            "max_depth": 2,
+                "question": "Trace the alert data",
+                "limit": 7,
+                "max_depth": 2,
+                "conversation_memory": "",
         }
     ]
     assert code_qa.calls == []
@@ -176,8 +179,9 @@ def test_executor_routes_change_plan() -> None:
     assert change_plan.calls == [
         {
             "project_id": 3,
-            "question": "Add risk_score",
-            "limit": 4,
+                "question": "Add risk_score",
+                "limit": 4,
+                "conversation_memory": "",
         }
     ]
     assert code_qa.calls == []

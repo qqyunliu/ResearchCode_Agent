@@ -7,6 +7,7 @@ from app.agent.types import AgentResult
 from app.errors import DomainError
 from app.models import Conversation, Message, Project
 from app.models.base import utc_now
+from app.services.conversation_memory import build_conversation_memory
 
 
 class ConversationService:
@@ -65,6 +66,16 @@ class ConversationService:
             self._require_project(project_id)
         else:
             self.get_for_project(conversation_id, project_id)
+
+    def get_working_memory(
+        self,
+        project_id: int,
+        conversation_id: int | None,
+    ) -> str:
+        if conversation_id is None:
+            return ""
+        conversation = self.get_for_project(conversation_id, project_id)
+        return build_conversation_memory(conversation.messages)
 
     def save_exchange(
         self,

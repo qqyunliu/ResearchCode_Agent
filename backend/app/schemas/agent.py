@@ -30,6 +30,7 @@ class ContextReferenceRead(BaseModel):
 class CodeQaResponse(BaseModel):
     answer: str
     references: list[ContextReferenceRead]
+    uncertainties: list[str] = Field(default_factory=list)
 
 
 class TraceRequest(BaseModel):

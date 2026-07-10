@@ -11,6 +11,7 @@ class CodeQaTaskService(Protocol):
         project_id: int,
         question: str,
         limit: int,
+        conversation_memory: str = "",
     ) -> CodeQaResponse: ...
 
 
@@ -22,6 +23,7 @@ class TraceTaskService(Protocol):
         *,
         limit: int,
         max_depth: int,
+        conversation_memory: str = "",
     ) -> TraceResponse: ...
 
 
@@ -31,6 +33,7 @@ class ChangePlanTaskService(Protocol):
         project_id: int,
         question: str,
         limit: int,
+        conversation_memory: str = "",
     ) -> object: ...
 
 
@@ -53,12 +56,14 @@ class AgentExecutor:
         project_id: int,
         question: str,
         limit: int,
+        conversation_memory: str = "",
     ) -> AgentResult:
         if task_type == TaskType.CODE_QA:
             response = self.code_qa.answer(
                 project_id=project_id,
                 question=question,
                 limit=limit,
+                conversation_memory=conversation_memory,
             )
         elif task_type == TaskType.TRACE_CHAIN:
             response = self.trace.answer(
@@ -66,12 +71,14 @@ class AgentExecutor:
                 question=question,
                 limit=limit,
                 max_depth=2,
+                conversation_memory=conversation_memory,
             )
         elif task_type == TaskType.CHANGE_PLAN:
             response = self.change_plan.answer(
                 project_id=project_id,
                 question=question,
                 limit=limit,
+                conversation_memory=conversation_memory,
             )
         else:
             raise DomainError(

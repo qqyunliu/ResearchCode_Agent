@@ -1,3 +1,4 @@
+from dataclasses import replace
 from types import SimpleNamespace
 
 import pytest
@@ -24,13 +25,15 @@ class FakeSearch:
 
 
 class FakeLlm:
-    def __init__(self, answer: str) -> None:
-        self.answer = answer
+    def __init__(self, answer: str | list[str]) -> None:
+        self.answers = (
+            [answer] if isinstance(answer, str) else list(answer)
+        )
         self.calls: list[tuple[str, str]] = []
 
     def complete(self, system_prompt: str, user_prompt: str) -> str:
         self.calls.append((system_prompt, user_prompt))
-        return self.answer
+        return self.answers[min(len(self.calls) - 1, len(self.answers) - 1)]
 
 
 def alert_hit() -> SearchHit:
@@ -106,6 +109,28 @@ def test_answers_from_cited_retrieval_context() -> None:
     )
 
 
+def test_conversation_memory_augments_retrieval_and_llm_prompt() -> None:
+    search = FakeSearch([alert_hit()])
+    llm = FakeLlm("It is implemented in AlertController [1].")
+    service = CodeQaService(
+        search=search,
+        context_builder=RagContextBuilder(),
+        llm=llm,
+    )
+    memory = "Conversation context (not code evidence):\nUser: Explain the alert API"
+
+    service.answer(
+        project_id=1,
+        question="Who calls it?",
+        limit=5,
+        conversation_memory=memory,
+    )
+
+    assert memory in search.calls[0][1]
+    assert "Current question:\nWho calls it?" in search.calls[0][1]
+    assert memory in llm.calls[0][1]
+
+
 def test_no_hits_returns_deterministic_answer_without_calling_llm() -> None:
     search = FakeSearch([])
     llm = FakeLlm("must not be used")
@@ -126,6 +151,97 @@ def test_no_hits_returns_deterministic_answer_without_calling_llm() -> None:
     )
     assert response.references == []
     assert llm.calls == []
+
+
+def test_retrieval_fallback_warning_is_returned_as_uncertainty() -> None:
+    degraded_hit = replace(
+        alert_hit(),
+        source="keyword_fallback",
+        uncertainties=(
+            (
+                "Vector retrieval was unavailable; "
+                "keyword-only fallback was used."
+            ),
+        ),
+    )
+    service = CodeQaService(
+        search=FakeSearch([degraded_hit]),
+        context_builder=RagContextBuilder(),
+        llm=FakeLlm("It is implemented in AlertController [1]."),
+    )
+
+    response = service.answer(1, "Where is the alert API?", 5)
+
+    assert response.uncertainties == [
+        (
+            "Vector retrieval was unavailable; "
+            "keyword-only fallback was used."
+        )
+    ]
+
+
+def test_repairs_answer_once_when_evidence_validation_fails() -> None:
+    search = FakeSearch([alert_hit()])
+    llm = FakeLlm(
+        [
+            (
+                "It is implemented in "
+                "backend/src/AlertController.java/AlertService.java [1]."
+            ),
+            "It is implemented in backend/src/AlertController.java:4-7 [1].",
+        ]
+    )
+    service = CodeQaService(
+        search=search,
+        context_builder=RagContextBuilder(),
+        llm=llm,
+    )
+
+    response = service.answer(
+        project_id=1,
+        question="Where is the alert API implemented?",
+        limit=5,
+    )
+
+    assert search.calls == [
+        (1, "Where is the alert API implemented?", 5)
+    ]
+    assert len(llm.calls) == 2
+    assert "Repair the previous answer" in llm.calls[1][1]
+    assert response.answer == (
+        "It is implemented in backend/src/AlertController.java:4-7 [1]."
+    )
+
+
+def test_returns_guarded_answer_when_repair_still_fails_validation() -> None:
+    search = FakeSearch([alert_hit()])
+    llm = FakeLlm(
+        [
+            "It is in missing/src/Ghost.java [2].",
+            "It is still in missing/src/Ghost.java [2].",
+        ]
+    )
+    service = CodeQaService(
+        search=search,
+        context_builder=RagContextBuilder(),
+        llm=llm,
+    )
+
+    response = service.answer(
+        project_id=1,
+        question="Where is the alert API implemented?",
+        limit=5,
+    )
+
+    assert len(llm.calls) == 2
+    assert response.answer == (
+        "The model answer did not pass evidence validation, so it was "
+        "not returned. Please ask a narrower question or rebuild the "
+        "index if the evidence looks incomplete."
+    )
+    assert response.references[0].file_path == (
+        "backend/src/AlertController.java"
+    )
 
 
 def test_chinese_original_question_is_kept_in_final_prompt() -> None:

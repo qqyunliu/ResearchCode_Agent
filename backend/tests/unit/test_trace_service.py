@@ -105,13 +105,18 @@ class FakeGraph:
 
 
 class FakeLlm:
-    def __init__(self, answer: str = "Controller calls service [1].") -> None:
-        self.answer = answer
+    def __init__(
+        self,
+        answer: str | list[str] = "Controller calls service [1].",
+    ) -> None:
+        self.answers = (
+            [answer] if isinstance(answer, str) else list(answer)
+        )
         self.calls: list[tuple[str, str]] = []
 
     def complete(self, system_prompt: str, user_prompt: str) -> str:
         self.calls.append((system_prompt, user_prompt))
-        return self.answer
+        return self.answers[min(len(self.calls) - 1, len(self.answers) - 1)]
 
 
 def test_trace_uses_grounded_graph_context_and_returns_graph() -> None:
@@ -158,7 +163,8 @@ def test_trace_uses_grounded_graph_context_and_returns_graph() -> None:
     assert "chain, involved files, and uncertain" in system_prompt
     assert "Stored graph edges (authoritative):" in user_prompt
     assert "Question:\nTrace the alert request" in user_prompt
-    assert response.answer == "Controller calls service [1]."
+    assert response.answer.startswith("Controller calls service [1].")
+    assert "Indexed relationship limits:" in response.answer
     assert response.references[0].entity_id == 5
     assert response.graph_nodes[1].entity_id == 10
     assert response.graph_edges[0].relation_type == "CALLS_METHOD"
@@ -193,6 +199,138 @@ def test_no_results_skip_graph_and_llm() -> None:
     assert response.uncertainties
     assert graph.calls == []
     assert llm.calls == []
+
+
+def test_conversation_memory_augments_trace_retrieval_and_prompt() -> None:
+    retriever = FakeRetriever([retrieval_result()])
+    llm = FakeLlm("The controller contains the entry point [1].")
+    memory = "Conversation context (not code evidence):\nUser: Explain the alert API"
+    service = TraceService(
+        retriever=retriever,
+        graph=FakeGraph(trace_graph()),
+        context_builder=GraphContextBuilder(),
+        llm=llm,
+    )
+
+    service.answer(
+        1,
+        "Who calls it?",
+        limit=5,
+        max_depth=2,
+        conversation_memory=memory,
+    )
+
+    assert memory in retriever.calls[0][1]
+    assert "Current question:\nWho calls it?" in llm.calls[0][1]
+
+
+def test_graph_expansion_failure_uses_direct_evidence() -> None:
+    class FailingGraph:
+        def expand_entities(
+            self,
+            project_id,
+            entity_ids,
+            *,
+            max_depth,
+        ):
+            raise TimeoutError("sqlite graph query timed out")
+
+    degraded_result = replace(
+        retrieval_result(),
+        uncertainties=(
+            (
+                "Graph relationship retrieval was unavailable; "
+                "only direct search evidence was used."
+            ),
+        ),
+    )
+    llm = FakeLlm("The controller contains the entry point [1].")
+    service = TraceService(
+        retriever=FakeRetriever([degraded_result]),
+        graph=FailingGraph(),
+        context_builder=GraphContextBuilder(),
+        llm=llm,
+    )
+
+    response = service.answer(
+        1,
+        "Trace the alert request",
+        limit=5,
+        max_depth=2,
+    )
+
+    assert len(llm.calls) == 1
+    assert response.references[0].entity_id == 5
+    assert response.graph_nodes == []
+    assert response.graph_edges == []
+    assert (
+        "Graph relationship retrieval was unavailable; "
+        "only direct search evidence was used."
+    ) in response.uncertainties
+    assert (
+        "Graph expansion was unavailable; "
+        "the answer uses direct search evidence only."
+    ) in response.uncertainties
+    assert all(
+        "No stored " not in uncertainty
+        for uncertainty in response.uncertainties
+    )
+
+
+def test_trace_repairs_answer_once_when_validation_fails() -> None:
+    retriever = FakeRetriever([retrieval_result()])
+    graph = FakeGraph(trace_graph())
+    llm = FakeLlm(
+        [
+            "The chain is in backend/src/AlertController.java/Ghost.java [1].",
+            "The chain starts in backend/src/AlertController.java:10-13 [1].",
+        ]
+    )
+    service = TraceService(
+        retriever=retriever,
+        graph=graph,
+        context_builder=GraphContextBuilder(),
+        llm=llm,
+    )
+
+    response = service.answer(
+        1,
+        "Trace the alert request",
+        limit=5,
+        max_depth=2,
+    )
+
+    assert len(llm.calls) == 2
+    assert "Repair the previous answer" in llm.calls[1][1]
+    assert response.answer.startswith(
+        "The chain starts in backend/src/AlertController.java:10-13 [1]."
+    )
+    assert "Indexed relationship limits:" in response.answer
+
+
+def test_trace_answer_includes_deterministic_relationship_limits() -> None:
+    retriever = FakeRetriever([retrieval_result()])
+    graph = FakeGraph(trace_graph())
+    llm = FakeLlm("Controller calls service [1].")
+    service = TraceService(
+        retriever=retriever,
+        graph=graph,
+        context_builder=GraphContextBuilder(),
+        llm=llm,
+    )
+
+    response = service.answer(
+        1,
+        "Trace the alert request",
+        limit=5,
+        max_depth=2,
+    )
+
+    assert "Indexed relationship limits:" in response.answer
+    assert (
+        "No stored REQUESTS_API edge was found" in response.answer
+    )
+    assert "No stored DEFINES_API edge was found" in response.answer
 
 
 def test_llm_failure_becomes_domain_error() -> None:
