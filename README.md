@@ -34,7 +34,7 @@ limitation or failure state instead of being converted into a code fact.
 
 | Concept | Role | What it is trusted for | What it is not trusted for |
 | --- | --- | --- | --- |
-| Source scanner and parsers | Read local Java, Vue, and Python source into an index | File metadata, parsed entities, conservative static relations, scan issues | Runtime behavior, reflection, dynamic dispatch, arbitrary framework conventions |
+| Source scanner and parsers | Read local Java, Vue, JavaScript, TypeScript, Python, and recognized configuration files into an index | File metadata, parsed entities, conservative static relations, scan issues | Runtime behavior, reflection, dynamic dispatch, arbitrary framework conventions |
 | SQLite | Project-scoped static source-of-truth store | Code files, entities, relations, scan issues, conversations | Semantic vector similarity or runtime traces |
 | Qdrant | Project-scoped vector store | Semantic ranking of indexed code chunks | Code graph facts or durable source metadata |
 | Hybrid retrieval | Combines keyword and vector results | Candidate evidence for the current question | Proof that a candidate relationship exists |
@@ -76,11 +76,12 @@ user question + project_id + optional conversation_id
         +--> persist the successful user/assistant exchange atomically
 ```
 
-The response contains an `answer`, numbered `references` with `file_path`,
-`start_line`, and `end_line`, optional `graph_nodes` and `graph_edges`, and an
-`uncertainties` list. Change-planning responses internally also identify
-grounded affected files; the unified chat response currently exposes the
-evidence and graph fields rather than a separate `affected_files` field.
+The unified chat response contains an `answer`, numbered `references` with
+`file_path`, `start_line`, and `end_line`, optional `graph_nodes` and
+`graph_edges`, and an `uncertainties` list. Change planning internally creates
+structured `affected_files` and `risks`, then renders grounded recommendations
+into `answer`; `/api/agent/chat` does not currently expose separate
+`affected_files` or `risks` response fields.
 
 ## Key capabilities
 
@@ -98,8 +99,8 @@ evidence and graph fields rather than a separate `affected_files` field.
 - Route questions to code QA, call-chain tracing, or grounded change planning.
 - Validate generated citations, file paths, and cited line ranges before an
   answer is returned; allow at most one evidence-repair generation.
-- Return citations, graph evidence, affected files, risks, and explicit
-  uncertainties.
+- Return citations, graph evidence, and explicit uncertainties; render grounded
+  affected-file and risk recommendations in change-plan answer text.
 - Save and reload project-isolated conversations, and use a bounded recent
   message window for same-conversation follow-up questions.
 - Explore projects, search results, graph relationships, and conversations
@@ -183,9 +184,12 @@ The scanner recognizes these extensions:
 | `.yml`, `.yaml` | YAML |
 | `.json` | JSON |
 
-Only Java, Vue, and Python currently have entity parsers. Other recognized
-files contribute to scan statistics but do not produce searchable entities.
-The system does not currently index arbitrary Markdown or project
+Java and Python have general declaration parsers for classes and functions.
+Vue, standalone JavaScript/JSX, and standalone TypeScript/TSX use the frontend
+request extractor: it can create `frontend_api_call` entities, but it does not
+create general JavaScript or TypeScript class/function entities. Other
+recognized files contribute to scan statistics but do not produce searchable
+entities. The system does not currently index arbitrary Markdown or project
 documentation.
 
 The scanner:
@@ -208,12 +212,17 @@ The scanner:
 | `java_class` | Java | Parsed class declaration |
 | `java_method` | Java | Parsed method with source range and invocation metadata |
 | `backend_api` | Java | Spring-style HTTP endpoint associated with a method |
-| `frontend_api_call` | Vue | Static HTTP request found in a Vue script block |
+| `frontend_api_call` | Vue, JavaScript, TypeScript | Statically verified HTTP request from a Vue script block or standalone JS/TS file |
 | `python_class` | Python | Python class parsed with the built-in AST |
 | `python_function` | Python | Module-level function or class method |
 
 Each entity stores its project, file path, qualified name, entity type, source
 line range, indexed source content, and parser-specific metadata.
+
+`frontend_api_call` can originate from a Vue `<script>` block or an independent
+`.js`, `.jsx`, `.ts`, or `.tsx` file when its request URL and HTTP method are
+statically resolvable. This is a dedicated request-analysis path, not a general
+JavaScript/TypeScript language model.
 
 ### Static relation model
 
@@ -512,8 +521,10 @@ GET  /api/projects/{project_id}/vector-index-status
 GET  /api/projects/{project_id}/frontend-request-diagnostics?limit=10
 ```
 
-The Projects page loads the complete registered-project history and provides
-client-side filtering, sorting, and pagination. Manual drag order is persisted
+`GET /api/projects` returns every registered project, ordered by persisted
+manual order and project ID. The Projects page loads that complete result and
+provides client-side filtering, sorting, and pagination; pagination limits only
+the visible page, not the fetched project set. Manual drag order is persisted
 in SQLite. Existing databases are upgraded automatically with the required
 `sort_order` column. Deleting a project is irreversible: its database-owned
 scan data and conversations are cascade-deleted after its Qdrant collection is
@@ -717,8 +728,10 @@ The backend coverage configuration requires at least 80% branch coverage.
   recognizable Axios, Fetch, direct `request`, and common wrapper expressions.
   Dynamic URLs, methods, constants, and unknown wrappers are reported as scan
   issues rather than guessed as graph facts.
-- Only Java, Vue, and Python produce entities; recognized configuration and
-  data files are not searchable chunks.
+- Java and Python produce general declaration entities. Vue, JavaScript/JSX,
+  and TypeScript/TSX can additionally produce only statically verified
+  `frontend_api_call` entities; recognized configuration and data files are not
+  searchable chunks.
 - Graph traversal is limited to two hops and four relation types.
 - A code entity is truncated to the configured character limit before
   embedding and RAG use.
@@ -733,7 +746,9 @@ The backend coverage configuration requires at least 80% branch coverage.
   relationship claim after generation.
 - Indexing is synchronous and provides no background progress, cancellation,
   or incremental update API.
-- The frontend does not list every saved project or conversation.
+- The frontend loads every registered project but does not provide a browseable
+  list of every saved conversation; restoring a conversation currently requires
+  its project ID and conversation ID.
 - External embedding depends on network availability, account balance, and
   provider rate limits.
 - The Cytoscape production bundle may emit a non-blocking large-chunk warning.
