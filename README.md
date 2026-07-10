@@ -10,20 +10,98 @@ plans must remain tied to indexed source evidence. Responses therefore include
 file paths, line ranges, graph relationships, and explicit uncertainty where
 the static index cannot prove a claim.
 
+## What this project is and is not
+
+ResearchCode-Agent helps a developer ask evidence-backed questions about a
+local code repository, for example:
+
+- "Where is the alert API implemented?"
+- "Trace the frontend request to the backend service."
+- "Which indexed files are likely affected by adding `risk_score`?"
+
+It is a code-understanding and change-planning system, not an autonomous coding
+agent. It does not edit the indexed repository, run arbitrary commands in that
+repository, or let an LLM dynamically choose tools in a ReAct/function-calling
+loop. Task selection is deterministic, and the LLM is used only after the
+backend has retrieved bounded code and graph evidence.
+
+The main design goal is useful uncertainty rather than confident guessing. A
+missing static relation, an unavailable retrieval branch, an unresolved
+frontend request, or an invalid generated citation is surfaced as an explicit
+limitation or failure state instead of being converted into a code fact.
+
+## Core concepts and trust boundaries
+
+| Concept | Role | What it is trusted for | What it is not trusted for |
+| --- | --- | --- | --- |
+| Source scanner and parsers | Read local Java, Vue, and Python source into an index | File metadata, parsed entities, conservative static relations, scan issues | Runtime behavior, reflection, dynamic dispatch, arbitrary framework conventions |
+| SQLite | Project-scoped static source-of-truth store | Code files, entities, relations, scan issues, conversations | Semantic vector similarity or runtime traces |
+| Qdrant | Project-scoped vector store | Semantic ranking of indexed code chunks | Code graph facts or durable source metadata |
+| Hybrid retrieval | Combines keyword and vector results | Candidate evidence for the current question | Proof that a candidate relationship exists |
+| GraphRAG | Expands retrieved entities through stored SQLite relations | Bounded one- or two-hop static relationship evidence | A complete runtime call graph |
+| LLM | Explains supplied evidence and generates a structured change plan | Natural-language synthesis within the supplied context | Inventing paths, line ranges, APIs, or relationships |
+| Evidence validator | Checks generated citations and mentioned locations against current references | Returning only supported citation IDs, paths, and entity line ranges | Physical file line-count verification or semantic relationship verification |
+| Conversation memory | Supplies a bounded recent window from the same conversation | Resolving follow-up wording and retaining local constraints | Cross-project facts, cross-conversation profiles, or code evidence |
+
+The current request's indexed evidence is always the authority for code facts.
+Conversation memory and prior LLM output can guide interpretation, but they do
+not become proof on their own.
+
+## How one Agent chat request works
+
+```text
+user question + project_id + optional conversation_id
+        |
+        +--> verify conversation belongs to the project
+        |
+        +--> load bounded same-conversation memory, if supplied
+        |
+        +--> deterministic task routing
+        |      CODE_QA | TRACE_CHAIN | CHANGE_PLAN
+        |
+        +--> project-scoped keyword/vector retrieval
+        |      one branch may degrade with an uncertainty
+        |
+        +--> optional one/two-hop SQLite graph expansion
+        |
+        +--> bounded cited context and authoritative stored graph edges
+        |
+        +--> LLM answer or structured change-plan generation
+        |
+        +--> validate citations, mentioned paths, and cited entity line ranges
+        |      valid: return answer
+        |      invalid: one evidence-directed repair request
+        |      invalid again: guarded failure + references + uncertainties
+        |
+        +--> persist the successful user/assistant exchange atomically
+```
+
+The response contains an `answer`, numbered `references` with `file_path`,
+`start_line`, and `end_line`, optional `graph_nodes` and `graph_edges`, and an
+`uncertainties` list. Change-planning responses internally also identify
+grounded affected files; the unified chat response currently exposes the
+evidence and graph fields rather than a separate `affected_files` field.
+
 ## Key capabilities
 
 - Register a local source repository and scan supported text files.
 - Parse Java, Vue, and Python with Tree-sitter and Python's built-in AST.
-- Extract classes, methods, functions, backend APIs, and frontend API calls.
+- Extract classes, methods, functions, backend APIs, and statically verified
+  frontend API calls from Vue, JavaScript, and TypeScript.
 - Persist code entities and directed relationships in SQLite.
 - Build one Qdrant vector collection per registered project.
 - Run keyword search or weighted keyword/vector hybrid search.
 - Expand retrieved entities through a one- or two-hop code graph.
 - Trace frontend request calls through backend APIs, controllers, and services.
+- Diagnose recognized, backend-matched, unmatched, and unresolved frontend
+  request candidates with source locations.
 - Route questions to code QA, call-chain tracing, or grounded change planning.
-- Return citations, graph evidence, affected files, risks, and uncertainties.
-- Save and reload Agent conversations without using history as hidden reasoning
-  context.
+- Validate generated citations, file paths, and cited line ranges before an
+  answer is returned; allow at most one evidence-repair generation.
+- Return citations, graph evidence, affected files, risks, and explicit
+  uncertainties.
+- Save and reload project-isolated conversations, and use a bounded recent
+  message window for same-conversation follow-up questions.
 - Explore projects, search results, graph relationships, and conversations
   through a four-route Vue application.
 
@@ -62,7 +140,7 @@ Java / Vue / Python parsers
                   LLM
                    |
                    v
-cited answer + graph evidence + uncertainty + saved conversation
+cited answer + graph evidence + uncertainty + bounded conversation memory
 ```
 
 SQLite is the source of truth for the static code graph:
@@ -187,6 +265,12 @@ hybrid_score = 0.7 * normalized_vector_score
              + 0.3 * normalized_keyword_score
 ```
 
+When an operational failure makes either the vector or keyword branch
+unavailable, hybrid retrieval can return results from the remaining branch and
+attaches an uncertainty. A missing vector collection remains an explicit
+configuration error; if both branches are unavailable, the request fails
+instead of being reported as "not found".
+
 GraphRAG uses the hybrid results as seed entities and expands their incoming
 and outgoing SQLite relationships to a maximum depth of two. Traversal remains
 within one project and deduplicates cycles.
@@ -215,13 +299,21 @@ and graph traversal, but it is not currently an LLM function-calling loop.
 ### Task execution
 
 - `CODE_QA` performs hybrid retrieval, builds a bounded cited context, and asks
-  the configured LLM to answer only from that evidence.
+  the configured LLM to answer only from that evidence. Its generated
+  citations, file paths, and line ranges are checked against the current cited
+  context before being returned.
 - `TRACE_CHAIN` combines hybrid retrieval, graph expansion, a bounded graph
   context, and an LLM explanation. Its response also returns deterministic
   nodes, edges, and missing-chain uncertainties.
 - `CHANGE_PLAN` retrieves and expands evidence, asks the LLM for structured
   JSON, validates it with Pydantic, and removes affected files that cannot be
   matched to an indexed reference. It produces a plan, not a code patch.
+
+If answer-evidence validation fails, the Agent performs one repair request
+with the previous answer, validation failures, and current evidence context.
+If the repaired answer also fails, it returns a guarded overall failure message
+with the validated references and uncertainty details instead of partially
+rewriting natural-language claims.
 
 All three real task types can consume provider tokens. Automated tests inject
 deterministic fake LLM and embedding implementations.
@@ -233,9 +325,13 @@ response in one transaction. A failed task does not save a partial exchange.
 Conversation IDs are checked against their project to prevent cross-project
 access.
 
-Saved messages are for display and reload. Earlier messages are deliberately
-not inserted into later LLM prompts, so the current MVP does not provide
-context-aware conversational reasoning.
+For an existing conversation, the Agent reads at most the latest six persisted
+messages, truncates each message to 600 characters and the entire memory block
+to 4,000 characters, then labels that block as non-code evidence for retrieval
+and generation. The current question still controls task routing and storage;
+code facts must still be supported by current indexed evidence. New
+conversations, different projects, and different conversations do not share
+memory.
 
 ## Repository structure
 
@@ -413,6 +509,7 @@ GET  /api/projects/{project_id}/stats
 GET  /api/projects/{project_id}/entities/{entity_id}
 POST /api/projects/{project_id}/build-vector-index
 GET  /api/projects/{project_id}/vector-index-status
+GET  /api/projects/{project_id}/frontend-request-diagnostics?limit=10
 ```
 
 The Projects page loads the complete registered-project history and provides
@@ -436,6 +533,11 @@ Project creation body:
 
 The entity endpoint returns indexed source for one entity, including its
 qualified name, file path, and line range.
+
+The frontend-request diagnostics endpoint reports counts and bounded examples
+for recognized calls, calls matched to backend APIs, recognized but unmatched
+calls, and unresolved request candidates. It reads only SQLite entities,
+relations, and scan issues; it does not call an LLM.
 
 ### Search
 
@@ -524,8 +626,10 @@ ID:
 }
 ```
 
-The conversation is continuous for storage and display, but the earlier
-messages are not supplied to the later LLM request.
+The conversation is continuous for storage, display, and bounded
+same-conversation working memory. Only the latest persisted messages from the
+same project and conversation are supplied as non-code context; they do not
+replace current indexed evidence.
 
 ## Offline scripts
 
@@ -587,9 +691,18 @@ The backend coverage configuration requires at least 80% branch coverage.
   become scan issues rather than silent index corruption.
 - Ambiguous service-method calls are omitted instead of guessed.
 - RAG contexts have a configurable character limit.
+- A vector or keyword retrieval branch can degrade to the other available
+  branch with an explicit uncertainty; total retrieval failure remains an
+  explicit error.
 - Code-QA prompts require source-grounded answers and structured references.
+- Generated citation IDs, mentioned file paths, and cited line ranges are
+  validated against the current RAG references; one bounded repair attempt is
+  permitted before a guarded failure response is returned.
+- Trace and change-plan prompts receive authoritative stored graph edges and
+  deterministic notices for missing expected relation types.
 - Change-plan output is schema-validated and ungrounded files are removed.
-- Conversation writes are transactional and roll back on task failure.
+- Conversation writes are transactional and roll back on task failure;
+  same-conversation memory is project-isolated and size-bounded.
 - Real provider credentials are not needed by the automated tests.
 
 ## Known limitations
@@ -600,14 +713,24 @@ The backend coverage configuration requires at least 80% branch coverage.
   computed URLs may not produce relationships.
 - Java method-call resolution focuses on service methods and a limited set of
   Spring dependency-injection patterns.
-- Vue request extraction targets statically recognizable request expressions.
+- Vue, JavaScript, and TypeScript request extraction targets statically
+  recognizable Axios, Fetch, direct `request`, and common wrapper expressions.
+  Dynamic URLs, methods, constants, and unknown wrappers are reported as scan
+  issues rather than guessed as graph facts.
 - Only Java, Vue, and Python produce entities; recognized configuration and
   data files are not searchable chunks.
 - Graph traversal is limited to two hops and four relation types.
 - A code entity is truncated to the configured character limit before
   embedding and RAG use.
 - Change planning generates recommendations, not patches.
-- Stored conversation history is not reasoning memory.
+- Conversation memory is a recent-message window, not a cross-conversation
+  profile or a durable summary of long discussions.
+- Evidence path and line-range validation is bounded by the current retrieved
+  entity references; it does not independently verify a file's physical total
+  line count or remap an invalid path to a nearest candidate.
+- Graph relationship grounding relies on authoritative graph context and prompt
+  constraints; it does not yet semantically validate every natural-language
+  relationship claim after generation.
 - Indexing is synchronous and provides no background progress, cancellation,
   or incremental update API.
 - The frontend does not list every saved project or conversation.
@@ -623,7 +746,7 @@ The following ideas are not implemented in the current MVP:
 
 - import/module dependency entities and relationships;
 - Markdown and project-documentation indexing;
-- bounded conversation summaries for context-aware follow-up questions;
+- bounded conversation summaries for long context-aware follow-up questions;
 - LLM-selected tool calling and multi-step task decomposition;
 - background indexing with progress, cancellation, and incremental updates;
 - broader language support and stronger symbol resolution;
