@@ -38,6 +38,32 @@ export interface ProjectStats {
   last_scan_at: string | null
 }
 
+export interface FrontendRequestExample {
+  entity_id: number
+  file_path: string
+  start_line: number
+  end_line: number
+  http_method: string
+  path: string
+  resolution: string
+}
+
+export interface FrontendRequestWarningExample {
+  file_path: string
+  reason: string
+  message: string
+}
+
+export interface FrontendRequestDiagnostics {
+  project_id: number
+  identified_calls: number
+  matched_calls: number
+  unmatched_calls: number
+  unresolved_candidates: number
+  unmatched_examples: FrontendRequestExample[]
+  unresolved_examples: FrontendRequestWarningExample[]
+}
+
 export interface ProjectEntity {
   entity_id: number
   entity_type: string

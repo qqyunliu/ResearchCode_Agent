@@ -17,14 +17,21 @@ from app.models import (
 from app.models.base import utc_now
 from app.parsers.base import (
     EntityCandidate,
+    FrontendRequestCandidate,
     ParseResult,
     RelationCandidate,
     entity_key,
 )
+from app.parsers.frontend_request import FrontendRequestResolver
 from app.parsers.registry import ParserRegistry
 from app.parsers.relation_builder import build_relations
 from app.schemas.scan import ScanSummary
 from app.schemas.stats import ProjectStats
+from app.schemas.frontend_diagnostics import (
+    FrontendRequestDiagnostics,
+    FrontendRequestExample,
+    FrontendRequestWarningExample,
+)
 from app.services.scanner import (
     ProjectScanner,
     ScanIssueCandidate,
@@ -35,6 +42,12 @@ from app.services.scanner import (
 class IndexService:
     _project_locks: dict[int, threading.Lock] = {}
     _locks_guard = threading.Lock()
+    _frontend_warning_reasons = {
+        "FRONTEND_REQUEST_DYNAMIC_URL": "dynamic_url",
+        "FRONTEND_REQUEST_DYNAMIC_METHOD": "dynamic_method",
+        "FRONTEND_REQUEST_AMBIGUOUS_CONSTANT": "ambiguous_constant",
+        "FRONTEND_REQUEST_UNKNOWN_WRAPPER": "unknown_wrapper",
+    }
 
     def __init__(
         self,
@@ -68,11 +81,19 @@ class IndexService:
 
         try:
             scan_result = self.scanner.scan(root_path)
-            entities, parser_relations, parse_issues = self._parse_files(
+            entities, parser_relations, candidates, parse_issues = self._parse_files(
                 scan_result.files
             )
+            frontend_entities, analysis_warnings = (
+                FrontendRequestResolver(scan_result.files).resolve(candidates)
+            )
+            entities.extend(frontend_entities)
             relations = build_relations(entities, parser_relations)
-            issues = [*scan_result.issues, *parse_issues]
+            issues = [
+                *scan_result.issues,
+                *parse_issues,
+                *analysis_warnings,
+            ]
             self._replace_index(
                 project_id,
                 scan_result.files,
@@ -153,16 +174,96 @@ class IndexService:
             last_scan_at=project.last_scan_at,
         )
 
+    def get_frontend_request_diagnostics(
+        self,
+        project_id: int,
+        *,
+        limit: int,
+    ) -> FrontendRequestDiagnostics:
+        project = self.session.get(Project, project_id)
+        if project is None:
+            raise DomainError(
+                code="PROJECT_NOT_FOUND",
+                message=f"Project {project_id} does not exist.",
+                status_code=404,
+            )
+
+        frontend_entities = select(CodeEntity).where(
+            CodeEntity.project_id == project_id,
+            CodeEntity.entity_type == "frontend_api_call",
+        )
+        matched_ids = (
+            select(CodeRelation.source_id)
+            .join(CodeEntity, CodeEntity.id == CodeRelation.source_id)
+            .where(
+                CodeRelation.project_id == project_id,
+                CodeRelation.relation_type == "REQUESTS_API",
+                CodeEntity.project_id == project_id,
+                CodeEntity.entity_type == "frontend_api_call",
+            )
+            .distinct()
+        )
+        identified_calls = self.session.scalar(
+            select(func.count()).select_from(frontend_entities.subquery())
+        )
+        matched_calls = self.session.scalar(
+            select(func.count()).select_from(matched_ids.subquery())
+        )
+        unmatched_entities = self.session.scalars(
+            frontend_entities.where(CodeEntity.id.not_in(matched_ids))
+            .order_by(CodeEntity.file_path, CodeEntity.start_line, CodeEntity.id)
+            .limit(limit)
+        ).all()
+        unresolved_issues = self.session.scalars(
+            select(ScanIssue)
+            .where(
+                ScanIssue.project_id == project_id,
+                ScanIssue.issue_type == "analysis_warning",
+                ScanIssue.reason_code.in_(self._frontend_warning_reasons),
+            )
+            .order_by(ScanIssue.file_path, ScanIssue.id)
+            .limit(limit)
+        ).all()
+        unresolved_candidates = self.session.scalar(
+            select(func.count()).select_from(ScanIssue).where(
+                ScanIssue.project_id == project_id,
+                ScanIssue.issue_type == "analysis_warning",
+                ScanIssue.reason_code.in_(self._frontend_warning_reasons),
+            )
+        )
+
+        return FrontendRequestDiagnostics(
+            project_id=project_id,
+            identified_calls=identified_calls or 0,
+            matched_calls=matched_calls or 0,
+            unmatched_calls=(identified_calls or 0) - (matched_calls or 0),
+            unresolved_candidates=unresolved_candidates or 0,
+            unmatched_examples=[
+                self._frontend_request_example(entity)
+                for entity in unmatched_entities
+            ],
+            unresolved_examples=[
+                FrontendRequestWarningExample(
+                    file_path=issue.file_path,
+                    reason=self._frontend_warning_reasons[issue.reason_code],
+                    message=issue.message,
+                )
+                for issue in unresolved_issues
+            ],
+        )
+
     def _parse_files(
         self,
         files: tuple[ScannedFile, ...],
     ) -> tuple[
         list[EntityCandidate],
         list[RelationCandidate],
+        list[FrontendRequestCandidate],
         list[ScanIssueCandidate],
     ]:
         entities: list[EntityCandidate] = []
         relations: list[RelationCandidate] = []
+        candidates: list[FrontendRequestCandidate] = []
         issues: list[ScanIssueCandidate] = []
 
         for scanned_file in files:
@@ -181,8 +282,9 @@ class IndexService:
             namespaced = self._namespace_result(scanned_file.file_path, result)
             entities.extend(namespaced.entities)
             relations.extend(namespaced.relations)
+            candidates.extend(namespaced.frontend_request_candidates)
 
-        return entities, relations, issues
+        return entities, relations, candidates, issues
 
     def _replace_index(
         self,
@@ -313,6 +415,21 @@ class IndexService:
         return {key: count for key, count in rows}
 
     @staticmethod
+    def _frontend_request_example(
+        entity: CodeEntity,
+    ) -> FrontendRequestExample:
+        metadata = json.loads(entity.metadata_json)
+        return FrontendRequestExample(
+            entity_id=entity.id,
+            file_path=entity.file_path,
+            start_line=entity.start_line,
+            end_line=entity.end_line,
+            http_method=metadata["http_method"],
+            path=metadata["path"],
+            resolution=metadata.get("resolution", "legacy_direct"),
+        )
+
+    @staticmethod
     def _namespace_result(file_path: str, result: ParseResult) -> ParseResult:
         prefix = f"{file_path}::"
         return ParseResult(
@@ -328,4 +445,5 @@ class IndexService:
                 )
                 for relation in result.relations
             ),
+            frontend_request_candidates=result.frontend_request_candidates,
         )

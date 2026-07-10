@@ -4,6 +4,7 @@ import type {
   Project,
   ProjectCreate,
   ProjectEntity,
+  FrontendRequestDiagnostics,
   ProjectStats,
   ScanSummary,
   VectorIndexSummary,
@@ -51,6 +52,17 @@ export async function getProjectStats(
 ): Promise<ProjectStats> {
   const response = await axios.get<ProjectStats>(
     `/api/projects/${projectId}/stats`,
+  )
+  return response.data
+}
+
+export async function getFrontendRequestDiagnostics(
+  projectId: number,
+  limit = 10,
+): Promise<FrontendRequestDiagnostics> {
+  const response = await axios.get<FrontendRequestDiagnostics>(
+    `/api/projects/${projectId}/frontend-request-diagnostics`,
+    { params: { limit } },
   )
   return response.data
 }

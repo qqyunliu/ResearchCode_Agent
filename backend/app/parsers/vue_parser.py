@@ -5,8 +5,7 @@ from pathlib import Path
 
 from tree_sitter_language_pack import PackConfig, configure, get_parser
 
-from app.parsers.base import EntityCandidate, ParseResult
-from app.utils.api_normalizer import normalize_api_path
+from app.parsers.base import FrontendRequestCandidate, ParseResult
 
 _SCRIPT_BLOCK = re.compile(
     r"<script\b(?P<attrs>[^>]*)>(?P<body>.*?)</script\s*>",
@@ -28,13 +27,6 @@ class _SourceBlock:
     start_line: int
 
 
-@dataclass(frozen=True, slots=True)
-class _RequestCall:
-    client: str
-    http_method: str
-    path: str
-
-
 class VueParser:
     def supports(self, language: str) -> bool:
         return language in {"vue", "javascript", "typescript"}
@@ -46,8 +38,8 @@ class VueParser:
             tree = get_parser(block.language).parse(block.source)
             extractor = _RequestExtractor(file_path, block)
             extractor.visit(tree.root_node())
-            entities.extend(extractor.entities)
-        return ParseResult(entities=tuple(entities))
+            entities.extend(extractor.candidates)
+        return ParseResult(frontend_request_candidates=tuple(entities))
 
     @staticmethod
     def _source_blocks(file_path: str, source: str) -> list[_SourceBlock]:
@@ -74,17 +66,20 @@ class _RequestExtractor:
         self.file_path = file_path
         self.block = block
         self.source_bytes = block.source.encode("utf-8")
-        self.entities: list[EntityCandidate] = []
+        self.candidates: list[FrontendRequestCandidate] = []
 
     def visit(self, node: object) -> None:
         if node.kind() == "call_expression":
-            request = self._request_call(node)
-            if request is not None:
-                self._add_entity(node, request)
+            candidate = self._request_candidate(node)
+            if candidate is not None:
+                self.candidates.append(candidate)
         for child in self._named_children(node):
             self.visit(child)
 
-    def _request_call(self, node: object) -> _RequestCall | None:
+    def _request_candidate(
+        self,
+        node: object,
+    ) -> FrontendRequestCandidate | None:
         function = node.child_by_field_name("function")
         arguments = node.child_by_field_name("arguments")
         if function is None or arguments is None:
@@ -97,31 +92,64 @@ class _RequestExtractor:
                 return None
             client = self._text(client_node)
             method = self._text(method_node).lower()
-            if client not in {"axios", "request"} or method not in _HTTP_METHODS:
-                return None
             argument_nodes = self._named_children(arguments)
+            if method in _HTTP_METHODS and client in {
+                "axios", "request", "http", "service",
+            }:
+                if not argument_nodes:
+                    return None
+                return self._candidate(
+                    node,
+                    f"{client}.{method}",
+                    argument_nodes[0],
+                    method.upper(),
+                )
+            if method == "request":
+                return self._object_request_candidate(
+                    node,
+                    f"{client}.request",
+                    argument_nodes,
+                )
+            return None
+
+        if function.kind() != "identifier":
+            return None
+        client = self._text(function)
+        argument_nodes = self._named_children(arguments)
+        if client == "fetch":
             if not argument_nodes:
                 return None
-            path = self._static_path(argument_nodes[0])
-            if path is None:
-                return None
-            return _RequestCall(client, method.upper(), path)
-
-        if function.kind() != "identifier" or self._text(function) != "request":
+            method = "GET"
+            if len(argument_nodes) > 1 and argument_nodes[1].kind() == "object":
+                method_node = self._object_values(argument_nodes[1]).get("method")
+                if method_node is not None:
+                    method = self._text(method_node)
+            return self._candidate(node, "fetch", argument_nodes[0], method)
+        if client == "axios":
+            return self._object_request_candidate(node, "axios", argument_nodes)
+        if client != "request":
             return None
-        argument_nodes = self._named_children(arguments)
+        return self._object_request_candidate(node, "request", argument_nodes)
+
+    def _object_request_candidate(
+        self,
+        node: object,
+        callee: str,
+        argument_nodes: list[object],
+    ) -> FrontendRequestCandidate | None:
         if not argument_nodes or argument_nodes[0].kind() != "object":
             return None
         values = self._object_values(argument_nodes[0])
         path_node = values.get("url")
+        if path_node is None:
+            return None
         method_node = values.get("method")
-        if path_node is None or method_node is None:
-            return None
-        path = self._static_path(path_node)
-        method = self._static_string(method_node)
-        if path is None or method is None or method.lower() not in _HTTP_METHODS:
-            return None
-        return _RequestCall("request", method.upper(), path)
+        return self._candidate(
+            node,
+            callee,
+            path_node,
+            self._text(method_node) if method_node is not None else None,
+        )
 
     def _object_values(self, node: object) -> dict[str, object]:
         values = {}
@@ -136,67 +164,24 @@ class _RequestExtractor:
             values[key] = value_node
         return values
 
-    def _static_path(self, node: object) -> str | None:
-        if node.kind() == "string":
-            return self._static_string(node)
-        if node.kind() != "template_string":
-            return None
-        raw = self._text(node)[1:-1]
-        literal_text = _TEMPLATE_SUBSTITUTION.sub("", raw)
-        if not literal_text.strip():
-            return None
-        return raw
-
-    def _static_string(self, node: object) -> str | None:
-        if node.kind() != "string":
-            return None
-        raw = self._text(node)
-        if len(raw) < 2 or raw[0] not in {"'", '"'}:
-            return None
-        return self._decode_escapes(raw[1:-1])
-
-    @staticmethod
-    def _decode_escapes(value: str) -> str:
-        escapes = {
-            "\\\\": "\\",
-            "\\/": "/",
-            '\\"': '"',
-            "\\'": "'",
-            "\\n": "\n",
-            "\\r": "\r",
-            "\\t": "\t",
-        }
-        return re.sub(
-            r"""\\[\\/"'nrt]""",
-            lambda match: escapes.get(match.group(0), match.group(0)),
-            value,
-        )
-
-    def _add_entity(self, node: object, request: _RequestCall) -> None:
+    def _candidate(
+        self,
+        node: object,
+        callee: str,
+        url_node: object,
+        method_expression: str | None,
+    ) -> FrontendRequestCandidate:
         start_line = self.block.start_line + node.start_position().row
         end_line = self.block.start_line + node.end_position().row
-        qualified_name = f"{request.http_method} {request.path}"
-        local_key = (
-            f"frontend_api_call:{request.http_method}:{request.path}:"
-            f"{start_line}:{node.start_byte()}"
-        )
-        self.entities.append(
-            EntityCandidate(
-                local_key=local_key,
-                entity_type="frontend_api_call",
-                name=qualified_name,
-                qualified_name=qualified_name,
-                file_path=self.file_path,
-                start_line=start_line,
-                end_line=end_line,
-                content=self._text(node),
-                metadata={
-                    "client": request.client,
-                    "http_method": request.http_method,
-                    "path": request.path,
-                    "normalized_path": normalize_api_path(request.path),
-                },
-            )
+        return FrontendRequestCandidate(
+            file_path=self.file_path,
+            start_line=start_line,
+            end_line=end_line,
+            start_byte=node.start_byte(),
+            content=self._text(node),
+            callee=callee,
+            url_expression=self._text(url_node),
+            method_expression=method_expression,
         )
 
     def _text(self, node: object) -> str:

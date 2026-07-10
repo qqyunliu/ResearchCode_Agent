@@ -33,8 +33,9 @@ def test_registry_delegates_supported_languages() -> None:
     assert [entity.entity_type for entity in python_result.entities] == [
         "python_function",
     ]
-    assert [entity.entity_type for entity in frontend_result.entities] == [
-        "frontend_api_call",
+    assert frontend_result.entities == ()
+    assert [candidate.callee for candidate in frontend_result.frontend_request_candidates] == [
+        "axios.get",
     ]
 
 

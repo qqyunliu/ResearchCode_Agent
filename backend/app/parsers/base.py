@@ -41,9 +41,22 @@ class RelationCandidate:
 
 
 @dataclass(frozen=True, slots=True)
+class FrontendRequestCandidate:
+    file_path: str
+    start_line: int
+    end_line: int
+    start_byte: int
+    content: str
+    callee: str
+    url_expression: str
+    method_expression: str | None
+
+
+@dataclass(frozen=True, slots=True)
 class ParseResult:
     entities: tuple[EntityCandidate, ...] = ()
     relations: tuple[RelationCandidate, ...] = ()
+    frontend_request_candidates: tuple[FrontendRequestCandidate, ...] = ()
 
 
 class SourceParser(Protocol):

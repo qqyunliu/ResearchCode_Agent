@@ -100,6 +100,34 @@ def test_unmatched_frontend_call_creates_no_relation() -> None:
     assert build_relations([frontend, backend]) == ()
 
 
+def test_resolved_wrapper_entity_builds_request_relation() -> None:
+    frontend = entity(
+        "frontend:wrapped-video",
+        "frontend_api_call",
+        "POST",
+        "/video/loadVideo",
+    )
+    frontend.metadata["resolution"] = "wrapper_default_method"
+    backend = entity(
+        "backend:load-video",
+        "backend_api",
+        "POST",
+        "/video/loadVideo",
+    )
+
+    relations = build_relations([frontend, backend])
+
+    assert relations == (
+        RelationCandidate(
+            source_key=frontend.local_key,
+            target_key=backend.local_key,
+            relation_type="REQUESTS_API",
+            confidence=1.0,
+            metadata={},
+        ),
+    )
+
+
 def test_parser_relations_are_combined_and_deduplicated() -> None:
     existing = RelationCandidate(
         source_key="class:AlertController",

@@ -11,6 +11,8 @@ axios.get("/api/alerts/123")
 request.post(`/api/alerts/${alertId}`, payload)
 request({ url: "/api/alerts/search", method: "POST" })
 request({ url: dynamicUrl, method: dynamicMethod })
+proxy.request({ url: proxy.Api.loadVideo })
+fetch("/api/alerts")
 </script>
 """
 
@@ -28,25 +30,17 @@ def test_extracts_static_requests_from_vue_script_with_source_lines() -> None:
     result = VueParser().parse("src/AlertView.vue", VUE_SOURCE)
 
     assert [
-        (entity.metadata["http_method"], entity.metadata["path"])
-        for entity in result.entities
+        (candidate.callee, candidate.url_expression, candidate.method_expression)
+        for candidate in result.frontend_request_candidates
     ] == [
-        ("GET", "/api/alerts/123"),
-        ("POST", "/api/alerts/${alertId}"),
-        ("POST", "/api/alerts/search"),
+        ("axios.get", '"/api/alerts/123"', "GET"),
+        ("request.post", "`/api/alerts/${alertId}`", "POST"),
+        ("request", '"/api/alerts/search"', '"POST"'),
+        ("request", "dynamicUrl", "dynamicMethod"),
+        ("proxy.request", "proxy.Api.loadVideo", None),
+        ("fetch", '"/api/alerts"', "GET"),
     ]
-    assert [
-        entity.metadata["normalized_path"] for entity in result.entities
-    ] == [
-        "/api/alerts/{param}",
-        "/api/alerts/{param}",
-        "/api/alerts/search",
-    ]
-    assert [entity.start_line for entity in result.entities] == [6, 7, 8]
-    assert all(
-        entity.entity_type == "frontend_api_call"
-        for entity in result.entities
-    )
+    assert result.entities == ()
     assert result.relations == ()
 
 
@@ -60,12 +54,12 @@ request.delete("/api/devices/42")
     result = VueParser().parse("src/api.ts", source)
 
     assert [
-        (entity.metadata["http_method"], entity.metadata["normalized_path"])
-        for entity in result.entities
+        (candidate.callee, candidate.method_expression)
+        for candidate in result.frontend_request_candidates
     ] == [
-        ("PUT", "/api/devices/{param}"),
-        ("PATCH", "/api/devices/{param}/status"),
-        ("DELETE", "/api/devices/{param}"),
+        ("request.put", "PUT"),
+        ("axios.patch", "PATCH"),
+        ("request.delete", "DELETE"),
     ]
 
 
@@ -78,4 +72,4 @@ request({ url: dynamicUrl, method: "GET" })
 
     result = VueParser().parse("src/api.js", source)
 
-    assert result.entities == ()
+    assert len(result.frontend_request_candidates) == 3

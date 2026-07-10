@@ -121,6 +121,85 @@ def test_rescan_removes_deleted_file_and_its_entities(scan_context) -> None:
     ).all() == []
 
 
+def test_scan_resolves_cross_file_request_wrapper(
+    scan_context,
+) -> None:
+    session, project, project_root = scan_context
+    frontend = project_root / "frontend" / "src"
+    frontend.mkdir(parents=True, exist_ok=True)
+    (frontend / "Api.js").write_text(
+        'const Api = { loadVideo: "/video/loadVideo" }',
+        encoding="utf-8",
+    )
+    (frontend / "Request.js").write_text(
+        """const request = (config) => {
+  const { url } = config
+  return instance.post(url)
+}""",
+        encoding="utf-8",
+    )
+    (frontend / "View.vue").write_text(
+        "<script setup>\nproxy.request({ url: proxy.Api.loadVideo })\n</script>",
+        encoding="utf-8",
+    )
+    controller = project_root / "backend" / "src" / "VideoController.java"
+    controller.write_text(
+        """@RestController
+@RequestMapping("/video")
+class VideoController {
+  @PostMapping("/loadVideo")
+  void loadVideo() {}
+}""",
+        encoding="utf-8",
+    )
+
+    IndexService(session).scan_project(project.id)
+
+    frontend_call = session.scalar(
+        select(CodeEntity).where(
+                CodeEntity.project_id == project.id,
+                CodeEntity.entity_type == "frontend_api_call",
+                CodeEntity.qualified_name == "POST /video/loadVideo",
+        )
+    )
+    assert frontend_call is not None
+    assert session.scalar(
+        select(CodeRelation).where(
+            CodeRelation.project_id == project.id,
+            CodeRelation.source_id == frontend_call.id,
+            CodeRelation.relation_type == "REQUESTS_API",
+        )
+    ) is not None
+
+
+def test_frontend_request_diagnostics_separates_matched_unmatched_and_unresolved(
+    scan_context,
+) -> None:
+    session, project, project_root = scan_context
+    frontend = project_root / "frontend" / "src"
+    (frontend / "Diagnostics.vue").write_text(
+        "<script setup>\n"
+        'fetch("/missing")\n'
+        "fetch(dynamicUrl)\n"
+        "</script>",
+        encoding="utf-8",
+    )
+    service = IndexService(session)
+    service.scan_project(project.id)
+
+    diagnostics = service.get_frontend_request_diagnostics(
+        project.id,
+        limit=10,
+    )
+
+    assert diagnostics.identified_calls == 4
+    assert diagnostics.matched_calls == 2
+    assert diagnostics.unmatched_calls == 2
+    assert diagnostics.unresolved_candidates == 1
+    assert diagnostics.unmatched_examples[0].path == "/missing"
+    assert diagnostics.unresolved_examples[0].reason == "dynamic_url"
+
+
 class FailingRegistry:
     def __init__(self) -> None:
         self.registry = ParserRegistry()

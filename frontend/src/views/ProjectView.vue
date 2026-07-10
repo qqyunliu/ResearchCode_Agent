@@ -2,13 +2,13 @@
 import { computed, onMounted, ref } from "vue"
 
 import {
-  buildVectorIndex, createProject, deleteProject, getProjectStats,
+  buildVectorIndex, createProject, deleteProject, getFrontendRequestDiagnostics, getProjectStats,
   getVectorIndexStatus, listProjects, reorderProjects, scanProject,
 } from "@/api/projects"
 import ProjectDeleteDialog from "@/components/ProjectDeleteDialog.vue"
 import ProjectHistoryList from "@/components/ProjectHistoryList.vue"
 import ProjectReorderList from "@/components/ProjectReorderList.vue"
-import type { Project, ProjectStats, VectorIndexSummary } from "@/types/project"
+import type { FrontendRequestDiagnostics, Project, ProjectStats, VectorIndexSummary } from "@/types/project"
 
 type Operation = "register" | "scan" | "index" | "reorder" | "delete" | null
 const name = ref("")
@@ -16,6 +16,8 @@ const rootPath = ref("")
 const projects = ref<Project[]>([])
 const selectedProjectId = ref<number | null>(null)
 const stats = ref<ProjectStats | null>(null)
+const frontendDiagnostics = ref<FrontendRequestDiagnostics | null>(null)
+const frontendDiagnosticsError = ref("")
 const indexSummary = ref<VectorIndexSummary | null>(null)
 const indexReady = ref(false)
 const rebuildConfirmOpen = ref(false)
@@ -59,6 +61,8 @@ async function loadProjects(preserveId = selectedProjectId.value) {
 async function selectProject(id: number | null) {
   selectedProjectId.value = id
   stats.value = null
+  frontendDiagnostics.value = null
+  frontendDiagnosticsError.value = ""
   indexSummary.value = null
   indexReady.value = false
   rebuildConfirmOpen.value = false
@@ -77,6 +81,16 @@ async function selectProject(id: number | null) {
     }
   } catch {
     if (token === selectionToken) errorMessage.value = "无法加载项目统计信息。"
+  }
+  void loadFrontendDiagnostics(selected.id, token)
+}
+
+async function loadFrontendDiagnostics(projectId: number, token = selectionToken) {
+  try {
+    const result = await getFrontendRequestDiagnostics(projectId, 10)
+    if (token === selectionToken) frontendDiagnostics.value = result
+  } catch {
+    if (token === selectionToken) frontendDiagnosticsError.value = "前端请求诊断暂时不可用。"
   }
 }
 
@@ -106,6 +120,7 @@ async function scan() {
     await scanProject(id)
     projects.value = projects.value.map((item) => item.id === id ? { ...item, status: "ready", last_scan_at: new Date().toISOString() } : item)
     stats.value = await getProjectStats(id)
+    await loadFrontendDiagnostics(id)
   } catch { errorMessage.value = "无法扫描项目或加载统计信息。" }
   finally { operation.value = null }
 }
@@ -183,6 +198,32 @@ onMounted(() => loadProjects())
           <section v-if="stats" class="stats" data-test="stats">
             <article><span>文件数</span><strong>{{ stats.total_files }}</strong></article><article><span>代码行数</span><strong>{{ stats.total_lines }}</strong></article><article><span>后端 API</span><strong>{{ stats.backend_api_count }}</strong></article><article><span>前端调用</span><strong>{{ stats.frontend_api_call_count }}</strong></article><article><span>跳过文件</span><strong>{{ stats.skipped_files }}</strong></article><article><span>解析错误</span><strong>{{ stats.parse_errors }}</strong></article>
           </section>
+          <section v-if="frontendDiagnostics" class="frontend-diagnostics" data-test="frontend-diagnostics">
+            <h3>前端请求诊断</h3>
+            <div class="diagnostic-counts">
+              <span>已识别 <strong>{{ frontendDiagnostics.identified_calls }}</strong></span>
+              <span>已匹配 <strong>{{ frontendDiagnostics.matched_calls }}</strong></span>
+              <span>未匹配 <strong>{{ frontendDiagnostics.unmatched_calls }}</strong></span>
+              <span>未解析 <strong>{{ frontendDiagnostics.unresolved_candidates }}</strong></span>
+            </div>
+            <details v-if="frontendDiagnostics.unmatched_examples.length">
+              <summary>未匹配示例</summary>
+              <ul>
+                <li v-for="item in frontendDiagnostics.unmatched_examples" :key="item.entity_id" data-test="unmatched-request">
+                  {{ item.http_method }} {{ item.path }} - {{ item.file_path }}:{{ item.start_line }}
+                </li>
+              </ul>
+            </details>
+            <details v-if="frontendDiagnostics.unresolved_examples.length">
+              <summary>未解析示例</summary>
+              <ul>
+                <li v-for="item in frontendDiagnostics.unresolved_examples" :key="`${item.file_path}:${item.reason}`" data-test="unresolved-request">
+                  {{ item.file_path }} - {{ item.reason }}
+                </li>
+              </ul>
+            </details>
+          </section>
+          <p v-else-if="frontendDiagnosticsError" class="diagnostics-error" data-test="frontend-diagnostics-error">{{ frontendDiagnosticsError }}</p>
         </div>
         <p v-else class="empty-detail">选择历史项目，或注册一个新项目开始分析。</p>
       </section>
@@ -201,5 +242,5 @@ onMounted(() => loadProjects())
 <style scoped>
 .page{max-width:1180px;margin:0 auto;padding:48px 32px 72px}.eyebrow,.section-label{color:#0f766e;font-size:.76rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}h1{margin:8px 0;color:#0f172a;font-size:clamp(2.2rem,5vw,4rem);letter-spacing:-.045em}header>p:last-child,.details p{color:#64748b}.register-panel{margin-top:30px;padding:20px;border:1px solid #dbe4ea;border-radius:20px;background:white}form{display:grid;grid-template-columns:220px minmax(0,1fr) auto;gap:14px}label{display:grid;gap:7px;color:#475569;font-size:.78rem;font-weight:700}input{box-sizing:border-box;min-width:0;width:100%;padding:12px 14px;border:1px solid #cbd5e1;border-radius:10px;background:#f8fafc}button{padding:12px 16px;border:0;border-radius:10px;background:#0f766e;color:white;font-weight:700;cursor:pointer}form button{align-self:end;padding:13px 20px;font-weight:800}button:disabled{background:#94a3b8;cursor:not-allowed}.workspace{display:grid;grid-template-columns:370px minmax(0,1fr);gap:18px;margin-top:20px}.details{min-width:0;padding:22px;border:1px solid #dbe4ea;border-radius:18px;background:white}.details h2{margin:7px 0}.path{overflow-wrap:anywhere}.badges,.actions,.shortcuts,.index-result{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.badges span,.badges strong{padding:5px 9px;border-radius:8px;background:#ecfdf5;color:#0f766e}.badges .danger{background:#fff1f2;color:#be123c}.actions{margin:18px 0}.delete{background:#be123c}.shortcuts a{padding:9px 12px;border-radius:9px;background:#ecfeff;color:#0f766e;text-decoration:none;font-weight:700}.index-result{margin-top:15px;padding:14px;border-radius:12px;background:#ecfdf5;color:#166534}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}.stats article{display:grid;gap:6px;padding:14px;border:1px solid #e2e8f0;border-radius:12px}.stats span{color:#64748b;font-size:.76rem}.stats strong{font-size:1.5rem}.notice{margin:16px 0 0;padding:12px;border-radius:10px}.error{background:#fff1f2;color:#be123c}.empty-detail{display:grid;min-height:300px;place-items:center}.actions button{align-self:end}
 @media(max-width:850px){form,.workspace{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.page{padding:32px 16px}.stats{grid-template-columns:1fr}}
-.modal-backdrop{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:20px;background:#0f172a88}.modal-backdrop section{max-width:520px;padding:24px;border-radius:18px;background:white}.modal-backdrop .actions{justify-content:flex-end}
+.frontend-diagnostics{margin-top:22px;padding-top:18px;border-top:1px solid #e2e8f0}.frontend-diagnostics h3{margin:0 0 10px;font-size:1rem}.diagnostic-counts{display:flex;flex-wrap:wrap;gap:12px;color:#475569;font-size:.84rem}.diagnostic-counts strong{margin-left:4px;color:#0f172a}.frontend-diagnostics details{margin-top:10px;color:#475569;font-size:.84rem}.frontend-diagnostics summary{cursor:pointer;font-weight:700}.frontend-diagnostics ul{margin:7px 0 0;padding-left:18px;overflow-wrap:anywhere}.diagnostics-error{margin-top:18px;color:#a16207;font-size:.84rem}.modal-backdrop{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:20px;background:#0f172a88}.modal-backdrop section{max-width:520px;padding:24px;border-radius:18px;background:white}.modal-backdrop .actions{justify-content:flex-end}
 </style>

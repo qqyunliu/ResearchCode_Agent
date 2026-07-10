@@ -8,6 +8,7 @@ const api = vi.hoisted(() => ({
   buildVectorIndex: vi.fn(),
   createProject: vi.fn(),
   deleteProject: vi.fn(),
+  getFrontendRequestDiagnostics: vi.fn(),
   getProjectStats: vi.fn(),
   getVectorIndexStatus: vi.fn(),
   listProjects: vi.fn(),
@@ -28,6 +29,28 @@ const stats = {
   skipped_files: 1,
   parse_errors: 0,
   last_scan_at: "2026-07-05T12:00:00Z",
+}
+
+const diagnostics = {
+  project_id: 9,
+  identified_calls: 44,
+  matched_calls: 31,
+  unmatched_calls: 13,
+  unresolved_candidates: 2,
+  unmatched_examples: [{
+    entity_id: 18,
+    file_path: "frontend/src/View.vue",
+    start_line: 20,
+    end_line: 20,
+    http_method: "GET",
+    path: "/missing",
+    resolution: "static_request",
+  }],
+  unresolved_examples: [{
+    file_path: "frontend/src/View.vue",
+    reason: "dynamic_url",
+    message: "Frontend request was not indexed: dynamic_url.",
+  }],
 }
 
 function configureSuccessfulScan() {
@@ -63,6 +86,7 @@ describe("ProjectView", () => {
     vi.clearAllMocks()
     api.listProjects.mockResolvedValue([])
     api.getVectorIndexStatus.mockResolvedValue({ project_id: 1, ready: false })
+    api.getFrontendRequestDiagnostics.mockResolvedValue(diagnostics)
   })
 
   it("loads history and selects an existing project", async () => {
@@ -77,6 +101,39 @@ describe("ProjectView", () => {
     expect(api.listProjects).toHaveBeenCalled()
     expect(wrapper.text()).toContain("Existing")
     expect(api.getProjectStats).toHaveBeenCalledWith(9)
+  })
+
+  it("loads and renders frontend request diagnostics", async () => {
+    api.listProjects.mockResolvedValue([{
+      id: 9, name: "Existing", root_path: "F:/existing", status: "ready",
+      created_at: "2026-01-01", last_scan_at: "2026-01-02",
+      sort_order: 0, path_accessible: true,
+    }])
+    api.getProjectStats.mockResolvedValue({ ...stats, project_id: 9 })
+    const wrapper = mount(ProjectView)
+    await flushPromises()
+
+    expect(api.getFrontendRequestDiagnostics).toHaveBeenCalledWith(9, 10)
+    expect(wrapper.get('[data-test="frontend-diagnostics"]').text()).toContain("44")
+    expect(wrapper.get('[data-test="unmatched-request"]').text()).toContain("/missing")
+    expect(wrapper.get('[data-test="unresolved-request"]').text()).toContain("dynamic_url")
+  })
+
+  it("keeps project statistics when diagnostics loading fails", async () => {
+    api.listProjects.mockResolvedValue([{
+      id: 9, name: "Existing", root_path: "F:/existing", status: "ready",
+      created_at: "2026-01-01", last_scan_at: "2026-01-02",
+      sort_order: 0, path_accessible: true,
+    }])
+    api.getProjectStats.mockResolvedValue({ ...stats, project_id: 9 })
+    api.getFrontendRequestDiagnostics.mockRejectedValue(new Error("offline"))
+    const wrapper = mount(ProjectView)
+    await flushPromises()
+
+    expect(wrapper.get('[data-test="stats"]').text()).toContain("12")
+    expect(wrapper.get('[data-test="frontend-diagnostics-error"]').text()).toContain(
+      "前端请求诊断",
+    )
   })
 
   it("requires confirmation before rebuilding an existing vector index", async () => {

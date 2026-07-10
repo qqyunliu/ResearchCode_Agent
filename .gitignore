@@ -10,3 +10,4 @@ __pycache__/
 qdrant_storage/
 node_modules/
 dist/
+expert-question-notes/

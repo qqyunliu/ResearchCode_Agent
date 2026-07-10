@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_session
@@ -16,6 +16,7 @@ from app.schemas.project import (
 )
 from app.schemas.scan import ScanSummary
 from app.schemas.stats import ProjectStats
+from app.schemas.frontend_diagnostics import FrontendRequestDiagnostics
 from app.services.index_service import IndexService
 from app.services.project_service import ProjectService
 
@@ -88,6 +89,21 @@ def project_stats(
     session: Session = Depends(get_session),
 ) -> ProjectStats:
     return IndexService(session).get_stats(project_id)
+
+
+@router.get(
+    "/{project_id}/frontend-request-diagnostics",
+    response_model=FrontendRequestDiagnostics,
+)
+def frontend_request_diagnostics(
+    project_id: int,
+    limit: int = Query(default=10, ge=1, le=50),
+    session: Session = Depends(get_session),
+) -> FrontendRequestDiagnostics:
+    return IndexService(session).get_frontend_request_diagnostics(
+        project_id,
+        limit=limit,
+    )
 
 
 @router.get(
