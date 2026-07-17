@@ -1,0 +1,2973 @@
+{
+  "artifact_identity": {
+    "config_fingerprint": "6ee67a670da2357d829ac5c84931843d6b14ce13ed4bf6a90d208510900d3548",
+    "dataset_sha256": "86ffda7cf4b90eabfaf5d44dff6b76a9f841fe7e6e9bcb8df6cae1e8fac8d65c",
+    "db_sha256": "cffd46aa7a2d495877dea84ed6eb613d0a78ce9f9cd19808cb6d720fbf9e1049",
+    "repo_commit": "41720e624c5a668c7d3777835e4c87095a7a1dfd",
+    "run_id": "fusion-weight-sweep-v1",
+    "snapshot_sha256": "2eb5eb8148e088f08159fc4605466ba0473145f2ae6217b6d89bac697bf61504"
+  },
+  "eligibility": {
+    "canonical_n": 36,
+    "contract": "source_answerable retrieval cases with indexed must_recall file gold",
+    "eligible_n": 27,
+    "excluded": {
+      "ruoyi-change-plan-0031": "not a source-answerable retrieval case with indexed must_recall file gold",
+      "ruoyi-change-plan-0034": "not a source-answerable retrieval case with indexed must_recall file gold",
+      "ruoyi-change-plan-0036": "not a source-answerable retrieval case with indexed must_recall file gold",
+      "ruoyi-code-qa-0007": "not a source-answerable retrieval case with indexed must_recall file gold",
+      "ruoyi-code-qa-0008": "not a source-answerable retrieval case with indexed must_recall file gold",
+      "ruoyi-code-qa-0009": "not a source-answerable retrieval case with indexed must_recall file gold",
+      "ruoyi-code-qa-0012": "not a source-answerable retrieval case with indexed must_recall file gold",
+      "ruoyi-trace-chain-0020": "not a source-answerable retrieval case with indexed must_recall file gold",
+      "ruoyi-trace-chain-0023": "not a source-answerable retrieval case with indexed must_recall file gold"
+    },
+    "included_question_ids": [
+      "ruoyi-change-plan-0025",
+      "ruoyi-change-plan-0026",
+      "ruoyi-change-plan-0027",
+      "ruoyi-change-plan-0028",
+      "ruoyi-change-plan-0029",
+      "ruoyi-change-plan-0030",
+      "ruoyi-change-plan-0032",
+      "ruoyi-change-plan-0033",
+      "ruoyi-change-plan-0035",
+      "ruoyi-code-qa-0001",
+      "ruoyi-code-qa-0002",
+      "ruoyi-code-qa-0003",
+      "ruoyi-code-qa-0004",
+      "ruoyi-code-qa-0005",
+      "ruoyi-code-qa-0006",
+      "ruoyi-code-qa-0010",
+      "ruoyi-code-qa-0011",
+      "ruoyi-trace-chain-0013",
+      "ruoyi-trace-chain-0014",
+      "ruoyi-trace-chain-0015",
+      "ruoyi-trace-chain-0016",
+      "ruoyi-trace-chain-0017",
+      "ruoyi-trace-chain-0018",
+      "ruoyi-trace-chain-0019",
+      "ruoyi-trace-chain-0021",
+      "ruoyi-trace-chain-0022",
+      "ruoyi-trace-chain-0024"
+    ]
+  },
+  "grid": {
+    "B2": {
+      "file": {
+        "mrr": 0.821,
+        "n": 27,
+        "recall@1": 0.5278,
+        "recall@10": 0.9815,
+        "recall@5": 0.9352,
+        "zero_hit_rate": 0.0
+      },
+      "variant_config": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.30000000000000004,
+        "mode": "vector",
+        "rewrite": true,
+        "vector_weight": 0.7
+      }
+    },
+    "W60": {
+      "file": {
+        "mrr": 0.8488,
+        "n": 27,
+        "recall@1": 0.5648,
+        "recall@10": 0.9815,
+        "recall@5": 0.9722,
+        "zero_hit_rate": 0.0
+      },
+      "variant_config": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.4,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.6
+      }
+    },
+    "W65": {
+      "file": {
+        "mrr": 0.8488,
+        "n": 27,
+        "recall@1": 0.5648,
+        "recall@10": 0.9815,
+        "recall@5": 0.9722,
+        "zero_hit_rate": 0.0
+      },
+      "variant_config": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.35,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.65
+      }
+    },
+    "W70": {
+      "file": {
+        "mrr": 0.8488,
+        "n": 27,
+        "recall@1": 0.5648,
+        "recall@10": 0.9815,
+        "recall@5": 0.9722,
+        "zero_hit_rate": 0.0
+      },
+      "variant_config": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.30000000000000004,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.7
+      }
+    },
+    "W75": {
+      "file": {
+        "mrr": 0.8673,
+        "n": 27,
+        "recall@1": 0.6019,
+        "recall@10": 0.9815,
+        "recall@5": 0.9722,
+        "zero_hit_rate": 0.0
+      },
+      "variant_config": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.25,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.75
+      }
+    },
+    "W80": {
+      "file": {
+        "mrr": 0.8673,
+        "n": 27,
+        "recall@1": 0.6019,
+        "recall@10": 0.9815,
+        "recall@5": 0.9722,
+        "zero_hit_rate": 0.0
+      },
+      "variant_config": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.19999999999999996,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.8
+      }
+    },
+    "W85": {
+      "file": {
+        "mrr": 0.8673,
+        "n": 27,
+        "recall@1": 0.6019,
+        "recall@10": 0.9815,
+        "recall@5": 0.9722,
+        "zero_hit_rate": 0.0
+      },
+      "variant_config": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.15000000000000002,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.85
+      }
+    },
+    "W90": {
+      "file": {
+        "mrr": 0.8673,
+        "n": 27,
+        "recall@1": 0.6019,
+        "recall@10": 0.9815,
+        "recall@5": 0.9722,
+        "zero_hit_rate": 0.0
+      },
+      "variant_config": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.09999999999999998,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.9
+      }
+    },
+    "W95": {
+      "file": {
+        "mrr": 0.8025,
+        "n": 27,
+        "recall@1": 0.4537,
+        "recall@10": 0.9815,
+        "recall@5": 0.9722,
+        "zero_hit_rate": 0.0
+      },
+      "variant_config": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.050000000000000044,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.95
+      }
+    }
+  },
+  "groups": {
+    "difficulty": {
+      "easy": {
+        "B2": {
+          "file": {
+            "mrr": 0.8333,
+            "n": 8,
+            "recall@1": 0.625,
+            "recall@10": 1.0,
+            "recall@5": 0.875,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.30000000000000004,
+            "mode": "vector",
+            "rewrite": true,
+            "vector_weight": 0.7
+          }
+        },
+        "W60": {
+          "file": {
+            "mrr": 0.8125,
+            "n": 8,
+            "recall@1": 0.5,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.4,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.6
+          }
+        },
+        "W65": {
+          "file": {
+            "mrr": 0.8125,
+            "n": 8,
+            "recall@1": 0.5,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.35,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.65
+          }
+        },
+        "W70": {
+          "file": {
+            "mrr": 0.8125,
+            "n": 8,
+            "recall@1": 0.5,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.30000000000000004,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.7
+          }
+        },
+        "W75": {
+          "file": {
+            "mrr": 0.875,
+            "n": 8,
+            "recall@1": 0.625,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.25,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.75
+          }
+        },
+        "W80": {
+          "file": {
+            "mrr": 0.875,
+            "n": 8,
+            "recall@1": 0.625,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.19999999999999996,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.8
+          }
+        },
+        "W85": {
+          "file": {
+            "mrr": 0.875,
+            "n": 8,
+            "recall@1": 0.625,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.15000000000000002,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.85
+          }
+        },
+        "W90": {
+          "file": {
+            "mrr": 0.875,
+            "n": 8,
+            "recall@1": 0.625,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.09999999999999998,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.9
+          }
+        },
+        "W95": {
+          "file": {
+            "mrr": 0.8125,
+            "n": 8,
+            "recall@1": 0.5,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.050000000000000044,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.95
+          }
+        }
+      },
+      "hard": {
+        "B2": {
+          "file": {
+            "mrr": 0.7708,
+            "n": 8,
+            "recall@1": 0.4062,
+            "recall@10": 0.9375,
+            "recall@5": 0.9062,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.30000000000000004,
+            "mode": "vector",
+            "rewrite": true,
+            "vector_weight": 0.7
+          }
+        },
+        "W60": {
+          "file": {
+            "mrr": 0.9167,
+            "n": 8,
+            "recall@1": 0.6562,
+            "recall@10": 0.9375,
+            "recall@5": 0.9062,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.4,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.6
+          }
+        },
+        "W65": {
+          "file": {
+            "mrr": 0.9167,
+            "n": 8,
+            "recall@1": 0.6562,
+            "recall@10": 0.9375,
+            "recall@5": 0.9062,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.35,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.65
+          }
+        },
+        "W70": {
+          "file": {
+            "mrr": 0.9167,
+            "n": 8,
+            "recall@1": 0.6562,
+            "recall@10": 0.9375,
+            "recall@5": 0.9062,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.30000000000000004,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.7
+          }
+        },
+        "W75": {
+          "file": {
+            "mrr": 0.9167,
+            "n": 8,
+            "recall@1": 0.6562,
+            "recall@10": 0.9375,
+            "recall@5": 0.9062,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.25,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.75
+          }
+        },
+        "W80": {
+          "file": {
+            "mrr": 0.9167,
+            "n": 8,
+            "recall@1": 0.6562,
+            "recall@10": 0.9375,
+            "recall@5": 0.9062,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.19999999999999996,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.8
+          }
+        },
+        "W85": {
+          "file": {
+            "mrr": 0.9167,
+            "n": 8,
+            "recall@1": 0.6562,
+            "recall@10": 0.9375,
+            "recall@5": 0.9062,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.15000000000000002,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.85
+          }
+        },
+        "W90": {
+          "file": {
+            "mrr": 0.9167,
+            "n": 8,
+            "recall@1": 0.6562,
+            "recall@10": 0.9375,
+            "recall@5": 0.9062,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.09999999999999998,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.9
+          }
+        },
+        "W95": {
+          "file": {
+            "mrr": 0.8542,
+            "n": 8,
+            "recall@1": 0.5312,
+            "recall@10": 0.9375,
+            "recall@5": 0.9062,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.050000000000000044,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.95
+          }
+        }
+      },
+      "medium": {
+        "B2": {
+          "file": {
+            "mrr": 0.8485,
+            "n": 11,
+            "recall@1": 0.5455,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.30000000000000004,
+            "mode": "vector",
+            "rewrite": true,
+            "vector_weight": 0.7
+          }
+        },
+        "W60": {
+          "file": {
+            "mrr": 0.8258,
+            "n": 11,
+            "recall@1": 0.5455,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.4,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.6
+          }
+        },
+        "W65": {
+          "file": {
+            "mrr": 0.8258,
+            "n": 11,
+            "recall@1": 0.5455,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.35,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.65
+          }
+        },
+        "W70": {
+          "file": {
+            "mrr": 0.8258,
+            "n": 11,
+            "recall@1": 0.5455,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.30000000000000004,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.7
+          }
+        },
+        "W75": {
+          "file": {
+            "mrr": 0.8258,
+            "n": 11,
+            "recall@1": 0.5455,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.25,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.75
+          }
+        },
+        "W80": {
+          "file": {
+            "mrr": 0.8258,
+            "n": 11,
+            "recall@1": 0.5455,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.19999999999999996,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.8
+          }
+        },
+        "W85": {
+          "file": {
+            "mrr": 0.8258,
+            "n": 11,
+            "recall@1": 0.5455,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.15000000000000002,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.85
+          }
+        },
+        "W90": {
+          "file": {
+            "mrr": 0.8258,
+            "n": 11,
+            "recall@1": 0.5455,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.09999999999999998,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.9
+          }
+        },
+        "W95": {
+          "file": {
+            "mrr": 0.7576,
+            "n": 11,
+            "recall@1": 0.3636,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.050000000000000044,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.95
+          }
+        }
+      }
+    },
+    "language": {
+      "en": {
+        "B2": {
+          "file": {
+            "mrr": 0.7564,
+            "n": 13,
+            "recall@1": 0.5,
+            "recall@10": 0.9615,
+            "recall@5": 0.8846,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.30000000000000004,
+            "mode": "vector",
+            "rewrite": true,
+            "vector_weight": 0.7
+          }
+        },
+        "W60": {
+          "file": {
+            "mrr": 0.8718,
+            "n": 13,
+            "recall@1": 0.6538,
+            "recall@10": 0.9615,
+            "recall@5": 0.9615,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.4,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.6
+          }
+        },
+        "W65": {
+          "file": {
+            "mrr": 0.8718,
+            "n": 13,
+            "recall@1": 0.6538,
+            "recall@10": 0.9615,
+            "recall@5": 0.9615,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.35,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.65
+          }
+        },
+        "W70": {
+          "file": {
+            "mrr": 0.8718,
+            "n": 13,
+            "recall@1": 0.6538,
+            "recall@10": 0.9615,
+            "recall@5": 0.9615,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.30000000000000004,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.7
+          }
+        },
+        "W75": {
+          "file": {
+            "mrr": 0.9103,
+            "n": 13,
+            "recall@1": 0.7308,
+            "recall@10": 0.9615,
+            "recall@5": 0.9615,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.25,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.75
+          }
+        },
+        "W80": {
+          "file": {
+            "mrr": 0.9103,
+            "n": 13,
+            "recall@1": 0.7308,
+            "recall@10": 0.9615,
+            "recall@5": 0.9615,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.19999999999999996,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.8
+          }
+        },
+        "W85": {
+          "file": {
+            "mrr": 0.9103,
+            "n": 13,
+            "recall@1": 0.7308,
+            "recall@10": 0.9615,
+            "recall@5": 0.9615,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.15000000000000002,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.85
+          }
+        },
+        "W90": {
+          "file": {
+            "mrr": 0.9103,
+            "n": 13,
+            "recall@1": 0.7308,
+            "recall@10": 0.9615,
+            "recall@5": 0.9615,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.09999999999999998,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.9
+          }
+        },
+        "W95": {
+          "file": {
+            "mrr": 0.7949,
+            "n": 13,
+            "recall@1": 0.5,
+            "recall@10": 0.9615,
+            "recall@5": 0.9615,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.050000000000000044,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.95
+          }
+        }
+      },
+      "zh": {
+        "B2": {
+          "file": {
+            "mrr": 0.881,
+            "n": 14,
+            "recall@1": 0.5536,
+            "recall@10": 1.0,
+            "recall@5": 0.9821,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.30000000000000004,
+            "mode": "vector",
+            "rewrite": true,
+            "vector_weight": 0.7
+          }
+        },
+        "W60": {
+          "file": {
+            "mrr": 0.8274,
+            "n": 14,
+            "recall@1": 0.4821,
+            "recall@10": 1.0,
+            "recall@5": 0.9821,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.4,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.6
+          }
+        },
+        "W65": {
+          "file": {
+            "mrr": 0.8274,
+            "n": 14,
+            "recall@1": 0.4821,
+            "recall@10": 1.0,
+            "recall@5": 0.9821,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.35,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.65
+          }
+        },
+        "W70": {
+          "file": {
+            "mrr": 0.8274,
+            "n": 14,
+            "recall@1": 0.4821,
+            "recall@10": 1.0,
+            "recall@5": 0.9821,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.30000000000000004,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.7
+          }
+        },
+        "W75": {
+          "file": {
+            "mrr": 0.8274,
+            "n": 14,
+            "recall@1": 0.4821,
+            "recall@10": 1.0,
+            "recall@5": 0.9821,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.25,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.75
+          }
+        },
+        "W80": {
+          "file": {
+            "mrr": 0.8274,
+            "n": 14,
+            "recall@1": 0.4821,
+            "recall@10": 1.0,
+            "recall@5": 0.9821,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.19999999999999996,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.8
+          }
+        },
+        "W85": {
+          "file": {
+            "mrr": 0.8274,
+            "n": 14,
+            "recall@1": 0.4821,
+            "recall@10": 1.0,
+            "recall@5": 0.9821,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.15000000000000002,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.85
+          }
+        },
+        "W90": {
+          "file": {
+            "mrr": 0.8274,
+            "n": 14,
+            "recall@1": 0.4821,
+            "recall@10": 1.0,
+            "recall@5": 0.9821,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.09999999999999998,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.9
+          }
+        },
+        "W95": {
+          "file": {
+            "mrr": 0.8095,
+            "n": 14,
+            "recall@1": 0.4107,
+            "recall@10": 1.0,
+            "recall@5": 0.9821,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.050000000000000044,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.95
+          }
+        }
+      }
+    },
+    "task_type": {
+      "CHANGE_PLAN": {
+        "B2": {
+          "file": {
+            "mrr": 0.7222,
+            "n": 9,
+            "recall@1": 0.5556,
+            "recall@10": 1.0,
+            "recall@5": 0.8889,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.30000000000000004,
+            "mode": "vector",
+            "rewrite": true,
+            "vector_weight": 0.7
+          }
+        },
+        "W60": {
+          "file": {
+            "mrr": 0.8426,
+            "n": 9,
+            "recall@1": 0.7778,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.4,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.6
+          }
+        },
+        "W65": {
+          "file": {
+            "mrr": 0.8426,
+            "n": 9,
+            "recall@1": 0.7778,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.35,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.65
+          }
+        },
+        "W70": {
+          "file": {
+            "mrr": 0.8426,
+            "n": 9,
+            "recall@1": 0.7778,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.30000000000000004,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.7
+          }
+        },
+        "W75": {
+          "file": {
+            "mrr": 0.8426,
+            "n": 9,
+            "recall@1": 0.7778,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.25,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.75
+          }
+        },
+        "W80": {
+          "file": {
+            "mrr": 0.8426,
+            "n": 9,
+            "recall@1": 0.7778,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.19999999999999996,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.8
+          }
+        },
+        "W85": {
+          "file": {
+            "mrr": 0.8426,
+            "n": 9,
+            "recall@1": 0.7778,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.15000000000000002,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.85
+          }
+        },
+        "W90": {
+          "file": {
+            "mrr": 0.8426,
+            "n": 9,
+            "recall@1": 0.7778,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.09999999999999998,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.9
+          }
+        },
+        "W95": {
+          "file": {
+            "mrr": 0.7593,
+            "n": 9,
+            "recall@1": 0.5556,
+            "recall@10": 1.0,
+            "recall@5": 1.0,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.050000000000000044,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.95
+          }
+        }
+      },
+      "CODE_QA": {
+        "B2": {
+          "file": {
+            "mrr": 0.8542,
+            "n": 8,
+            "recall@1": 0.625,
+            "recall@10": 0.9375,
+            "recall@5": 0.9375,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.30000000000000004,
+            "mode": "vector",
+            "rewrite": true,
+            "vector_weight": 0.7
+          }
+        },
+        "W60": {
+          "file": {
+            "mrr": 0.6667,
+            "n": 8,
+            "recall@1": 0.25,
+            "recall@10": 0.9375,
+            "recall@5": 0.9375,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.4,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.6
+          }
+        },
+        "W65": {
+          "file": {
+            "mrr": 0.6667,
+            "n": 8,
+            "recall@1": 0.25,
+            "recall@10": 0.9375,
+            "recall@5": 0.9375,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.35,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.65
+          }
+        },
+        "W70": {
+          "file": {
+            "mrr": 0.6667,
+            "n": 8,
+            "recall@1": 0.25,
+            "recall@10": 0.9375,
+            "recall@5": 0.9375,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.30000000000000004,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.7
+          }
+        },
+        "W75": {
+          "file": {
+            "mrr": 0.7292,
+            "n": 8,
+            "recall@1": 0.375,
+            "recall@10": 0.9375,
+            "recall@5": 0.9375,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.25,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.75
+          }
+        },
+        "W80": {
+          "file": {
+            "mrr": 0.7292,
+            "n": 8,
+            "recall@1": 0.375,
+            "recall@10": 0.9375,
+            "recall@5": 0.9375,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.19999999999999996,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.8
+          }
+        },
+        "W85": {
+          "file": {
+            "mrr": 0.7292,
+            "n": 8,
+            "recall@1": 0.375,
+            "recall@10": 0.9375,
+            "recall@5": 0.9375,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.15000000000000002,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.85
+          }
+        },
+        "W90": {
+          "file": {
+            "mrr": 0.7292,
+            "n": 8,
+            "recall@1": 0.375,
+            "recall@10": 0.9375,
+            "recall@5": 0.9375,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.09999999999999998,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.9
+          }
+        },
+        "W95": {
+          "file": {
+            "mrr": 0.7292,
+            "n": 8,
+            "recall@1": 0.375,
+            "recall@10": 0.9375,
+            "recall@5": 0.9375,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.050000000000000044,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.95
+          }
+        }
+      },
+      "TRACE_CHAIN": {
+        "B2": {
+          "file": {
+            "mrr": 0.8833,
+            "n": 10,
+            "recall@1": 0.425,
+            "recall@10": 1.0,
+            "recall@5": 0.975,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.30000000000000004,
+            "mode": "vector",
+            "rewrite": true,
+            "vector_weight": 0.7
+          }
+        },
+        "W60": {
+          "file": {
+            "mrr": 1.0,
+            "n": 10,
+            "recall@1": 0.625,
+            "recall@10": 1.0,
+            "recall@5": 0.975,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.4,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.6
+          }
+        },
+        "W65": {
+          "file": {
+            "mrr": 1.0,
+            "n": 10,
+            "recall@1": 0.625,
+            "recall@10": 1.0,
+            "recall@5": 0.975,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.35,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.65
+          }
+        },
+        "W70": {
+          "file": {
+            "mrr": 1.0,
+            "n": 10,
+            "recall@1": 0.625,
+            "recall@10": 1.0,
+            "recall@5": 0.975,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.30000000000000004,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.7
+          }
+        },
+        "W75": {
+          "file": {
+            "mrr": 1.0,
+            "n": 10,
+            "recall@1": 0.625,
+            "recall@10": 1.0,
+            "recall@5": 0.975,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.25,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.75
+          }
+        },
+        "W80": {
+          "file": {
+            "mrr": 1.0,
+            "n": 10,
+            "recall@1": 0.625,
+            "recall@10": 1.0,
+            "recall@5": 0.975,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.19999999999999996,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.8
+          }
+        },
+        "W85": {
+          "file": {
+            "mrr": 1.0,
+            "n": 10,
+            "recall@1": 0.625,
+            "recall@10": 1.0,
+            "recall@5": 0.975,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.15000000000000002,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.85
+          }
+        },
+        "W90": {
+          "file": {
+            "mrr": 1.0,
+            "n": 10,
+            "recall@1": 0.625,
+            "recall@10": 1.0,
+            "recall@5": 0.975,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.09999999999999998,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.9
+          }
+        },
+        "W95": {
+          "file": {
+            "mrr": 0.9,
+            "n": 10,
+            "recall@1": 0.425,
+            "recall@10": 1.0,
+            "recall@5": 0.975,
+            "zero_hit_rate": 0.0
+          },
+          "variant_config": {
+            "fusion": "weighted",
+            "graph_depth": null,
+            "keyword_weight": 0.050000000000000044,
+            "mode": "hybrid",
+            "rewrite": true,
+            "vector_weight": 0.95
+          }
+        }
+      }
+    }
+  },
+  "ledger_sha256": {
+    "embedding.jsonl": "83ed62a11e13cd125ae87daf3a930954919cea4025f39b1deea2c3f0a5688195",
+    "rewrite_llm.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "per_case": {
+    "ruoyi-change-plan-0025": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-change-plan-0026": {
+      "B2": {
+        "first_correct_rank": 6,
+        "recall@10": 1.0,
+        "recall@5": 0.0
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-change-plan-0027": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 4,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 4,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 4,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 4,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 4,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 4,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 4,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-change-plan-0028": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-change-plan-0029": {
+      "B2": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-change-plan-0030": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-change-plan-0032": {
+      "B2": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-change-plan-0033": {
+      "B2": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-change-plan-0035": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-code-qa-0001": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-code-qa-0002": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-code-qa-0003": {
+      "B2": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-code-qa-0004": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-code-qa-0005": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-code-qa-0006": {
+      "B2": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-code-qa-0010": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 0.5,
+        "recall@5": 0.5
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 0.5,
+        "recall@5": 0.5
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 0.5,
+        "recall@5": 0.5
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 0.5,
+        "recall@5": 0.5
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 0.5,
+        "recall@5": 0.5
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 0.5,
+        "recall@5": 0.5
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 0.5,
+        "recall@5": 0.5
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 0.5,
+        "recall@5": 0.5
+      },
+      "W95": {
+        "first_correct_rank": 1,
+        "recall@10": 0.5,
+        "recall@5": 0.5
+      }
+    },
+    "ruoyi-code-qa-0011": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-trace-chain-0013": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-trace-chain-0014": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-trace-chain-0015": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-trace-chain-0016": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-trace-chain-0017": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-trace-chain-0018": {
+      "B2": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-trace-chain-0019": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-trace-chain-0021": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 0.75
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 0.75
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 0.75
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 0.75
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 0.75
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 0.75
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 0.75
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 0.75
+      },
+      "W95": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 0.75
+      }
+    },
+    "ruoyi-trace-chain-0022": {
+      "B2": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    },
+    "ruoyi-trace-chain-0024": {
+      "B2": {
+        "first_correct_rank": 3,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W60": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W65": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W70": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W75": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W80": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W85": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W90": {
+        "first_correct_rank": 1,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      },
+      "W95": {
+        "first_correct_rank": 2,
+        "recall@10": 1.0,
+        "recall@5": 1.0
+      }
+    }
+  },
+  "robustness": {
+    "bootstrap": {
+      "candidates": {
+        "W60": {
+          "bootstrap_frequency_mrr_ge_W70": 1.0,
+          "bootstrap_frequency_recall@5_ge_W70": 1.0,
+          "mrr_delta_95pct": [
+            0.0,
+            0.0
+          ],
+          "recall@5_delta_95pct": [
+            0.0,
+            0.0
+          ]
+        },
+        "W65": {
+          "bootstrap_frequency_mrr_ge_W70": 1.0,
+          "bootstrap_frequency_recall@5_ge_W70": 1.0,
+          "mrr_delta_95pct": [
+            0.0,
+            0.0
+          ],
+          "recall@5_delta_95pct": [
+            0.0,
+            0.0
+          ]
+        },
+        "W70": {
+          "bootstrap_frequency_mrr_ge_W70": 1.0,
+          "bootstrap_frequency_recall@5_ge_W70": 1.0,
+          "mrr_delta_95pct": [
+            0.0,
+            0.0
+          ],
+          "recall@5_delta_95pct": [
+            0.0,
+            0.0
+          ]
+        },
+        "W75": {
+          "bootstrap_frequency_mrr_ge_W70": 1.0,
+          "bootstrap_frequency_recall@5_ge_W70": 1.0,
+          "mrr_delta_95pct": [
+            0.0,
+            0.05555555555555558
+          ],
+          "recall@5_delta_95pct": [
+            0.0,
+            0.0
+          ]
+        },
+        "W80": {
+          "bootstrap_frequency_mrr_ge_W70": 1.0,
+          "bootstrap_frequency_recall@5_ge_W70": 1.0,
+          "mrr_delta_95pct": [
+            0.0,
+            0.05555555555555558
+          ],
+          "recall@5_delta_95pct": [
+            0.0,
+            0.0
+          ]
+        },
+        "W85": {
+          "bootstrap_frequency_mrr_ge_W70": 1.0,
+          "bootstrap_frequency_recall@5_ge_W70": 1.0,
+          "mrr_delta_95pct": [
+            0.0,
+            0.05555555555555558
+          ],
+          "recall@5_delta_95pct": [
+            0.0,
+            0.0
+          ]
+        },
+        "W90": {
+          "bootstrap_frequency_mrr_ge_W70": 1.0,
+          "bootstrap_frequency_recall@5_ge_W70": 1.0,
+          "mrr_delta_95pct": [
+            0.0,
+            0.05555555555555558
+          ],
+          "recall@5_delta_95pct": [
+            0.0,
+            0.0
+          ]
+        },
+        "W95": {
+          "bootstrap_frequency_mrr_ge_W70": 0.1619,
+          "bootstrap_frequency_recall@5_ge_W70": 1.0,
+          "mrr_delta_95pct": [
+            -0.12962962962962965,
+            0.03703703703703698
+          ],
+          "recall@5_delta_95pct": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "iterations": 10000,
+      "seed": 20260717
+    },
+    "leave_one_case_out": {
+      "absolute_run_gate_enforced": false,
+      "iterations": 27,
+      "no_winner_count": 1,
+      "note": "Full-run absolute floors are excluded because leave-one-out changes the denominator; subset-relative gates remain enforced.",
+      "winner_counts": {
+        "W75": 26
+      }
+    }
+  },
+  "schedule": [
+    "B2",
+    "W60",
+    "W65",
+    "W70",
+    "W75",
+    "W80",
+    "W85",
+    "W90",
+    "W95"
+  ],
+  "schema_version": "1.0.0",
+  "selected": {
+    "keyword_weight": 0.25,
+    "qualified": [
+      "W75",
+      "W80",
+      "W85",
+      "W90"
+    ],
+    "reasons": {
+      "W60": [
+        "neither recall@5 nor MRR strictly improves over W70"
+      ],
+      "W65": [
+        "neither recall@5 nor MRR strictly improves over W70"
+      ],
+      "W70": [
+        "neither recall@5 nor MRR strictly improves over W70"
+      ],
+      "W75": [],
+      "W80": [],
+      "W85": [],
+      "W90": [],
+      "W95": [
+        "neither recall@5 nor MRR strictly improves over W70"
+      ]
+    },
+    "run_gate": {
+      "absolute_floors_enforced": true,
+      "passed": true,
+      "reasons": []
+    },
+    "variant": "W75",
+    "vector_weight": 0.75
+  }
+}

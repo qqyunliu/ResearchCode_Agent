@@ -1,0 +1,87 @@
+{
+  "config_fingerprint": "efa79e99fd55883ab4e84969c1ecc811fb6782a09ac6d65009627bef6fe8cd50",
+  "dataset_path": "evaluation\\datasets\\pilot-current.jsonl",
+  "dataset_sha256": "86ffda7cf4b90eabfaf5d44dff6b76a9f841fe7e6e9bcb8df6cae1e8fac8d65c",
+  "db_sha256": "cffd46aa7a2d495877dea84ed6eb613d0a78ce9f9cd19808cb6d720fbf9e1049",
+  "effective_config": {
+    "candidate_limit": 20,
+    "chunk_max_content_chars": 4000,
+    "embedding_dimensions": 1024,
+    "embedding_endpoint": "https://open.bigmodel.cn/api/paas/v4",
+    "embedding_model": "embedding-3",
+    "embedding_provider": "api",
+    "lexical_implementation_version": "code_aware_multiterm_v2",
+    "qdrant_path": "F:\\LIUQINGYUN\\ResearchCode_Agent\\evaluation\\runtime\\pilot\\stage2b_qdrant",
+    "rewrite_llm_endpoint": "https://api.xiaomimimo.com/v1",
+    "rewrite_llm_model": "mimo-v2.5",
+    "selected_variants": [
+      "B2",
+      "B3",
+      "A1",
+      "A2",
+      "A3",
+      "A4"
+    ],
+    "top_k": 10,
+    "variants": {
+      "A1": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.3,
+        "mode": "hybrid",
+        "rewrite": false,
+        "vector_weight": 0.7
+      },
+      "A2": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.5,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.5
+      },
+      "A3": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.7,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.3
+      },
+      "A4": {
+        "fusion": "rrf",
+        "graph_depth": null,
+        "keyword_weight": 0.3,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.7
+      },
+      "B2": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.3,
+        "mode": "vector",
+        "rewrite": true,
+        "vector_weight": 0.7
+      },
+      "B3": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.3,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.7
+      }
+    }
+  },
+  "error": {
+    "message": "verified completed build provenance is required; rerun with --rebuild",
+    "type": "RuntimeError"
+  },
+  "phase": "run",
+  "records_written": 0,
+  "repo_commit": "41720e624c5a668c7d3777835e4c87095a7a1dfd",
+  "run_id": "hybrid-lexical-v2",
+  "snapshot_sha256": "2eb5eb8148e088f08159fc4605466ba0473145f2ae6217b6d89bac697bf61504",
+  "status": "failed"
+}

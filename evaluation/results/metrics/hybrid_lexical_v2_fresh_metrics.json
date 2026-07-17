@@ -1,0 +1,791 @@
+{
+  "identity": {
+    "dataset_sha256": "86ffda7cf4b90eabfaf5d44dff6b76a9f841fe7e6e9bcb8df6cae1e8fac8d65c",
+    "repo_commit": "41720e624c5a668c7d3777835e4c87095a7a1dfd",
+    "retrieval_run_id": "hybrid-lexical-v2-fresh",
+    "agent_run_id": null
+  },
+  "dataset": {
+    "records": 36,
+    "source_records": 36,
+    "eligibility": "machine_verified_and_accepted",
+    "repositories": [
+      "ruoyi-vue"
+    ]
+  },
+  "environment": {
+    "dataset_sha256": "86ffda7cf4b90eabfaf5d44dff6b76a9f841fe7e6e9bcb8df6cae1e8fac8d65c",
+    "repo_commit": "41720e624c5a668c7d3777835e4c87095a7a1dfd",
+    "retrieval_config": {
+      "candidate_limit": 20,
+      "chunk_max_content_chars": 4000,
+      "embedding_dimensions": 1024,
+      "embedding_endpoint": "https://open.bigmodel.cn/api/paas/v4",
+      "embedding_model": "embedding-3",
+      "embedding_provider": "api",
+      "lexical_implementation_version": "code_aware_multiterm_v2",
+      "qdrant_path": "F:\\LIUQINGYUN\\ResearchCode_Agent\\evaluation\\runtime\\pilot\\hybrid_lexical_v2_qdrant",
+      "rewrite_llm_endpoint": "https://api.xiaomimimo.com/v1",
+      "rewrite_llm_model": "mimo-v2.5",
+      "selected_variants": [
+        "B2",
+        "B3",
+        "A1",
+        "A2",
+        "A3",
+        "A4"
+      ],
+      "top_k": 10,
+      "variants": {
+        "A1": {
+          "fusion": "weighted",
+          "graph_depth": null,
+          "keyword_weight": 0.3,
+          "mode": "hybrid",
+          "rewrite": false,
+          "vector_weight": 0.7
+        },
+        "A2": {
+          "fusion": "weighted",
+          "graph_depth": null,
+          "keyword_weight": 0.5,
+          "mode": "hybrid",
+          "rewrite": true,
+          "vector_weight": 0.5
+        },
+        "A3": {
+          "fusion": "weighted",
+          "graph_depth": null,
+          "keyword_weight": 0.7,
+          "mode": "hybrid",
+          "rewrite": true,
+          "vector_weight": 0.3
+        },
+        "A4": {
+          "fusion": "rrf",
+          "graph_depth": null,
+          "keyword_weight": 0.3,
+          "mode": "hybrid",
+          "rewrite": true,
+          "vector_weight": 0.7
+        },
+        "B2": {
+          "fusion": "weighted",
+          "graph_depth": null,
+          "keyword_weight": 0.3,
+          "mode": "vector",
+          "rewrite": true,
+          "vector_weight": 0.7
+        },
+        "B3": {
+          "fusion": "weighted",
+          "graph_depth": null,
+          "keyword_weight": 0.3,
+          "mode": "hybrid",
+          "rewrite": true,
+          "vector_weight": 0.7
+        }
+      }
+    },
+    "agent_config": null,
+    "models": [],
+    "model_versions": [],
+    "os": {
+      "value": "Windows-10-10.0.19045-SP0",
+      "source": "metrics_process"
+    },
+    "cpu": {
+      "value": "Intel64 Family 6 Model 151 Stepping 2, GenuineIntel",
+      "source": "metrics_process"
+    },
+    "ram": {
+      "value": "unknown",
+      "source": "agent_metadata_or_unknown"
+    },
+    "python": {
+      "value": "3.11.15",
+      "source": "metrics_process"
+    },
+    "node": {
+      "value": "unknown",
+      "source": "agent_metadata_or_unknown"
+    },
+    "qdrant_mode": {
+      "value": "local",
+      "source": "retrieval_metadata"
+    },
+    "providers": {
+      "value": {
+        "retrieval": {
+          "embedding": {
+            "base_url": "https://open.bigmodel.cn/api/paas/v4",
+            "dimensions": 1024,
+            "model": "embedding-3",
+            "provider": "api"
+          },
+          "rewrite_llm": {
+            "base_url": "https://api.xiaomimimo.com/v1",
+            "model": "mimo-v2.5"
+          },
+          "sdk_retries_disabled": true
+        },
+        "agent": "unknown"
+      },
+      "source": "runner_metadata"
+    },
+    "scan_measurement": {
+      "value": "unknown",
+      "source": "retrieval_metadata_or_unknown"
+    },
+    "vector_build_measurement": {
+      "value": {
+        "chunks": 2199,
+        "collection": "project_1_code_chunks",
+        "config_fingerprint": "c94c62cae20f0f0c0b9b394586a1d3dbde874dacbc20066fc6d44670ed913937",
+        "db_sha256": "cffd46aa7a2d495877dea84ed6eb613d0a78ce9f9cd19808cb6d720fbf9e1049",
+        "dimension": 1024,
+        "duration_seconds": 213.5824433999369,
+        "embedding_batches": 35,
+        "embedding_dimensions": 1024,
+        "embedding_endpoint": "https://open.bigmodel.cn/api/paas/v4",
+        "embedding_model": "embedding-3",
+        "entity_count": 2199,
+        "model": "embedding-3",
+        "points_count": 2199,
+        "project_count": 1,
+        "project_id": 1,
+        "provenance_status": "measured_current_process",
+        "qdrant_mode": "local",
+        "qdrant_path": "F:\\LIUQINGYUN\\ResearchCode_Agent\\evaluation\\runtime\\pilot\\hybrid_lexical_v2_qdrant",
+        "relation_count": 1980,
+        "snapshot_sha256": "2eb5eb8148e088f08159fc4605466ba0473145f2ae6217b6d89bac697bf61504",
+        "status": "completed",
+        "vector_size": 1024
+      },
+      "source": "retrieval_metadata_or_unknown"
+    }
+  },
+  "baselines": {
+    "B0": {
+      "status": "not_comparable",
+      "reason": "B0 raw records were not supplied; aggregated legacy metrics use a different gold contract."
+    },
+    "B1": {
+      "status": "not_comparable",
+      "reason": "B1 raw records were not supplied; aggregated legacy metrics use a different gold contract."
+    }
+  },
+  "retrieval": {
+    "B2": {
+      "entity": {
+        "n": 27,
+        "recall@1": 0.1278,
+        "recall@5": 0.3648,
+        "recall@10": 0.5957,
+        "mrr": 0.4655,
+        "zero_hit_rate": 0.1852
+      },
+      "file": {
+        "n": 27,
+        "recall@1": 0.5278,
+        "recall@5": 0.9352,
+        "recall@10": 0.9815,
+        "mrr": 0.821,
+        "zero_hit_rate": 0.0
+      },
+      "failures": 0,
+      "latency_seconds": {
+        "n": 36,
+        "mean": 4.2227,
+        "p50": 1.2655,
+        "p95": 11.1093,
+        "total": 152.0183
+      }
+    },
+    "B3": {
+      "entity": {
+        "n": 27,
+        "recall@1": 0.1648,
+        "recall@5": 0.4574,
+        "recall@10": 0.5895,
+        "mrr": 0.5365,
+        "zero_hit_rate": 0.1852
+      },
+      "file": {
+        "n": 27,
+        "recall@1": 0.5648,
+        "recall@5": 0.9722,
+        "recall@10": 0.9815,
+        "mrr": 0.8488,
+        "zero_hit_rate": 0.0
+      },
+      "failures": 0,
+      "latency_seconds": {
+        "n": 36,
+        "mean": 4.0936,
+        "p50": 1.1848,
+        "p95": 10.9073,
+        "total": 147.3687
+      }
+    },
+    "A1": {
+      "entity": {
+        "n": 27,
+        "recall@1": 0.1648,
+        "recall@5": 0.5377,
+        "recall@10": 0.6265,
+        "mrr": 0.5778,
+        "zero_hit_rate": 0.1481
+      },
+      "file": {
+        "n": 27,
+        "recall@1": 0.6389,
+        "recall@5": 0.9722,
+        "recall@10": 0.9815,
+        "mrr": 0.8951,
+        "zero_hit_rate": 0.0
+      },
+      "failures": 0,
+      "latency_seconds": {
+        "n": 36,
+        "mean": 0.1859,
+        "p50": 0.1639,
+        "p95": 0.3096,
+        "total": 6.6923
+      }
+    },
+    "A2": {
+      "entity": {
+        "n": 27,
+        "recall@1": 0.1216,
+        "recall@5": 0.4451,
+        "recall@10": 0.6265,
+        "mrr": 0.4733,
+        "zero_hit_rate": 0.1481
+      },
+      "file": {
+        "n": 27,
+        "recall@1": 0.5093,
+        "recall@5": 0.9722,
+        "recall@10": 0.9815,
+        "mrr": 0.8025,
+        "zero_hit_rate": 0.0
+      },
+      "failures": 0,
+      "latency_seconds": {
+        "n": 36,
+        "mean": 4.0938,
+        "p50": 1.1815,
+        "p95": 10.9008,
+        "total": 147.375
+      }
+    },
+    "A3": {
+      "entity": {
+        "n": 27,
+        "recall@1": 0.1216,
+        "recall@5": 0.4265,
+        "recall@10": 0.6265,
+        "mrr": 0.4565,
+        "zero_hit_rate": 0.1852
+      },
+      "file": {
+        "n": 27,
+        "recall@1": 0.4907,
+        "recall@5": 0.787,
+        "recall@10": 0.7963,
+        "mrr": 0.7173,
+        "zero_hit_rate": 0.1481
+      },
+      "failures": 0,
+      "latency_seconds": {
+        "n": 36,
+        "mean": 4.0943,
+        "p50": 1.1811,
+        "p95": 10.9008,
+        "total": 147.3949
+      }
+    },
+    "A4": {
+      "entity": {
+        "n": 27,
+        "recall@1": 0.1525,
+        "recall@5": 0.4636,
+        "recall@10": 0.6451,
+        "mrr": 0.5446,
+        "zero_hit_rate": 0.1481
+      },
+      "file": {
+        "n": 27,
+        "recall@1": 0.5463,
+        "recall@5": 0.9352,
+        "recall@10": 0.9815,
+        "mrr": 0.8241,
+        "zero_hit_rate": 0.0
+      },
+      "failures": 0,
+      "latency_seconds": {
+        "n": 36,
+        "mean": 4.0969,
+        "p50": 1.186,
+        "p95": 10.902,
+        "total": 147.4866
+      }
+    }
+  },
+  "graph": {
+    "B4": {
+      "n": 0,
+      "latency_seconds": {
+        "n": 0,
+        "mean": 0.0,
+        "p50": null,
+        "p95": null,
+        "total": 0
+      },
+      "node_precision": 0.0,
+      "node_recall": 0.0,
+      "edge_precision": 0.0,
+      "edge_recall": 0.0,
+      "chain_diagnostics": {
+        "complete_chain_rate": 0.0,
+        "partial_chain_coverage": 0.0,
+        "non_gold_edge_rate": 0.0,
+        "unsupported_stored_edge_rate": 0.0,
+        "exact_ordered_chain_match": "not_computable_from_unordered_evidence",
+        "note": "Graph raw contains authoritative stored traversal edges but not a canonical ordered path."
+      },
+      "diagnostics": {
+        "system_partial_n": 6,
+        "source_unanswerable_n": 8,
+        "nonindexed_graph_gold_n": 6
+      }
+    },
+    "A5": {
+      "n": 0,
+      "latency_seconds": {
+        "n": 0,
+        "mean": 0.0,
+        "p50": null,
+        "p95": null,
+        "total": 0
+      },
+      "node_precision": 0.0,
+      "node_recall": 0.0,
+      "edge_precision": 0.0,
+      "edge_recall": 0.0,
+      "chain_diagnostics": {
+        "complete_chain_rate": 0.0,
+        "partial_chain_coverage": 0.0,
+        "non_gold_edge_rate": 0.0,
+        "unsupported_stored_edge_rate": 0.0,
+        "exact_ordered_chain_match": "not_computable_from_unordered_evidence",
+        "note": "Graph raw contains authoritative stored traversal edges but not a canonical ordered path."
+      },
+      "diagnostics": {
+        "system_partial_n": 6,
+        "source_unanswerable_n": 8,
+        "nonindexed_graph_gold_n": 6
+      }
+    },
+    "A6": {
+      "n": 0,
+      "latency_seconds": {
+        "n": 0,
+        "mean": 0.0,
+        "p50": null,
+        "p95": null,
+        "total": 0
+      },
+      "node_precision": 0.0,
+      "node_recall": 0.0,
+      "edge_precision": 0.0,
+      "edge_recall": 0.0,
+      "chain_diagnostics": {
+        "complete_chain_rate": 0.0,
+        "partial_chain_coverage": 0.0,
+        "non_gold_edge_rate": 0.0,
+        "unsupported_stored_edge_rate": 0.0,
+        "exact_ordered_chain_match": "not_computable_from_unordered_evidence",
+        "note": "Graph raw contains authoritative stored traversal edges but not a canonical ordered path."
+      },
+      "diagnostics": {
+        "system_partial_n": 6,
+        "source_unanswerable_n": 8,
+        "nonindexed_graph_gold_n": 6
+      }
+    }
+  },
+  "agent": {},
+  "stability": {
+    "n_questions": 0,
+    "question_ids": [],
+    "reference_jaccard_mean": 0.0,
+    "graph_node_jaccard_mean": 0.0,
+    "answer_hash_agreement_rate": 0.0,
+    "semantic_similarity_evaluated": false,
+    "semantic_similarity_status": "not_evaluated",
+    "fixed_subset_verified": false
+  },
+  "diagnostics": {
+    "source_unanswerable": {
+      "B2": {
+        "n": 8,
+        "nonempty_hit_rate": 1.0,
+        "error_rate": 0.0
+      },
+      "B3": {
+        "n": 8,
+        "nonempty_hit_rate": 1.0,
+        "error_rate": 0.0
+      },
+      "A1": {
+        "n": 8,
+        "nonempty_hit_rate": 1.0,
+        "error_rate": 0.0
+      },
+      "A2": {
+        "n": 8,
+        "nonempty_hit_rate": 1.0,
+        "error_rate": 0.0
+      },
+      "A3": {
+        "n": 8,
+        "nonempty_hit_rate": 1.0,
+        "error_rate": 0.0
+      },
+      "A4": {
+        "n": 8,
+        "nonempty_hit_rate": 1.0,
+        "error_rate": 0.0
+      }
+    },
+    "source_only": {
+      "entity": {
+        "count": 10,
+        "question_ids": [
+          "ruoyi-code-qa-0007",
+          "ruoyi-trace-chain-0015",
+          "ruoyi-trace-chain-0016",
+          "ruoyi-trace-chain-0018",
+          "ruoyi-trace-chain-0022",
+          "ruoyi-trace-chain-0024"
+        ],
+        "excluded_from_main": true,
+        "definition": "source-truth gold component with indexed_in_system=false",
+        "variants": {
+          "B2": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "B3": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A1": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A2": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A3": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A4": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "B4": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A5": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A6": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "B5": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A8": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          }
+        }
+      },
+      "nodes": {
+        "count": 7,
+        "question_ids": [
+          "ruoyi-trace-chain-0015",
+          "ruoyi-trace-chain-0016",
+          "ruoyi-trace-chain-0018",
+          "ruoyi-trace-chain-0020",
+          "ruoyi-trace-chain-0022",
+          "ruoyi-trace-chain-0024"
+        ],
+        "excluded_from_main": true,
+        "definition": "source-truth gold component with indexed_in_system=false",
+        "variants": {
+          "B2": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "B3": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A1": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A2": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A3": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A4": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "B4": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A5": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A6": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "B5": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A8": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          }
+        }
+      },
+      "edges": {
+        "count": 6,
+        "question_ids": [
+          "ruoyi-trace-chain-0015",
+          "ruoyi-trace-chain-0016",
+          "ruoyi-trace-chain-0018",
+          "ruoyi-trace-chain-0022",
+          "ruoyi-trace-chain-0024"
+        ],
+        "excluded_from_main": true,
+        "definition": "source-truth gold component with indexed_in_system=false",
+        "variants": {
+          "B2": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "B3": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A1": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A2": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A3": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A4": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "B4": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A5": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A6": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "B5": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          },
+          "A8": {
+            "status": "not_observed",
+            "observed_count": 0,
+            "question_ids": []
+          }
+        }
+      }
+    },
+    "hybrid_degeneracy": {
+      "B2_vs_B3": {
+        "n": 36,
+        "identical_top10_n": 3,
+        "identical_top10_rate": 0.0833
+      },
+      "A2_vs_A3_vs_A4": {
+        "n": 36,
+        "all_identical_top10_n": 0,
+        "all_identical_top10_rate": 0.0
+      },
+      "hybrid_comparison_valid": true,
+      "reason": "retrieval variants produced distinguishable Top-10 rankings"
+    }
+  },
+  "ablations": {
+    "A1": {
+      "status": "executable"
+    },
+    "A2": {
+      "status": "executable"
+    },
+    "A3": {
+      "status": "executable"
+    },
+    "A4": {
+      "status": "executable"
+    },
+    "A5": {
+      "status": "executable"
+    },
+    "A6": {
+      "status": "executable"
+    },
+    "A8": {
+      "status": "executable"
+    },
+    "A7": {
+      "status": "not_executable",
+      "reason": "Canonical Pilot has no multi-turn cases; memory cannot be ablated fairly."
+    },
+    "A9": {
+      "status": "not_executable",
+      "reason": "Product services expose no fair validate-without-repair switch."
+    }
+  },
+  "costs": {
+    "provider_counters": {
+      "retrieval": {
+        "embedding_sdk_create_attempts": {
+          "calls": 89,
+          "failures": 0,
+          "latency_seconds": 38.38913599937223,
+          "pending": 0,
+          "successes": 89,
+          "unconfirmed": 0
+        },
+        "rewrite_llm_sdk_create_attempts": {
+          "calls": 18,
+          "failures": 0,
+          "latency_seconds": 141.1494843000546,
+          "pending": 0,
+          "successes": 18,
+          "unconfirmed": 0
+        }
+      },
+      "agent": {}
+    },
+    "latency_seconds": {
+      "retrieval_mean": 3.4645,
+      "agent_mean": 0.0,
+      "retrieval_total": 748.3358,
+      "agent_total": 0
+    },
+    "failures": {
+      "retrieval_records": 0,
+      "agent_records": 0
+    },
+    "response_events": {
+      "attempts": 0,
+      "repair_attempts": 0,
+      "failed_attempts": 0,
+      "usage_available_attempts": 0,
+      "usage_unavailable_attempts": 0,
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      },
+      "models": [],
+      "model_versions": [],
+      "provider_latency_seconds_total": 0
+    },
+    "usage": {
+      "token_usage": "not_recorded",
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0,
+      "usage_available_attempts": 0,
+      "usage_unavailable_attempts": 0
+    },
+    "monetary_cost": {
+      "status": "unknown",
+      "reason": "Provider pricing was not pinned in evaluation metadata."
+    }
+  },
+  "methodology": {
+    "llm_judge_used": false,
+    "semantic_answer_correctness_scored": false,
+    "required_claim_coverage_scored": false,
+    "hallucination_rate_scored": false
+  },
+  "limitations": [
+    "single development repository",
+    "static analysis is best-effort and may miss runtime or dynamic behavior",
+    "semantic answer correctness is not scored without a separately governed judge protocol"
+  ]
+}

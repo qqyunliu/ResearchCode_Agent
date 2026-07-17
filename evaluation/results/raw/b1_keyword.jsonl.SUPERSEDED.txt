@@ -1,0 +1,4 @@
+SUPERSEDED -- This file is from the Stage 2A draft (proposed/unverified annotations).
+Archived at: evaluation/archive/stage2a-draft-invalid/b1_keyword.jsonl
+Current valid predictions: evaluation/results/raw/pilot_current_b1_keyword.jsonl
+This stale copy should be removed from results/raw/.

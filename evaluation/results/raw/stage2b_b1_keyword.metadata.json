@@ -1,0 +1,19 @@
+{
+  "config_fingerprint": "aeb6f49e28244d21aa9cb85e54b0647183214511c7ac0428db8fbdcf60b498d0",
+  "dataset_sha256": "86ffda7cf4b90eabfaf5d44dff6b76a9f841fe7e6e9bcb8df6cae1e8fac8d65c",
+  "effective_config": {
+    "contract_version": 1,
+    "ranking_unit": "file",
+    "top_k": 10,
+    "variant": "B1"
+  },
+  "entity_count": 2199,
+  "files_indexed": 481,
+  "records_written": 36,
+  "repo_commit": "41720e624c5a668c7d3777835e4c87095a7a1dfd",
+  "run_id": "stage2b-b1-c03d4d82784c3890",
+  "run_index": 0,
+  "scan_time_seconds": 2.4466,
+  "status": "completed",
+  "variant": "B1"
+}
