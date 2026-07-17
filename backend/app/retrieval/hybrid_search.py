@@ -11,6 +11,8 @@ VECTOR_FALLBACK_UNCERTAINTY = (
 KEYWORD_FALLBACK_UNCERTAINTY = (
     "Keyword retrieval was unavailable; vector-only fallback was used."
 )
+HYBRID_VECTOR_WEIGHT = 0.75
+HYBRID_KEYWORD_WEIGHT = 0.25
 
 
 class QueryEmbedder(Protocol):
@@ -156,14 +158,14 @@ def fuse_search_hits(
     for hit in vector_hits:
         hits_by_entity.setdefault(hit.entity_id, hit)
         scores_by_entity[hit.entity_id] = (
-            0.7 * _normalize(hit.score, vector_max)
+            HYBRID_VECTOR_WEIGHT * _normalize(hit.score, vector_max)
         )
 
     for hit in keyword_hits:
         hits_by_entity.setdefault(hit.entity_id, hit)
         scores_by_entity[hit.entity_id] = (
             scores_by_entity.get(hit.entity_id, 0.0)
-            + 0.3 * _normalize(hit.score, keyword_max)
+            + HYBRID_KEYWORD_WEIGHT * _normalize(hit.score, keyword_max)
         )
 
     fused = [

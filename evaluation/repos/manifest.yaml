@@ -1,0 +1,158 @@
+# Repository Manifest
+# Each entry records a repository selected for evaluation with a fixed commit SHA.
+# Repositories are cloned into evaluation/workspaces/ (not committed to Git).
+#
+# Status values:
+#   candidate   - Proposed but not yet selected
+#   selected    - Selected for a specific split
+#   cloned      - Cloned locally at the specified commit
+#   indexed     - Scanned and vector-indexed by ResearchCode-Agent
+#
+# Field conventions:
+#   clone_url          - Git URL suitable for `git clone` (never a subdirectory URL)
+#   repository_subdir  - Non-empty when the usable project lives in a subdirectory
+#                        of a larger monorepo; empty string otherwise
+#   exclusion_reason    - Null for active candidates; reason string if excluded
+#   verified           - True once the repo has been cloned and fields confirmed
+#   file_count_*       - Estimated file counts; always unverified until clone
+#   file_counts_verified - Whether file counts have been confirmed post-clone
+#
+# Usage:
+#   python scripts/clone_repos.py  # Clones all 'selected' repos at fixed SHA
+
+version: "1.1"
+
+repositories:
+  # --- Pilot Candidates (Stage 2) ---
+  # Only one will be selected for the Pilot. None are downloaded yet.
+
+  - repo_id: ruoyi-vue
+    name: "RuoYi-Vue"
+    clone_url: "https://github.com/yangzongzhuan/RuoYi-Vue"
+    repository_subdir: ""
+    license: "MIT"
+    default_branch: "master"
+    commit_sha: "41720e624c5a668c7d3777835e4c87095a7a1dfd"
+    primary_language: "java"
+    secondary_languages: ["vue", "javascript"]
+    framework: "Spring Boot 2.x + Vue 2 + Element UI"
+    file_count_java: 266
+    file_count_vue: 106
+    file_count_js: 78
+    file_count_ts: 0
+    file_count_py: 0
+    file_count_xml: 29
+    file_count_yml: 5
+    file_count_sql: 2
+    file_count_total_supported: 450
+    line_count_java: 30803
+    line_count_vue: 21675
+    line_count_js: 5454
+    line_count_total: 57932
+    file_counts_verified: true
+    clone_time: "2026-07-15T11:43:57+08:00"
+    status: cloned
+    proposed_split: development
+    verified: true
+    exclusion_reason: null
+    notes: "Classic Chinese enterprise admin. Clear Spring Controller/Service structure. Vue 2 (not 3). No TypeScript, no Python."
+
+  - repo_id: jeecg-boot
+    name: "JeecgBoot"
+    clone_url: "https://github.com/jeecgboot/JeecgBoot"
+    repository_subdir: ""
+    license: "Apache-2.0"
+    default_branch: "master"
+    commit_sha: null
+    primary_language: "java"
+    secondary_languages: ["vue", "typescript"]
+    framework: "Spring Boot + Vue 3 + Ant Design Vue"
+    file_count_java: 1000
+    file_count_vue: 400
+    file_counts_verified: false
+    status: candidate
+    proposed_split: null  # Too large for pilot; candidate for extended evaluation
+    verified: false
+    exclusion_reason: null
+    notes: "Very large. Would need to select a single module. Code generation may produce repetitive patterns."
+
+  - repo_id: pig
+    name: "Pig"
+    clone_url: "https://github.com/pig-mesh/pig"
+    repository_subdir: ""
+    license: "MIT"
+    default_branch: "master"
+    commit_sha: null
+    primary_language: "java"
+    secondary_languages: ["vue", "typescript"]
+    framework: "Spring Cloud + Vue 3"
+    file_count_java: 400
+    file_count_vue: 200
+    file_counts_verified: false
+    status: candidate
+    proposed_split: null
+    verified: false
+    exclusion_reason: null
+    notes: "Microservice architecture. Spring Cloud Gateway. May exceed single-project scanning scope."
+
+  - repo_id: halo
+    name: "Halo"
+    clone_url: "https://github.com/halo-dev/halo"
+    repository_subdir: ""
+    license: "GPL-3.0"
+    license_note: "GPL-3.0 — boundary candidate only; does not meet permissive-license criterion"
+    default_branch: "main"
+    commit_sha: null
+    primary_language: "java"
+    secondary_languages: ["vue", "typescript"]
+    framework: "Spring Boot 3.x + Vue 3 (Console)"
+    file_count_java: 400
+    file_count_vue: 200
+    file_counts_verified: false
+    status: candidate
+    proposed_split: null
+    verified: false
+    exclusion_reason: null
+    notes: "GPL-3.0 (more restrictive). Plugin architecture uses dynamic loading that static analysis cannot trace. Good failure-boundary test."
+
+  # --- Extended Evaluation Candidates (Stage 4) ---
+  # Python project for language-diversity testing
+
+  - repo_id: fastapi-realworld
+    name: "FastAPI RealWorld Example"
+    clone_url: "https://github.com/gothinkster/realworld"
+    repository_subdir: "apps/python-fastapi"
+    license: "MIT"
+    default_branch: "main"
+    commit_sha: null
+    primary_language: "python"
+    secondary_languages: []
+    framework: "FastAPI"
+    file_count_python: 30
+    file_counts_verified: false
+    status: candidate
+    proposed_split: null
+    verified: false
+    exclusion_reason: null
+    notes: "Python-only subdirectory within the gothinkster/realworld monorepo. Tests parser coverage for non-Java repos. Small but real application."
+
+  # --- Existing Fixture (Smoke Test Only) ---
+
+  - repo_id: sample-project
+    name: "ResearchCode-Agent sample_project"
+    clone_url: null  # Local fixture, not a real repo
+    repository_subdir: "backend/tests/fixtures/sample_project"
+    parent_repo: "ResearchCode-Agent"
+    license: null
+    default_branch: null
+    commit_sha: null  # Uses parent repo (ResearchCode-Agent) SHA when needed
+    primary_language: "mixed"
+    secondary_languages: ["java", "python", "vue", "typescript"]
+    framework: "Minimal fixture"
+    file_count_mixed: 5
+    file_counts_verified: true
+    status: selected
+    proposed_split: development
+    verified: true
+    exclusion_reason: null
+    notes: "Internal test fixture living inside the ResearchCode-Agent repository. Only for smoke-testing the evaluation framework. NOT for real benchmark conclusions."

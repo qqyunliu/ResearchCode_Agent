@@ -1,0 +1,202 @@
+{
+  "dataset_sha256": "eabda374f8a1f717924537b03dc37f0b47fa25acd71498da45360a8f98b4c78e",
+  "timestamp": "2026-07-15T08:39:04.571114+00:00",
+  "dataset_path": "evaluation/datasets/pilot-current.jsonl",
+  "total_records": 36,
+  "eligible_records": 36,
+  "excluded_reasons": {},
+  "no_gold_files_count": 7,
+  "source_answerable_true_count": 27,
+  "source_answerable_false_count": 2,
+  "configuration": {
+    "dataset_path": "evaluation/datasets/pilot-current.jsonl",
+    "repo_path": "evaluation/workspaces/ruoyi-vue",
+    "b0_script": "evaluation/runners/baseline_rg.py",
+    "b1_script": "evaluation/runners/baseline_keyword.py",
+    "top_k": 10,
+    "metric_type": "file-level retrieval",
+    "gold_source": "gold_entities where relevance=must_recall, field file_path",
+    "eligibility_filter": "gold_status=machine_verified AND review_status=accepted AND execution_status in (executable, executed) AND retrieval in evaluation_layers"
+  },
+  "b0_ripgrep": {
+    "overall": {
+      "n": 27,
+      "recall@1": 0.0741,
+      "recall@5": 0.2222,
+      "recall@10": 0.2593,
+      "mrr": 0.1177,
+      "zero_hit_rate": 0.7407
+    },
+    "diagnostic_source_answerable_false": {
+      "n": 2,
+      "recall@1": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "zero_hit_rate": 1.0
+    },
+    "grouped": {
+      "language": {
+        "en": {
+          "n": 12,
+          "recall@1": 0.0,
+          "recall@5": 0.3333,
+          "recall@10": 0.4167,
+          "mrr": 0.0981,
+          "zero_hit_rate": 0.5833
+        },
+        "zh": {
+          "n": 15,
+          "recall@1": 0.1333,
+          "recall@5": 0.1333,
+          "recall@10": 0.1333,
+          "mrr": 0.1333,
+          "zero_hit_rate": 0.8667
+        }
+      },
+      "difficulty": {
+        "easy": {
+          "n": 8,
+          "recall@1": 0.0,
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr": 0.0,
+          "zero_hit_rate": 1.0
+        },
+        "hard": {
+          "n": 7,
+          "recall@1": 0.0,
+          "recall@5": 0.2857,
+          "recall@10": 0.2857,
+          "mrr": 0.0762,
+          "zero_hit_rate": 0.7143
+        },
+        "medium": {
+          "n": 12,
+          "recall@1": 0.1667,
+          "recall@5": 0.3333,
+          "recall@10": 0.4167,
+          "mrr": 0.2204,
+          "zero_hit_rate": 0.5833
+        }
+      },
+      "task_type": {
+        "CHANGE_PLAN": {
+          "n": 9,
+          "recall@1": 0.1111,
+          "recall@5": 0.2222,
+          "recall@10": 0.3333,
+          "mrr": 0.1605,
+          "zero_hit_rate": 0.6667
+        },
+        "CODE_QA": {
+          "n": 9,
+          "recall@1": 0.0,
+          "recall@5": 0.1111,
+          "recall@10": 0.1111,
+          "mrr": 0.0222,
+          "zero_hit_rate": 0.8889
+        },
+        "TRACE_CHAIN": {
+          "n": 9,
+          "recall@1": 0.1111,
+          "recall@5": 0.3333,
+          "recall@10": 0.3333,
+          "mrr": 0.1704,
+          "zero_hit_rate": 0.6667
+        }
+      }
+    }
+  },
+  "b1_keyword": {
+    "overall": {
+      "n": 27,
+      "recall@1": 0.1852,
+      "recall@5": 0.2593,
+      "recall@10": 0.4074,
+      "mrr": 0.2307,
+      "zero_hit_rate": 0.5926
+    },
+    "diagnostic_source_answerable_false": {
+      "n": 2,
+      "recall@1": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "zero_hit_rate": 1.0
+    },
+    "grouped": {
+      "language": {
+        "en": {
+          "n": 12,
+          "recall@1": 0.25,
+          "recall@5": 0.4167,
+          "recall@10": 0.6667,
+          "mrr": 0.3441,
+          "zero_hit_rate": 0.3333
+        },
+        "zh": {
+          "n": 15,
+          "recall@1": 0.1333,
+          "recall@5": 0.1333,
+          "recall@10": 0.2,
+          "mrr": 0.14,
+          "zero_hit_rate": 0.8
+        }
+      },
+      "difficulty": {
+        "easy": {
+          "n": 8,
+          "recall@1": 0.0,
+          "recall@5": 0.25,
+          "recall@10": 0.25,
+          "mrr": 0.0938,
+          "zero_hit_rate": 0.75
+        },
+        "hard": {
+          "n": 7,
+          "recall@1": 0.0,
+          "recall@5": 0.0,
+          "recall@10": 0.2857,
+          "mrr": 0.0383,
+          "zero_hit_rate": 0.7143
+        },
+        "medium": {
+          "n": 12,
+          "recall@1": 0.4167,
+          "recall@5": 0.4167,
+          "recall@10": 0.5833,
+          "mrr": 0.4343,
+          "zero_hit_rate": 0.4167
+        }
+      },
+      "task_type": {
+        "CHANGE_PLAN": {
+          "n": 9,
+          "recall@1": 0.3333,
+          "recall@5": 0.4444,
+          "recall@10": 0.5556,
+          "mrr": 0.4048,
+          "zero_hit_rate": 0.4444
+        },
+        "CODE_QA": {
+          "n": 9,
+          "recall@1": 0.0,
+          "recall@5": 0.1111,
+          "recall@10": 0.2222,
+          "mrr": 0.0401,
+          "zero_hit_rate": 0.7778
+        },
+        "TRACE_CHAIN": {
+          "n": 9,
+          "recall@1": 0.2222,
+          "recall@5": 0.2222,
+          "recall@10": 0.4444,
+          "mrr": 0.2472,
+          "zero_hit_rate": 0.5556
+        }
+      }
+    },
+    "entity_count": 2199
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "archive_id": "stage2a-draft-invalid",
+  "archived_at": "2026-07-15T07:33:43.348844+00:00",
+  "reason": "Schema validation failed (511 errors), role separation violated (question_generator_A = evidence_annotator), metrics used unverified proposed annotations, pytest exit code 1",
+  "file_count": 8,
+  "files": [
+    {
+      "original_path": "evaluation/results/raw/b0_rg.jsonl",
+      "archive_path": "evaluation/archive/stage2a-draft-invalid/b0_rg.jsonl",
+      "sha256": "30051f2d8e3035c056bf290b7cd793d8cb11bd186f6d6a9e6704ee9914d81782",
+      "size_bytes": 62695,
+      "validation_errors": 0,
+      "status": "superseded",
+      "notes": "B0 ripgrep baseline raw results"
+    },
+    {
+      "original_path": "evaluation/results/raw/b1_keyword.jsonl",
+      "archive_path": "evaluation/archive/stage2a-draft-invalid/b1_keyword.jsonl",
+      "sha256": "63d575dd683374f280e0313934ca89cefaa00506c36bb28b286d2fd03bc2d26a",
+      "size_bytes": 117763,
+      "validation_errors": 0,
+      "status": "superseded",
+      "notes": "B1 keyword baseline raw results"
+    },
+    {
+      "original_path": "evaluation/results/metrics/baseline_summary.json",
+      "archive_path": "evaluation/archive/stage2a-draft-invalid/baseline_summary.json",
+      "sha256": "e083e2b83724275529ca02e8d8d7732d00e96e79319afe9fdca3f88278d8ee99",
+      "size_bytes": 28293,
+      "validation_errors": 0,
+      "status": "superseded",
+      "notes": "Aggregated baseline metrics summary"
+    },
+    {
+      "original_path": "evaluation/annotations/proposed/generate_questions.py",
+      "archive_path": "evaluation/archive/stage2a-draft-invalid/generate_questions.py",
+      "sha256": "b7516c3de5935a94f6ffcb04a5a1a815139030702b6721677106bfef68ba4e16",
+      "size_bytes": 78011,
+      "validation_errors": 0,
+      "status": "superseded",
+      "notes": "Question generation script"
+    },
+    {
+      "original_path": "evaluation/reports/pilot-report.md",
+      "archive_path": "evaluation/archive/stage2a-draft-invalid/pilot-report.md",
+      "sha256": "98d414b3e9e88bc80bd46d1b9ad803cdf7b65c67b1967bc60841370f89b3ddbb",
+      "size_bytes": 13748,
+      "validation_errors": 0,
+      "status": "superseded",
+      "notes": "Stage 2A pilot report (now superseded)"
+    },
+    {
+      "original_path": "evaluation/datasets/pilot.jsonl",
+      "archive_path": "evaluation/archive/stage2a-draft-invalid/pilot.jsonl",
+      "sha256": "197d5baa447c25d957f71eff2913ec6e29d7b59512af6dd26d22e91cb8640daa",
+      "size_bytes": 75474,
+      "validation_errors": 511,
+      "status": "superseded",
+      "notes": "36/36 records failed schema validation"
+    },
+    {
+      "original_path": "evaluation/annotations/proposed/pilot_candidates.jsonl",
+      "archive_path": "evaluation/archive/stage2a-draft-invalid/pilot_candidates.jsonl",
+      "sha256": "a5b0d90afce6007146a1163ace86da0f647ef6c56a03ebab571053e994720b4b",
+      "size_bytes": 67237,
+      "validation_errors": 0,
+      "status": "superseded",
+      "notes": "Proposed annotations from question_generator_A"
+    },
+    {
+      "original_path": "evaluation/annotations/reviewed/pilot_review.jsonl",
+      "archive_path": "evaluation/archive/stage2a-draft-invalid/pilot_review.jsonl",
+      "sha256": "a0b7db49b17fd7bab5c5024410c5880da136132627827c654179f98619e919ad",
+      "size_bytes": 12209,
+      "validation_errors": 0,
+      "status": "superseded",
+      "notes": "Adversarial reviewer output"
+    }
+  ]
+}

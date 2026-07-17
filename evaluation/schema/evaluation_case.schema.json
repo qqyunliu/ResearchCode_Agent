@@ -1,0 +1,540 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://researchcode-agent/evaluation/evaluation_case.schema.json/1.4.0",
+  "title": "ResearchCode-Agent Evaluation Case",
+  "description": "Schema for a single evaluation question with gold-standard annotations. v1.4.0 adds snapshot-aware validation fields. Validation rules: (1) indexed_in_system=true entities must exist in the scan snapshot; (2) indexed_in_system=false entities must have missing_reason and source_evidence; (3) system_answerable=full requires all required nodes/edges to have indexed_in_system=true; (4) chain_complete=true requires all required edges to have indexed_in_system=true.",
+  "type": "object",
+  "required": [
+    "dataset_version",
+    "question_id",
+    "question_fingerprint",
+    "repo_id",
+    "commit_sha",
+    "split",
+    "task_type",
+    "language",
+    "difficulty",
+    "question",
+    "source_answerable",
+    "system_answerable",
+    "question_origin",
+    "gold_status",
+    "execution_status",
+    "annotation",
+    "provenance"
+  ],
+  "properties": {
+    "dataset_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$",
+      "description": "Semantic version of the dataset (e.g. '1.0')"
+    },
+    "question_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+-\\d{4}$",
+      "description": "Unique ID in format '{repo_id}-{task}-{seq}', e.g. 'ruoyi-retrieval-0001'"
+    },
+    "question_fingerprint": {
+      "type": "string",
+      "description": "Normalized hash of question text for duplicate detection across splits"
+    },
+    "repo_id": {
+      "type": "string",
+      "description": "Repository identifier matching repos/manifest.yaml"
+    },
+    "commit_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "Full 40-character Git commit SHA"
+    },
+    "split": {
+      "type": "string",
+      "enum": ["development", "validation", "holdout"],
+      "description": "Data split assignment"
+    },
+    "task_type": {
+      "type": "string",
+      "enum": ["CODE_QA", "TRACE_CHAIN", "CHANGE_PLAN"],
+      "description": "Expected task type for routing evaluation"
+    },
+    "language": {
+      "type": "string",
+      "enum": ["zh", "en"],
+      "description": "Question language"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": ["easy", "medium", "hard"],
+      "description": "Question difficulty level"
+    },
+    "question": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 500,
+      "description": "The evaluation question text"
+    },
+    "source_answerable": {
+      "type": "boolean",
+      "description": "Whether the question can be answered by reading the source code at the fixed commit (source truth level)"
+    },
+    "system_answerable": {
+      "type": "string",
+      "enum": ["full", "partial", "insufficient"],
+      "description": "Whether ResearchCode-Agent's current indexed data can fully, partially, or not at all answer this question (indexed observation level). 'full' = all evidence in index; 'partial' = some evidence missing (e.g. CALLS_METHOD edge); 'insufficient' = key evidence absent from index"
+    },
+    "question_origin": {
+      "type": "string",
+      "enum": ["human", "machine_generated", "paraphrased"],
+      "description": "How the question was created"
+    },
+    "gold_status": {
+      "type": "string",
+      "enum": ["machine_proposed", "machine_verified", "human_verified"],
+      "description": "Current verification status of the gold standard"
+    },
+    "execution_status": {
+      "type": "string",
+      "enum": ["executable", "prepared_not_executed", "executed", "excluded"],
+      "description": "Whether this record can be executed in the current evaluation run. 'executable' = all inputs ready; 'prepared_not_executed' = question ready but base snapshot not built; 'executed' = already run; 'excluded' = not for formal metrics"
+    },
+    "evaluation_layers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["routing", "retrieval", "trace_chain", "answer_citation", "change_plan"]
+      },
+      "description": "Which evaluation layers apply to this question"
+    },
+    "expected_task_type": {
+      "type": "string",
+      "enum": ["CODE_QA", "TRACE_CHAIN", "CHANGE_PLAN"],
+      "description": "Expected routing result (may differ from task_type if testing misrouting)"
+    },
+    "gold_entities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["stable_entity_key", "entity_type", "qualified_name", "file_path", "start_line", "end_line", "relevance"],
+        "properties": {
+          "stable_entity_key": {
+            "type": "string",
+            "description": "SHA-256 of repo_id|commit_sha|file_path|entity_type|qualified_name|start_line|end_line"
+          },
+          "entity_type": {
+            "type": "string",
+            "description": "Entity type (java_class, java_method, backend_api, frontend_api_call, python_class, python_function)"
+          },
+          "qualified_name": {
+            "type": "string"
+          },
+          "file_path": {
+            "type": "string",
+            "description": "Relative path within the repository"
+          },
+          "start_line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "end_line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "relevance": {
+            "type": "string",
+            "enum": ["must_recall", "acceptable_alternative", "insufficient", "distractor", "source_only"],
+            "description": "Relevance level for retrieval evaluation. must_recall: must be found by index-level retrieval. acceptable_alternative: acceptable index-level match. insufficient: related but not sufficient. distractor: intentionally misleading. source_only: exists in source truth but not in index; excluded from index-level Recall."
+          },
+          "indexed_in_system": {
+            "type": "boolean",
+            "description": "Whether this entity exists in ResearchCode-Agent's current scan snapshot (indexed observation). true = entity found in scan results; false = entity exists in source truth but is missing from the index (e.g. due to parser limitations, dynamic URL patterns, or interface-type mismatches). When false, this entity is excluded from index-level Recall computation and the relevance should be 'source_only'."
+          },
+          "missing_reason": {
+            "type": "string",
+            "description": "Why this entity is not present in the scan index. Required when indexed_in_system=false. Examples: 'dynamic_url', 'interface_type_mismatch', 'component_not_recognized', 'parser_limitation'."
+          },
+          "source_evidence": {
+            "type": "object",
+            "required": ["file_path", "start_line", "end_line"],
+            "properties": {
+              "file_path": {
+                "type": "string",
+                "description": "Relative path within the repository where the entity can be verified in source code"
+              },
+              "start_line": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "1-based start line of the entity in source code"
+              },
+              "end_line": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "1-based end line of the entity in source code"
+              }
+            },
+            "description": "Source code location where this entity can be verified at the fixed commit. Required when indexed_in_system=false."
+          }
+        }
+      },
+      "description": "Gold-standard entities for retrieval evaluation"
+    },
+    "gold_files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["file_path", "category"],
+        "properties": {
+          "file_path": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["must_change", "likely_change", "context_only", "should_not_change"],
+            "description": "File's role in a change plan"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why this file is in this category"
+          }
+        }
+      },
+      "description": "Gold-standard file sets for change plan evaluation"
+    },
+    "gold_nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["stable_entity_key", "entity_type", "qualified_name", "file_path"],
+        "properties": {
+          "stable_entity_key": {
+            "type": "string",
+            "description": "SHA-256 of repo_id|commit_sha|file_path|entity_type|qualified_name|start_line|end_line"
+          },
+          "runtime_entity_id": {
+            "type": "string",
+            "description": "Database auto-increment ID from a specific scan run; not stable across rescans"
+          },
+          "entity_type": {
+            "type": "string"
+          },
+          "qualified_name": {
+            "type": "string"
+          },
+          "file_path": {
+            "type": "string"
+          },
+          "order": {
+            "type": "integer",
+            "description": "Position in the expected chain (0-indexed)"
+          },
+          "indexed_in_system": {
+            "type": "boolean",
+            "description": "Whether this node exists in ResearchCode-Agent's current scan snapshot (indexed observation). true = node found in scan results; false = node exists in source truth but is missing from the index. When any required node has indexed_in_system=false, chain_complete must be false and system_answerable must not be 'full'."
+          },
+          "missing_reason": {
+            "type": "string",
+            "description": "Why this node is not present in the scan index. Required when indexed_in_system=false. Examples: 'dynamic_url', 'interface_type_mismatch', 'component_not_recognized', 'parser_limitation'."
+          }
+        }
+      },
+      "description": "Expected graph nodes for trace chain evaluation"
+    },
+    "gold_edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_key", "target_key", "relation_type"],
+        "properties": {
+          "source_key": {
+            "type": "string",
+            "description": "SHA-256 of repo_id|commit_sha|file_path|entity_type|qualified_name|start_line|end_line"
+          },
+          "target_key": {
+            "type": "string",
+            "description": "SHA-256 of repo_id|commit_sha|file_path|entity_type|qualified_name|start_line|end_line"
+          },
+          "relation_type": {
+            "type": "string",
+            "enum": ["CONTAINS", "DEFINES_API", "REQUESTS_API", "CALLS_METHOD"]
+          },
+          "confidence": {
+            "type": "string",
+            "enum": ["certain", "inferred", "uncertain"],
+            "description": "Expected confidence level"
+          },
+          "indexed_in_system": {
+            "type": "boolean",
+            "description": "Whether this edge exists in ResearchCode-Agent's current indexed data (indexed observation). true = edge found in scan results; false = edge exists in source truth but is missing from the index (e.g. CALLS_METHOD for interface-typed services). When false, this edge counts as a false negative in graph retrieval evaluation."
+          }
+        }
+      },
+      "description": "Expected graph edges for trace chain evaluation"
+    },
+    "chain_complete": {
+      "type": "boolean",
+      "description": "Whether the gold chain is expected to be fully resolvable"
+    },
+    "required_claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim", "evidence_file"],
+        "properties": {
+          "claim": {
+            "type": "string",
+            "description": "A factual claim that must appear in the answer"
+          },
+          "evidence_file": {
+            "type": "string",
+            "description": "File path containing evidence for this claim"
+          },
+          "evidence_ranges": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["file_path", "start_line", "end_line"],
+              "properties": {
+                "file_path": {
+                  "type": "string",
+                  "description": "File path containing the evidence range"
+                },
+                "start_line": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Start line of the evidence range"
+                },
+                "end_line": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "End line of the evidence range"
+                }
+              }
+            },
+            "description": "Line ranges supporting the claim"
+          }
+        }
+      },
+      "description": "Factual claims that must be present in a correct answer"
+    },
+    "optional_claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "claim": {
+            "type": "string"
+          },
+          "evidence_file": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Claims that may appear but are not required"
+    },
+    "forbidden_claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim", "reason"],
+        "properties": {
+          "claim": {
+            "type": "string",
+            "description": "A claim that must NOT appear in the answer"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why this claim is incorrect or unsupported"
+          }
+        }
+      },
+      "description": "Claims that would constitute hallucination"
+    },
+    "acceptable_alternatives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Acceptable alternative phrasings or entities"
+    },
+    "expected_uncertainties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["condition", "description"],
+        "properties": {
+          "condition": {
+            "type": "string",
+            "description": "What triggers this uncertainty"
+          },
+          "description": {
+            "type": "string",
+            "description": "What the system should report as uncertain"
+          }
+        }
+      },
+      "description": "Uncertainties the system should express"
+    },
+    "required_risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Risks that must be mentioned in change plan answers"
+    },
+    "forbidden_recommendations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Recommendations that must NOT appear in change plan answers"
+    },
+    "expected_language": {
+      "type": "string",
+      "enum": ["zh", "en"],
+      "description": "Expected answer language (should match question language)"
+    },
+    "change_plan_type": {
+      "type": "string",
+      "enum": ["historical_change", "expert_hypothetical"],
+      "description": "Type of change plan gold standard"
+    },
+    "change_plan_provenance": {
+      "type": "object",
+      "properties": {
+        "annotation_type": {
+          "type": "string",
+          "enum": ["historical_change", "expert_hypothetical"],
+          "description": "Whether this change plan is from a real historical commit or an expert-constructed hypothetical"
+        },
+        "base_commit_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$",
+          "description": "The starting commit SHA for the historical change"
+        },
+        "target_commit_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$",
+          "description": "The ending commit SHA for the historical change"
+        },
+        "change_request": {
+          "type": "string",
+          "description": "The original change request or issue description"
+        },
+        "observed_changed_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Files that were actually changed between base and target commits"
+        },
+        "source_commit_message": {
+          "type": "string",
+          "description": "The commit message of the target commit"
+        },
+        "diff_summary": {
+          "type": "string",
+          "description": "A summary of the diff between base and target commits"
+        }
+      },
+      "description": "Provenance information for change plan gold standards, describing whether the case comes from a historical commit pair or an expert-constructed hypothetical"
+    },
+    "special_sample_type": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 20
+      },
+      "description": "Which special sample types (1-20) this question represents"
+    },
+    "annotation": {
+      "type": "object",
+      "required": ["annotator", "reviewer", "review_status"],
+      "properties": {
+        "annotator": {
+          "type": "string",
+          "description": "Agent role that created the annotation (e.g. 'evidence_annotator_A')"
+        },
+        "reviewer": {
+          "type": "string",
+          "description": "Agent role that reviewed the annotation (e.g. 'adversarial_reviewer_A')"
+        },
+        "review_status": {
+          "type": "string",
+          "enum": ["accepted", "needs_review", "rejected"],
+          "description": "Current review status"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Free-text annotation notes"
+        },
+        "disagreements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": {
+                "type": "string",
+                "description": "Which field was disputed"
+              },
+              "original": {
+                "description": "Original value"
+              },
+              "challenged": {
+                "description": "Challenged value"
+              },
+              "resolution": {
+                "type": "string",
+                "description": "How the disagreement was resolved"
+              }
+            }
+          },
+          "description": "Recorded disagreements between annotator and reviewer"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["source_files", "generation_method", "created_at"],
+      "properties": {
+        "source_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Repository files used as evidence for gold standard"
+        },
+        "source_lines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "file_path": {
+                "type": "string"
+              },
+              "start_line": {
+                "type": "integer"
+              },
+              "end_line": {
+                "type": "integer"
+              }
+            }
+          },
+          "description": "Specific line ranges used as evidence"
+        },
+        "generation_method": {
+          "type": "string",
+          "description": "How the gold standard was generated (e.g. 'manual_code_inspection', 'parser_output_verified')"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

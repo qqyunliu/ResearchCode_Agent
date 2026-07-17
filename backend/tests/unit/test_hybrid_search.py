@@ -37,13 +37,43 @@ def test_normalizes_weights_and_deduplicates_hits() -> None:
 
     results = fuse_search_hits(vector_hits, keyword_hits, limit=10)
 
-    assert [result.entity_id for result in results] == [2, 1, 3]
+    assert [result.entity_id for result in results] == [1, 2, 3]
     assert results[0].score == pytest.approx(
-        0.7 * (0.6 / 0.9) + 0.3
+        0.75 * (0.6 / 0.9) + 0.25
     )
-    assert results[1].score == pytest.approx(0.7)
-    assert results[2].score == pytest.approx(0.3 * 0.8)
+    assert results[1].score == pytest.approx(0.75)
+    assert results[2].score == pytest.approx(0.25 * 0.8)
     assert {result.source for result in results} == {"hybrid"}
+
+
+def test_fixed_fusion_weights_are_vector_point_seven_five_keyword_point_two_five() -> None:
+    """Characterize the production weights independently of overlap ordering."""
+    results = fuse_search_hits(
+        [hit(entity_id=1, score=2.0, source="vector")],
+        [hit(entity_id=2, score=4.0, source="keyword")],
+        limit=10,
+    )
+
+    scores = {result.entity_id: result.score for result in results}
+
+    assert scores == pytest.approx({1: 0.75, 2: 0.25})
+
+
+def test_keyword_only_candidate_can_change_vector_only_top_k() -> None:
+    """A strong lexical-only candidate must make hybrid differ from B2."""
+    vector_hits = [
+        hit(entity_id=1, score=1.0, source="vector"),
+        hit(entity_id=2, score=0.5, source="vector"),
+        hit(entity_id=3, score=0.2, source="vector"),
+    ]
+    keyword_only_hit = hit(entity_id=4, score=1.0, source="keyword")
+
+    results = fuse_search_hits(vector_hits, [keyword_only_hit], limit=3)
+
+    assert [hit.entity_id for hit in vector_hits[:3]] == [1, 2, 3]
+    assert [result.entity_id for result in results] == [1, 2, 4]
+    assert results[2].score == pytest.approx(0.25)
+    assert results[2].score > 0.75 * (vector_hits[2].score / vector_hits[0].score)
 
 
 def test_ties_use_entity_id_and_limit_is_honored() -> None:

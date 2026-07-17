@@ -34,7 +34,7 @@ limitation or failure state instead of being converted into a code fact.
 
 | Concept | Role | What it is trusted for | What it is not trusted for |
 | --- | --- | --- | --- |
-| Source scanner and parsers | Read local Java, Vue, JavaScript, TypeScript, Python, and recognized configuration files into an index | File metadata, parsed entities, conservative static relations, scan issues | Runtime behavior, reflection, dynamic dispatch, arbitrary framework conventions |
+| Source scanner and parsers | Discover local source and configuration files, parse supported code into indexed entities, and record scan metadata and issues | File metadata, parsed entities, conservative static relations, scan issues | Runtime behavior, reflection, dynamic dispatch, arbitrary framework conventions |
 | SQLite | Project-scoped static source-of-truth store | Code files, entities, relations, scan issues, conversations | Semantic vector similarity or runtime traces |
 | Qdrant | Project-scoped vector store | Semantic ranking of indexed code chunks | Code graph facts or durable source metadata |
 | Hybrid retrieval | Combines keyword and vector results | Candidate evidence for the current question | Proof that a candidate relationship exists |
@@ -114,8 +114,9 @@ local source repository
         v
 safe file discovery and UTF-8 reading
         |
-        v
-Java / Vue / Python parsers
+        +--> Java / Python declaration parsers
+        |
+        +--> Vue / JavaScript / TypeScript request extractor
         |
         +--> SQLite code files, entities, scan issues, and relations
         |
@@ -270,9 +271,13 @@ limit from both sources, normalizes positive scores independently, deduplicates
 entities, and computes:
 
 ```text
-hybrid_score = 0.7 * normalized_vector_score
-             + 0.3 * normalized_keyword_score
+hybrid_score = 0.75 * normalized_vector_score
+             + 0.25 * normalized_keyword_score
 ```
+
+These production weights were selected by a frozen Pilot grid calibration;
+the [fusion-weight selection report](evaluation/reports/hybrid-fusion-weight-selection-report.md)
+records the comparison, selection rule, and claim boundary.
 
 When an operational failure makes either the vector or keyword branch
 unavailable, hybrid retrieval can return results from the remaining branch and
@@ -354,7 +359,7 @@ ResearchCode_Agent/
 |   |   |-- graph/       # project-scoped graph queries and traversal types
 |   |   |-- llm/         # OpenAI-compatible chat client
 |   |   |-- models/      # SQLAlchemy persistence models
-|   |   |-- parsers/     # Java, Vue, Python parsers and relation builder
+|   |   |-- parsers/     # Java/Python declaration parsers, frontend request extraction, and relation building
 |   |   |-- rag/         # cited text/graph context and GraphRAG retrieval
 |   |   |-- retrieval/   # chunks, embeddings, search, Qdrant adapter
 |   |   |-- schemas/     # Pydantic request and response contracts

@@ -1,0 +1,502 @@
+{
+  "dataset_path": "evaluation/datasets/pilot-current.jsonl",
+  "dataset_sha256": "86ffda7cf4b90eabfaf5d44dff6b76a9f841fe7e6e9bcb8df6cae1e8fac8d65c",
+  "repository_commit": "41720e624c5a668c7d3777835e4c87095a7a1dfd",
+  "dataset_records": 36,
+  "schema_eligible_records": 36,
+  "retrieval_layer_records": 36,
+  "index_retrieval_scored_records": 27,
+  "source_answerable_true_records": 28,
+  "source_answerable_false_records": 8,
+  "unanswerable_with_source_gold_records": 1,
+  "skipped_no_indexable_gold_records": 1,
+  "excluded_records_by_reason": {},
+  "eligible_question_ids": [
+    "ruoyi-change-plan-0025",
+    "ruoyi-change-plan-0026",
+    "ruoyi-change-plan-0027",
+    "ruoyi-change-plan-0028",
+    "ruoyi-change-plan-0029",
+    "ruoyi-change-plan-0030",
+    "ruoyi-change-plan-0031",
+    "ruoyi-change-plan-0032",
+    "ruoyi-change-plan-0033",
+    "ruoyi-change-plan-0034",
+    "ruoyi-change-plan-0035",
+    "ruoyi-change-plan-0036",
+    "ruoyi-code-qa-0001",
+    "ruoyi-code-qa-0002",
+    "ruoyi-code-qa-0003",
+    "ruoyi-code-qa-0004",
+    "ruoyi-code-qa-0005",
+    "ruoyi-code-qa-0006",
+    "ruoyi-code-qa-0007",
+    "ruoyi-code-qa-0008",
+    "ruoyi-code-qa-0009",
+    "ruoyi-code-qa-0010",
+    "ruoyi-code-qa-0011",
+    "ruoyi-code-qa-0012",
+    "ruoyi-trace-chain-0013",
+    "ruoyi-trace-chain-0014",
+    "ruoyi-trace-chain-0015",
+    "ruoyi-trace-chain-0016",
+    "ruoyi-trace-chain-0017",
+    "ruoyi-trace-chain-0018",
+    "ruoyi-trace-chain-0019",
+    "ruoyi-trace-chain-0020",
+    "ruoyi-trace-chain-0021",
+    "ruoyi-trace-chain-0022",
+    "ruoyi-trace-chain-0023",
+    "ruoyi-trace-chain-0024"
+  ],
+  "excluded_question_ids": [],
+  "timestamp": "2026-07-15T11:45:50.051033+00:00",
+  "baselines": {
+    "b0_rgrep": {
+      "description": "B0 baseline: ripgrep text search (token extraction + file-level grep). No index used.",
+      "predictions_file": "evaluation\\results\\raw\\stage2a3_b0_rg.jsonl",
+      "overall": {
+        "n": 27,
+        "recall@1": 0.0741,
+        "recall@5": 0.2222,
+        "recall@10": 0.2222,
+        "mrr": 0.1105,
+        "zero_hit_rate": 0.7778
+      },
+      "diagnostic_source_answerable_false": {
+        "n": 1,
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "zero_hit_rate": 1.0
+      },
+      "grouped": {
+        "language": {
+          "en": {
+            "n": 13,
+            "recall@1": 0.0,
+            "recall@5": 0.3077,
+            "recall@10": 0.3077,
+            "mrr": 0.0756,
+            "zero_hit_rate": 0.6923
+          },
+          "zh": {
+            "n": 14,
+            "recall@1": 0.1429,
+            "recall@5": 0.1429,
+            "recall@10": 0.1429,
+            "mrr": 0.1429,
+            "zero_hit_rate": 0.8571
+          }
+        },
+        "difficulty": {
+          "easy": {
+            "n": 8,
+            "recall@1": 0.0,
+            "recall@5": 0.0,
+            "recall@10": 0.0,
+            "mrr": 0.0,
+            "zero_hit_rate": 1.0
+          },
+          "hard": {
+            "n": 8,
+            "recall@1": 0.0,
+            "recall@5": 0.25,
+            "recall@10": 0.25,
+            "mrr": 0.0667,
+            "zero_hit_rate": 0.75
+          },
+          "medium": {
+            "n": 11,
+            "recall@1": 0.1818,
+            "recall@5": 0.3636,
+            "recall@10": 0.3636,
+            "mrr": 0.2227,
+            "zero_hit_rate": 0.6364
+          }
+        },
+        "task_type": {
+          "CHANGE_PLAN": {
+            "n": 9,
+            "recall@1": 0.1111,
+            "recall@5": 0.2222,
+            "recall@10": 0.2222,
+            "mrr": 0.1389,
+            "zero_hit_rate": 0.7778
+          },
+          "CODE_QA": {
+            "n": 8,
+            "recall@1": 0.0,
+            "recall@5": 0.125,
+            "recall@10": 0.125,
+            "mrr": 0.025,
+            "zero_hit_rate": 0.875
+          },
+          "TRACE_CHAIN": {
+            "n": 10,
+            "recall@1": 0.1,
+            "recall@5": 0.3,
+            "recall@10": 0.3,
+            "mrr": 0.1533,
+            "zero_hit_rate": 0.7
+          }
+        },
+        "system_answerable": {
+          "full": {
+            "n": 22,
+            "recall@1": 0.0909,
+            "recall@5": 0.1818,
+            "recall@10": 0.1818,
+            "mrr": 0.1114,
+            "zero_hit_rate": 0.8182
+          },
+          "insufficient": {
+            "n": 2,
+            "recall@1": 0.0,
+            "recall@5": 0.0,
+            "recall@10": 0.0,
+            "mrr": 0.0,
+            "zero_hit_rate": 1.0
+          },
+          "partial": {
+            "n": 3,
+            "recall@1": 0.0,
+            "recall@5": 0.6667,
+            "recall@10": 0.6667,
+            "mrr": 0.1778,
+            "zero_hit_rate": 0.3333
+          }
+        }
+      }
+    },
+    "b1_keyword": {
+      "description": "B1 baseline: SQLite keyword search (per-token LIKE matching via KeywordSearchService). Uses scanned index.",
+      "predictions_file": "evaluation\\results\\raw\\stage2a3_b1_keyword.jsonl",
+      "overall": {
+        "n": 27,
+        "recall@1": 0.1852,
+        "recall@5": 0.2593,
+        "recall@10": 0.4074,
+        "mrr": 0.2307,
+        "zero_hit_rate": 0.5926
+      },
+      "diagnostic_source_answerable_false": {
+        "n": 1,
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "zero_hit_rate": 1.0
+      },
+      "grouped": {
+        "language": {
+          "en": {
+            "n": 13,
+            "recall@1": 0.2308,
+            "recall@5": 0.3846,
+            "recall@10": 0.6154,
+            "mrr": 0.3176,
+            "zero_hit_rate": 0.3846
+          },
+          "zh": {
+            "n": 14,
+            "recall@1": 0.1429,
+            "recall@5": 0.1429,
+            "recall@10": 0.2143,
+            "mrr": 0.15,
+            "zero_hit_rate": 0.7857
+          }
+        },
+        "difficulty": {
+          "easy": {
+            "n": 8,
+            "recall@1": 0.0,
+            "recall@5": 0.25,
+            "recall@10": 0.25,
+            "mrr": 0.0938,
+            "zero_hit_rate": 0.75
+          },
+          "hard": {
+            "n": 8,
+            "recall@1": 0.0,
+            "recall@5": 0.0,
+            "recall@10": 0.25,
+            "mrr": 0.0335,
+            "zero_hit_rate": 0.75
+          },
+          "medium": {
+            "n": 11,
+            "recall@1": 0.4545,
+            "recall@5": 0.4545,
+            "recall@10": 0.6364,
+            "mrr": 0.4737,
+            "zero_hit_rate": 0.3636
+          }
+        },
+        "task_type": {
+          "CHANGE_PLAN": {
+            "n": 9,
+            "recall@1": 0.3333,
+            "recall@5": 0.4444,
+            "recall@10": 0.5556,
+            "mrr": 0.4048,
+            "zero_hit_rate": 0.4444
+          },
+          "CODE_QA": {
+            "n": 8,
+            "recall@1": 0.0,
+            "recall@5": 0.125,
+            "recall@10": 0.25,
+            "mrr": 0.0451,
+            "zero_hit_rate": 0.75
+          },
+          "TRACE_CHAIN": {
+            "n": 10,
+            "recall@1": 0.2,
+            "recall@5": 0.2,
+            "recall@10": 0.4,
+            "mrr": 0.2225,
+            "zero_hit_rate": 0.6
+          }
+        },
+        "system_answerable": {
+          "full": {
+            "n": 22,
+            "recall@1": 0.1818,
+            "recall@5": 0.2727,
+            "recall@10": 0.3636,
+            "mrr": 0.2275,
+            "zero_hit_rate": 0.6364
+          },
+          "insufficient": {
+            "n": 2,
+            "recall@1": 0.0,
+            "recall@5": 0.0,
+            "recall@10": 0.5,
+            "mrr": 0.05,
+            "zero_hit_rate": 0.5
+          },
+          "partial": {
+            "n": 3,
+            "recall@1": 0.3333,
+            "recall@5": 0.3333,
+            "recall@10": 0.6667,
+            "mrr": 0.375,
+            "zero_hit_rate": 0.3333
+          }
+        }
+      },
+      "scan_metadata": {
+        "entity_count": 2199,
+        "files_indexed": 481,
+        "scan_time_seconds": 2.5526
+      }
+    }
+  },
+  "grouped_metrics": {
+    "b0_rgrep": {
+      "language": {
+        "en": {
+          "n": 13,
+          "recall@1": 0.0,
+          "recall@5": 0.3077,
+          "recall@10": 0.3077,
+          "mrr": 0.0756,
+          "zero_hit_rate": 0.6923
+        },
+        "zh": {
+          "n": 14,
+          "recall@1": 0.1429,
+          "recall@5": 0.1429,
+          "recall@10": 0.1429,
+          "mrr": 0.1429,
+          "zero_hit_rate": 0.8571
+        }
+      },
+      "difficulty": {
+        "easy": {
+          "n": 8,
+          "recall@1": 0.0,
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr": 0.0,
+          "zero_hit_rate": 1.0
+        },
+        "hard": {
+          "n": 8,
+          "recall@1": 0.0,
+          "recall@5": 0.25,
+          "recall@10": 0.25,
+          "mrr": 0.0667,
+          "zero_hit_rate": 0.75
+        },
+        "medium": {
+          "n": 11,
+          "recall@1": 0.1818,
+          "recall@5": 0.3636,
+          "recall@10": 0.3636,
+          "mrr": 0.2227,
+          "zero_hit_rate": 0.6364
+        }
+      },
+      "task_type": {
+        "CHANGE_PLAN": {
+          "n": 9,
+          "recall@1": 0.1111,
+          "recall@5": 0.2222,
+          "recall@10": 0.2222,
+          "mrr": 0.1389,
+          "zero_hit_rate": 0.7778
+        },
+        "CODE_QA": {
+          "n": 8,
+          "recall@1": 0.0,
+          "recall@5": 0.125,
+          "recall@10": 0.125,
+          "mrr": 0.025,
+          "zero_hit_rate": 0.875
+        },
+        "TRACE_CHAIN": {
+          "n": 10,
+          "recall@1": 0.1,
+          "recall@5": 0.3,
+          "recall@10": 0.3,
+          "mrr": 0.1533,
+          "zero_hit_rate": 0.7
+        }
+      },
+      "system_answerable": {
+        "full": {
+          "n": 22,
+          "recall@1": 0.0909,
+          "recall@5": 0.1818,
+          "recall@10": 0.1818,
+          "mrr": 0.1114,
+          "zero_hit_rate": 0.8182
+        },
+        "insufficient": {
+          "n": 2,
+          "recall@1": 0.0,
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr": 0.0,
+          "zero_hit_rate": 1.0
+        },
+        "partial": {
+          "n": 3,
+          "recall@1": 0.0,
+          "recall@5": 0.6667,
+          "recall@10": 0.6667,
+          "mrr": 0.1778,
+          "zero_hit_rate": 0.3333
+        }
+      }
+    },
+    "b1_keyword": {
+      "language": {
+        "en": {
+          "n": 13,
+          "recall@1": 0.2308,
+          "recall@5": 0.3846,
+          "recall@10": 0.6154,
+          "mrr": 0.3176,
+          "zero_hit_rate": 0.3846
+        },
+        "zh": {
+          "n": 14,
+          "recall@1": 0.1429,
+          "recall@5": 0.1429,
+          "recall@10": 0.2143,
+          "mrr": 0.15,
+          "zero_hit_rate": 0.7857
+        }
+      },
+      "difficulty": {
+        "easy": {
+          "n": 8,
+          "recall@1": 0.0,
+          "recall@5": 0.25,
+          "recall@10": 0.25,
+          "mrr": 0.0938,
+          "zero_hit_rate": 0.75
+        },
+        "hard": {
+          "n": 8,
+          "recall@1": 0.0,
+          "recall@5": 0.0,
+          "recall@10": 0.25,
+          "mrr": 0.0335,
+          "zero_hit_rate": 0.75
+        },
+        "medium": {
+          "n": 11,
+          "recall@1": 0.4545,
+          "recall@5": 0.4545,
+          "recall@10": 0.6364,
+          "mrr": 0.4737,
+          "zero_hit_rate": 0.3636
+        }
+      },
+      "task_type": {
+        "CHANGE_PLAN": {
+          "n": 9,
+          "recall@1": 0.3333,
+          "recall@5": 0.4444,
+          "recall@10": 0.5556,
+          "mrr": 0.4048,
+          "zero_hit_rate": 0.4444
+        },
+        "CODE_QA": {
+          "n": 8,
+          "recall@1": 0.0,
+          "recall@5": 0.125,
+          "recall@10": 0.25,
+          "mrr": 0.0451,
+          "zero_hit_rate": 0.75
+        },
+        "TRACE_CHAIN": {
+          "n": 10,
+          "recall@1": 0.2,
+          "recall@5": 0.2,
+          "recall@10": 0.4,
+          "mrr": 0.2225,
+          "zero_hit_rate": 0.6
+        }
+      },
+      "system_answerable": {
+        "full": {
+          "n": 22,
+          "recall@1": 0.1818,
+          "recall@5": 0.2727,
+          "recall@10": 0.3636,
+          "mrr": 0.2275,
+          "zero_hit_rate": 0.6364
+        },
+        "insufficient": {
+          "n": 2,
+          "recall@1": 0.0,
+          "recall@5": 0.0,
+          "recall@10": 0.5,
+          "mrr": 0.05,
+          "zero_hit_rate": 0.5
+        },
+        "partial": {
+          "n": 3,
+          "recall@1": 0.3333,
+          "recall@5": 0.3333,
+          "recall@10": 0.6667,
+          "mrr": 0.375,
+          "zero_hit_rate": 0.3333
+        }
+      }
+    }
+  },
+  "notes": [
+    "Index-level Recall: only entities with relevance='must_recall' AND indexed_in_system=true are gold for Recall computation.",
+    "Entities with relevance='source_only' are NOT counted in index-level Recall.",
+    "source_answerable=false records are reported separately as diagnostic, NOT in main Recall/MRR.",
+    "File-level matching: a hit matches if any result file_path equals any gold entity file_path.",
+    "B0 returns file-level hits (ripgrep). B1 returns entity-level hits deduplicated by file_path."
+  ]
+}

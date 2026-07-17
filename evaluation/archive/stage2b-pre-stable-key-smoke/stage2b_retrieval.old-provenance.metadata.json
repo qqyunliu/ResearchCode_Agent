@@ -1,0 +1,183 @@
+{
+  "build": {
+    "chunks": 2199,
+    "collection": "project_1_code_chunks",
+    "config_fingerprint": "ffba5c4f7dbd6923692e46bf265ac38b9db7082ccdff7dd4b845c1fd2ddec529",
+    "current_embedding_batches": 0,
+    "db_sha256": "cffd46aa7a2d495877dea84ed6eb613d0a78ce9f9cd19808cb6d720fbf9e1049",
+    "dimension": 1024,
+    "duration_seconds": 208.15060350002022,
+    "embedding_batches": 35,
+    "embedding_dimensions": 1024,
+    "embedding_endpoint": "https://open.bigmodel.cn/api/paas/v4",
+    "embedding_model": "embedding-3",
+    "entity_count": 2199,
+    "model": "embedding-3",
+    "original_build": {
+      "chunks": 2199,
+      "collection": "project_1_code_chunks",
+      "config_fingerprint": "ffba5c4f7dbd6923692e46bf265ac38b9db7082ccdff7dd4b845c1fd2ddec529",
+      "db_sha256": "cffd46aa7a2d495877dea84ed6eb613d0a78ce9f9cd19808cb6d720fbf9e1049",
+      "dimension": 1024,
+      "duration_seconds": 208.15060350002022,
+      "embedding_batches": 35,
+      "embedding_dimensions": 1024,
+      "embedding_endpoint": "https://open.bigmodel.cn/api/paas/v4",
+      "embedding_model": "embedding-3",
+      "entity_count": 2199,
+      "model": "embedding-3",
+      "points_count": 2199,
+      "project_count": 1,
+      "project_id": 1,
+      "provenance_status": "measured_current_process",
+      "qdrant_mode": "local",
+      "qdrant_path": "F:\\LIUQINGYUN\\ResearchCode_Agent\\evaluation\\runtime\\pilot\\stage2b_qdrant",
+      "relation_count": 1980,
+      "snapshot_sha256": "f65fda94ee5c5bb0ed360f6e0eb5e7315e6ccfec1916d69decb8f2567e2e816b",
+      "status": "completed",
+      "vector_size": 1024
+    },
+    "points_count": 2199,
+    "project_count": 1,
+    "project_id": 1,
+    "provenance_status": "verified_metadata",
+    "qdrant_mode": "local",
+    "qdrant_path": "F:\\LIUQINGYUN\\ResearchCode_Agent\\evaluation\\runtime\\pilot\\stage2b_qdrant",
+    "relation_count": 1980,
+    "snapshot_sha256": "f65fda94ee5c5bb0ed360f6e0eb5e7315e6ccfec1916d69decb8f2567e2e816b",
+    "status": "reused",
+    "vector_size": 1024
+  },
+  "config_fingerprint": "ffba5c4f7dbd6923692e46bf265ac38b9db7082ccdff7dd4b845c1fd2ddec529",
+  "dataset_path": "F:\\LIUQINGYUN\\ResearchCode_Agent\\evaluation\\datasets\\pilot-current.jsonl",
+  "dataset_sha256": "86ffda7cf4b90eabfaf5d44dff6b76a9f841fe7e6e9bcb8df6cae1e8fac8d65c",
+  "db_sha256": "cffd46aa7a2d495877dea84ed6eb613d0a78ce9f9cd19808cb6d720fbf9e1049",
+  "effective_config": {
+    "candidate_limit": 20,
+    "chunk_max_content_chars": 4000,
+    "embedding_dimensions": 1024,
+    "embedding_endpoint": "https://open.bigmodel.cn/api/paas/v4",
+    "embedding_model": "embedding-3",
+    "embedding_provider": "api",
+    "qdrant_path": "F:\\LIUQINGYUN\\ResearchCode_Agent\\evaluation\\runtime\\pilot\\stage2b_qdrant",
+    "rewrite_llm_endpoint": "https://api.xiaomimimo.com/v1",
+    "rewrite_llm_model": "mimo-v2.5",
+    "top_k": 10,
+    "variants": {
+      "A1": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.3,
+        "mode": "hybrid",
+        "rewrite": false,
+        "vector_weight": 0.7
+      },
+      "A2": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.5,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.5
+      },
+      "A3": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.7,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.3
+      },
+      "A4": {
+        "fusion": "rrf",
+        "graph_depth": null,
+        "keyword_weight": 0.3,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.7
+      },
+      "A5": {
+        "fusion": "weighted",
+        "graph_depth": 0,
+        "keyword_weight": 0.3,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.7
+      },
+      "A6": {
+        "fusion": "weighted",
+        "graph_depth": 1,
+        "keyword_weight": 0.3,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.7
+      },
+      "B2": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.3,
+        "mode": "vector",
+        "rewrite": true,
+        "vector_weight": 0.7
+      },
+      "B3": {
+        "fusion": "weighted",
+        "graph_depth": null,
+        "keyword_weight": 0.3,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.7
+      },
+      "B4": {
+        "fusion": "weighted",
+        "graph_depth": 2,
+        "keyword_weight": 0.3,
+        "mode": "hybrid",
+        "rewrite": true,
+        "vector_weight": 0.7
+      }
+    }
+  },
+  "process_counters": {
+    "embedding_service": {
+      "calls": 0,
+      "failures": 0,
+      "latency_seconds": 0.0,
+      "successes": 0
+    },
+    "rewrite_cache_entries": 1
+  },
+  "project_id": 1,
+  "provider_counters": {
+    "embedding_sdk_create_attempts": {
+      "calls": 36,
+      "failures": 0,
+      "latency_seconds": 29.316409800201654,
+      "successes": 36
+    },
+    "rewrite_llm_sdk_create_attempts": {
+      "calls": 1,
+      "failures": 0,
+      "latency_seconds": 6.352758699969854,
+      "successes": 1
+    }
+  },
+  "providers": {
+    "embedding": {
+      "base_url": "https://open.bigmodel.cn/api/paas/v4",
+      "dimensions": 1024,
+      "model": "embedding-3",
+      "provider": "api"
+    },
+    "rewrite_llm": {
+      "base_url": "https://api.xiaomimimo.com/v1",
+      "model": "mimo-v2.5"
+    },
+    "sdk_retries_disabled": true
+  },
+  "qdrant_mode": "local",
+  "records_written": 3,
+  "repo_commit": "41720e624c5a668c7d3777835e4c87095a7a1dfd",
+  "run_id": "stage2b-4baa53b34eedaead",
+  "snapshot_sha256": "f65fda94ee5c5bb0ed360f6e0eb5e7315e6ccfec1916d69decb8f2567e2e816b"
+}

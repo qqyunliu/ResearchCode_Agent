@@ -1,0 +1,4 @@
+SUPERSEDED -- This file is from the old 42-record contaminated canonical dataset.
+Archived at: evaluation/archive/stage2a1-baseline-contaminated/canonical_b1_keyword.jsonl
+Current valid predictions: evaluation/results/raw/pilot_current_b1_keyword.jsonl (36 records)
+This stale copy should be removed from results/raw/.

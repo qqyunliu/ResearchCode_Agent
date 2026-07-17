@@ -1,0 +1,1192 @@
+[
+  {
+    "question_id": "ruoyi-code-qa-0001",
+    "task_type": "CODE_QA",
+    "language": "zh",
+    "difficulty": "easy",
+    "question": "用户登录的接口定义在哪个控制器中？该接口的HTTP方法和路径是什么？",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval"
+    ],
+    "expected_task_type": "CODE_QA",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysLoginController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysLoginController.java:56-65"
+    ],
+    "_old_notes": "",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-code-qa-0002",
+    "task_type": "CODE_QA",
+    "language": "en",
+    "difficulty": "easy",
+    "question": "Which controller handles the user list query API, and what is its request mapping path prefix?",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval"
+    ],
+    "expected_task_type": "CODE_QA",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysUserController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysUserController.java:41-66"
+    ],
+    "_old_notes": "",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-code-qa-0003",
+    "task_type": "CODE_QA",
+    "language": "zh",
+    "difficulty": "easy",
+    "question": "验证码生成的API端点路径是什么？该功能在哪个类中实现？",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval"
+    ],
+    "expected_task_type": "CODE_QA",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/common/CaptchaController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/common/CaptchaController.java:45-93"
+    ],
+    "_old_notes": "",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-code-qa-0004",
+    "task_type": "CODE_QA",
+    "language": "en",
+    "difficulty": "easy",
+    "question": "Where is the department tree structure API implemented for the user management page?",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval"
+    ],
+    "expected_task_type": "CODE_QA",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysUserController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysUserController.java:250-255"
+    ],
+    "_old_notes": "Distractor entity: SysDeptController also exists but doesn't have deptTree endpoint for user page. Same-name: deptTree could logically belong to either controller.",
+    "_special_types": [
+      "distractor_entity",
+      "same_name_entity"
+    ],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-code-qa-0005",
+    "task_type": "CODE_QA",
+    "language": "zh",
+    "difficulty": "medium",
+    "question": "角色管理模块提供了哪些API接口？请列出所有HTTP方法和路径，以及各自对应的操作类型。",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CODE_QA",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysRoleController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysRoleController.java:37-254"
+    ],
+    "_old_notes": "",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-code-qa-0006",
+    "task_type": "CODE_QA",
+    "language": "en",
+    "difficulty": "medium",
+    "question": "What security validations are performed when creating a new scheduled job? List all the checks done in the creation endpoint.",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CODE_QA",
+    "_provenance_files": [
+      "ruoyi-quartz/src/main/java/com/ruoyi/quartz/controller/SysJobController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-quartz/src/main/java/com/ruoyi/quartz/controller/SysJobController.java:80-111"
+    ],
+    "_old_notes": "",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-code-qa-0007",
+    "task_type": "CODE_QA",
+    "language": "zh",
+    "difficulty": "medium",
+    "question": "前端缓存管理页面中，有哪些请求使用了动态URL拼接？为什么这些请求在静态分析时无法被自动匹配到后端接口？",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CODE_QA",
+    "_provenance_files": [
+      "ruoyi-ui/src/api/monitor/cache.js"
+    ],
+    "_provenance_lines": [
+      "ruoyi-ui/src/api/monitor/cache.js:20-49"
+    ],
+    "_old_notes": "No exact entity names in question. Tests dynamic URL understanding.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-code-qa-0008",
+    "task_type": "CODE_QA",
+    "language": "en",
+    "difficulty": "medium",
+    "question": "Is there a dedicated API for batch-importing user data from a JSON file? Which endpoint accepts JSON-format user imports?",
+    "source_answerable": false,
+    "evaluation_layers": [
+      "routing",
+      "retrieval"
+    ],
+    "expected_task_type": "CODE_QA",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysUserController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysUserController.java:78-88"
+    ],
+    "_old_notes": "Unanswerable: import only supports Excel, not JSON. Distractor: importData endpoint exists but for Excel only.",
+    "_special_types": [
+      "distractor_entity"
+    ],
+    "_old_forbidden": [
+      "There is a JSON batch import endpoint",
+      "Any endpoint accepts JSON for user import"
+    ],
+    "_old_uncertainties": [
+      "The system supports user import only via Excel files (POST /system/user/importData with MultipartFile)",
+      "No JSON-based batch import API exists"
+    ]
+  },
+  {
+    "question_id": "ruoyi-code-qa-0009",
+    "task_type": "CODE_QA",
+    "language": "zh",
+    "difficulty": "medium",
+    "question": "系统中是否有处理短信发送功能的API接口？如果有，请说明其实现位置。",
+    "source_answerable": false,
+    "evaluation_layers": [
+      "routing",
+      "retrieval"
+    ],
+    "expected_task_type": "CODE_QA",
+    "_provenance_files": [],
+    "_provenance_lines": [],
+    "_old_notes": "Unanswerable CODE_QA: no SMS feature exists. No exact names in question.",
+    "_special_types": [],
+    "_old_forbidden": [
+      "存在短信发送API",
+      "有任何控制器实现了短信发送方法"
+    ],
+    "_old_uncertainties": [
+      "系统中不存在短信发送相关的API接口",
+      "扫描到的所有控制器中均未发现短信发送功能"
+    ]
+  },
+  {
+    "question_id": "ruoyi-code-qa-0010",
+    "task_type": "CODE_QA",
+    "language": "en",
+    "difficulty": "hard",
+    "question": "How does the system implement user logout? Why does the frontend logout request not appear as a mapped endpoint in any controller class?",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CODE_QA",
+    "_provenance_files": [
+      "ruoyi-framework/src/main/java/com/ruoyi/framework/config/SecurityConfig.java",
+      "ruoyi-framework/src/main/java/com/ruoyi/framework/security/handle/LogoutSuccessHandlerImpl.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-framework/src/main/java/com/ruoyi/framework/config/SecurityConfig.java:111",
+      "ruoyi-framework/src/main/java/com/ruoyi/framework/security/handle/LogoutSuccessHandlerImpl.java:39-52"
+    ],
+    "_old_notes": "Hard: explains the unmatched /logout finding.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": [
+      "The logout URL is configured declaratively in Spring Security, not via @RequestMapping"
+    ]
+  },
+  {
+    "question_id": "ruoyi-code-qa-0011",
+    "task_type": "CODE_QA",
+    "language": "zh",
+    "difficulty": "hard",
+    "question": "系统中用户管理相关的API分布在两个不同的控制器中，一个处理管理后台的用户CRUD，另一个处理个人信息修改。请说明它们的路径前缀分别是什么，各自包含哪些HTTP方法和路径？",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CODE_QA",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysUserController.java",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysProfileController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysUserController.java:41",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysProfileController.java:35"
+    ],
+    "_old_notes": "Hard: same-prefix entity disambiguation. Both controllers share /system/user prefix. Distractor: SysUserController and SysProfileController have overlapping path prefix.",
+    "_special_types": [
+      "same_name_entity",
+      "distractor_entity"
+    ],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-code-qa-0012",
+    "task_type": "CODE_QA",
+    "language": "en",
+    "difficulty": "hard",
+    "question": "Does the system provide an API endpoint for exporting user data to PDF format? If so, which controller and method implement it?",
+    "source_answerable": false,
+    "evaluation_layers": [
+      "routing",
+      "retrieval"
+    ],
+    "expected_task_type": "CODE_QA",
+    "_provenance_files": [],
+    "_provenance_lines": [],
+    "_old_notes": "Unanswerable: only Excel export exists, no PDF.",
+    "_special_types": [],
+    "_old_forbidden": [
+      "There is a PDF export endpoint",
+      "Any controller generates PDF output"
+    ],
+    "_old_uncertainties": [
+      "The system only supports Excel export via ExcelUtil",
+      "No PDF generation library or endpoint exists"
+    ]
+  },
+  {
+    "question_id": "ruoyi-trace-chain-0013",
+    "task_type": "TRACE_CHAIN",
+    "language": "zh",
+    "difficulty": "easy",
+    "question": "前端调用登录接口POST /login时，请求最终到达后端的哪个控制器和哪个方法？",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval"
+    ],
+    "expected_task_type": "TRACE_CHAIN",
+    "_provenance_files": [
+      "ruoyi-ui/src/api/login.js",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysLoginController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-ui/src/api/login.js:11-19",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysLoginController.java:56-65"
+    ],
+    "_old_notes": "1-hop frontend->backend trace. Frontend request included.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-trace-chain-0014",
+    "task_type": "TRACE_CHAIN",
+    "language": "en",
+    "difficulty": "easy",
+    "question": "Trace the frontend request for creating a new department. Which frontend API function sends the request, and which backend controller method receives it?",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval"
+    ],
+    "expected_task_type": "TRACE_CHAIN",
+    "_provenance_files": [
+      "ruoyi-ui/src/api/system/dept.js",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysDeptController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-ui/src/api/system/dept.js:30-37",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysDeptController.java:75-86"
+    ],
+    "_old_notes": "1-hop frontend->backend. Frontend request included.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-trace-chain-0015",
+    "task_type": "TRACE_CHAIN",
+    "language": "zh",
+    "difficulty": "medium",
+    "question": "当用户管理页面调用GET /system/user/list接口时，请求从控制器到服务层的调用链是怎样的？控制器方法调用了哪个Service接口和哪个方法？",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "TRACE_CHAIN",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysUserController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysUserController.java:59-66"
+    ],
+    "_old_notes": "Controller->Service trace. 2-hop chain. Distractor: ISysRoleService also injected in same controller.",
+    "_special_types": [
+      "distractor_entity"
+    ],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-trace-chain-0016",
+    "task_type": "TRACE_CHAIN",
+    "language": "en",
+    "difficulty": "medium",
+    "question": "When the frontend calls PUT /system/role to update a role, which controller method handles it and which service method does it invoke? Also, what additional action is taken after a successful update?",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "TRACE_CHAIN",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysRoleController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysRoleController.java:110-134"
+    ],
+    "_old_notes": "Controller->Service chain with post-action. Distractor: SysPermissionService also injected in the same controller.",
+    "_special_types": [
+      "distractor_entity"
+    ],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-trace-chain-0017",
+    "task_type": "TRACE_CHAIN",
+    "language": "zh",
+    "difficulty": "medium",
+    "question": "从前端调用新增通知公告接口到后端处理完成，完整的调用链是怎样的？请说明前端函数、后端控制器方法、以及服务层方法的调用顺序。",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "TRACE_CHAIN",
+    "_provenance_files": [
+      "ruoyi-ui/src/api/system/notice.js",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysNoticeController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-ui/src/api/system/notice.js:22-27",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysNoticeController.java:65-72"
+    ],
+    "_old_notes": "2-hop: frontend -> controller -> service. Frontend request included.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-trace-chain-0018",
+    "task_type": "TRACE_CHAIN",
+    "language": "en",
+    "difficulty": "medium",
+    "question": "The frontend cache management module calls a function to retrieve cache keys for a given cache name. Can the static index trace this request to its backend endpoint? If not, why?",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "TRACE_CHAIN",
+    "_provenance_files": [
+      "ruoyi-ui/src/api/monitor/cache.js",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/monitor/CacheController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-ui/src/api/monitor/cache.js:20-25",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/monitor/CacheController.java:80-86"
+    ],
+    "_old_notes": "Tests understanding of unresolved dynamic URL. Frontend request included.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": [
+      "The static scanner flagged this as dynamic_url so the REQUESTS_API link is not stored"
+    ]
+  },
+  {
+    "question_id": "ruoyi-trace-chain-0019",
+    "task_type": "TRACE_CHAIN",
+    "language": "zh",
+    "difficulty": "medium",
+    "question": "前端请求获取菜单路由信息时(GET /getRouters)，后端控制器方法调用了哪些服务方法？请追踪完整调用链。",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "TRACE_CHAIN",
+    "_provenance_files": [
+      "ruoyi-ui/src/api/menu.js",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysLoginController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-ui/src/api/menu.js:5",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysLoginController.java:101-107"
+    ],
+    "_old_notes": "2-hop chain with multiple service calls. Frontend request included.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-trace-chain-0020",
+    "task_type": "TRACE_CHAIN",
+    "language": "en",
+    "difficulty": "medium",
+    "question": "Trace the call chain for the frontend POST /logout request. Which backend controller method handles this request?",
+    "source_answerable": false,
+    "evaluation_layers": [
+      "routing",
+      "retrieval"
+    ],
+    "expected_task_type": "TRACE_CHAIN",
+    "_provenance_files": [
+      "ruoyi-ui/src/api/login.js",
+      "ruoyi-framework/src/main/java/com/ruoyi/framework/config/SecurityConfig.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-ui/src/api/login.js:52-56",
+      "ruoyi-framework/src/main/java/com/ruoyi/framework/config/SecurityConfig.java:111"
+    ],
+    "_old_notes": "Unanswerable trace: /logout is unmatched. HTTP method/path mismatch verification. Frontend request included.",
+    "_special_types": [],
+    "_old_forbidden": [
+      "A controller class maps POST /logout via @PostMapping or @RequestMapping"
+    ],
+    "_old_uncertainties": [
+      "POST /logout is not handled by any controller - it is configured via Spring Security LogoutFilter",
+      "The static index has no DEFINES_API entity for /logout",
+      "LogoutSuccessHandlerImpl handles the logout response but is not a controller"
+    ]
+  },
+  {
+    "question_id": "ruoyi-trace-chain-0021",
+    "task_type": "TRACE_CHAIN",
+    "language": "zh",
+    "difficulty": "hard",
+    "question": "系统中存在多个名为getInfo的方法，分别在哪些控制器中定义？它们各自对应的API路径是什么？前端调用GET /getInfo时会到达哪个方法？",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "TRACE_CHAIN",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysLoginController.java",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/monitor/CacheController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysLoginController.java:72-94",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/monitor/CacheController.java:48-71"
+    ],
+    "_old_notes": "Hard: same-name method disambiguation across controllers. Three getInfo methods exist. Distractor: CacheController.getInfo and SysUserController.getInfo are wrong targets.",
+    "_special_types": [
+      "same_name_entity",
+      "distractor_entity"
+    ],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-trace-chain-0022",
+    "task_type": "TRACE_CHAIN",
+    "language": "en",
+    "difficulty": "hard",
+    "question": "The frontend user.js file sends a DELETE request to /system/user/{userId}. Can you trace this to the backend? Also check: does the same path /system/user/ with a GET method go to the same controller method or a different one?",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "TRACE_CHAIN",
+    "_provenance_files": [
+      "ruoyi-ui/src/api/system/user.js",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysUserController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-ui/src/api/system/user.js:40-44",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysUserController.java:100-117",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysUserController.java:177-187"
+    ],
+    "_old_notes": "Hard: HTTP method/path verification. Same path /system/user/{id}, different HTTP methods -> different handlers. Tests method overloading via HTTP verbs.",
+    "_special_types": [
+      "same_name_entity"
+    ],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-trace-chain-0023",
+    "task_type": "TRACE_CHAIN",
+    "language": "zh",
+    "difficulty": "hard",
+    "question": "请追踪前端调用POST /system/user/batchDelete请求的完整链路，该请求在后端由哪个控制器方法处理？",
+    "source_answerable": false,
+    "evaluation_layers": [
+      "routing",
+      "retrieval"
+    ],
+    "expected_task_type": "TRACE_CHAIN",
+    "_provenance_files": [],
+    "_provenance_lines": [],
+    "_old_notes": "Unanswerable: batchDelete endpoint doesn't exist. Tests uncertainty.",
+    "_special_types": [],
+    "_old_forbidden": [
+      "POST /system/user/batchDelete是一个有效的后端API",
+      "存在专门处理batchDelete的控制器方法"
+    ],
+    "_old_uncertainties": [
+      "系统中不存在POST /system/user/batchDelete接口",
+      "用户删除使用DELETE /system/user/{userIds}，通过路径参数传入多个ID实现批量删除",
+      "前端user.js中也没有batchDelete函数"
+    ]
+  },
+  {
+    "question_id": "ruoyi-trace-chain-0024",
+    "task_type": "TRACE_CHAIN",
+    "language": "en",
+    "difficulty": "hard",
+    "question": "The frontend job module calls a function to get job details by ID using a dynamically constructed URL. Can you trace this specific frontend request through the REQUESTS_API relation in the static index to its backend handler?",
+    "source_answerable": false,
+    "evaluation_layers": [
+      "routing",
+      "retrieval"
+    ],
+    "expected_task_type": "TRACE_CHAIN",
+    "_provenance_files": [
+      "ruoyi-ui/src/api/monitor/job.js",
+      "ruoyi-quartz/src/main/java/com/ruoyi/quartz/controller/SysJobController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-ui/src/api/monitor/job.js:13-18",
+      "ruoyi-quartz/src/main/java/com/ruoyi/quartz/controller/SysJobController.java:70-75"
+    ],
+    "_old_notes": "Unanswerable trace: dynamic URL prevents index-based verification. Frontend request included.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": [
+      "The frontend getJob function constructs the URL dynamically: '/monitor/job/' + jobId",
+      "The static index marks this as dynamic_url and does NOT store a REQUESTS_API relation for it",
+      "While the backend endpoint GET /monitor/job/{jobId} exists in SysJobController, the trace cannot be verified through the index"
+    ]
+  },
+  {
+    "question_id": "ruoyi-change-plan-0025",
+    "task_type": "CHANGE_PLAN",
+    "language": "zh",
+    "difficulty": "easy",
+    "question": "如果需要在通知公告模块中新增一个\"置顶公告\"的功能，需要修改哪些文件？请列出后端控制器、服务接口、服务实现和前端API文件。",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CHANGE_PLAN",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysNoticeController.java",
+      "ruoyi-system/src/main/java/com/ruoyi/system/service/ISysNoticeService.java",
+      "ruoyi-system/src/main/java/com/ruoyi/system/service/impl/SysNoticeServiceImpl.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysNoticeController.java:32-150"
+    ],
+    "_old_notes": "Hypothetical change: add pin/top feature to notices.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-change-plan-0026",
+    "task_type": "CHANGE_PLAN",
+    "language": "en",
+    "difficulty": "easy",
+    "question": "If you needed to add an Excel export feature for the online user list (currently only GET /monitor/online/list exists), which files would need to be modified?",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CHANGE_PLAN",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/monitor/SysUserOnlineController.java",
+      "ruoyi-ui/src/api/monitor/online.js"
+    ],
+    "_provenance_lines": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/monitor/SysUserOnlineController.java:41-70"
+    ],
+    "_old_notes": "Hypothetical change: add export to online users. Uses existing pattern from other controllers.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-change-plan-0027",
+    "task_type": "CHANGE_PLAN",
+    "language": "zh",
+    "difficulty": "medium",
+    "question": "如果要为用户注册功能添加邮箱验证步骤，需要修改哪些文件和类？请分析注册流程涉及的后端控制器、服务类和可能需要新增的组件。",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CHANGE_PLAN",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysRegisterController.java",
+      "ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/SysRegisterService.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysRegisterController.java:28-37"
+    ],
+    "_old_notes": "Hypothetical change: add email verification to registration.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-change-plan-0028",
+    "task_type": "CHANGE_PLAN",
+    "language": "en",
+    "difficulty": "medium",
+    "question": "To add audit logging for all cache modification operations (clear specific cache name, clear specific key, clear all), which files would need to be modified and what pattern should be followed?",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CHANGE_PLAN",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/monitor/CacheController.java",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysUserController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/monitor/CacheController.java:97-121",
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysUserController.java:68-76"
+    ],
+    "_old_notes": "Hypothetical change: add @Log to cache operations. Pattern already exists in other controllers.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-change-plan-0029",
+    "task_type": "CHANGE_PLAN",
+    "language": "zh",
+    "difficulty": "medium",
+    "question": "如果要给公告模块的\"标记已读\"和\"批量标记已读\"接口添加权限控制注解，应该修改哪个文件的哪些方法？参考系统中其他接口的权限命名规范，应该使用什么权限字符串？",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CHANGE_PLAN",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysNoticeController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysNoticeController.java:104-124"
+    ],
+    "_old_notes": "Hypothetical change: add permission annotations to existing methods that lack them.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-change-plan-0030",
+    "task_type": "CHANGE_PLAN",
+    "language": "en",
+    "difficulty": "medium",
+    "question": "If you wanted to refactor the code generation module to separate the import/create table operations into a dedicated controller (leaving only query/edit/delete/generate in the existing one), which files and endpoints would be affected?",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CHANGE_PLAN",
+    "_provenance_files": [
+      "ruoyi-generator/src/main/java/com/ruoyi/generator/controller/GenController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-generator/src/main/java/com/ruoyi/generator/controller/GenController.java:113-160"
+    ],
+    "_old_notes": "Hypothetical change: split GenController.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-change-plan-0031",
+    "task_type": "CHANGE_PLAN",
+    "language": "zh",
+    "difficulty": "medium",
+    "question": "如果要优化系统的整体性能，应该从哪些方面入手？需要修改哪些核心文件？",
+    "source_answerable": false,
+    "evaluation_layers": [
+      "routing",
+      "retrieval"
+    ],
+    "expected_task_type": "CHANGE_PLAN",
+    "_provenance_files": [],
+    "_provenance_lines": [],
+    "_old_notes": "Unanswerable: too vague to determine specific files. Tests uncertainty expression.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": [
+      "\"整体性能优化\"范围过于宽泛，无法确定具体的修改文件",
+      "可能的方向包括数据库查询优化、缓存策略、异步处理等，但无法从代码结构中确定优先级",
+      "需要更具体的性能瓶颈描述才能给出精确的修改方案"
+    ]
+  },
+  {
+    "question_id": "ruoyi-change-plan-0032",
+    "task_type": "CHANGE_PLAN",
+    "language": "en",
+    "difficulty": "hard",
+    "question": "To implement real-time WebSocket-based notification delivery for the notice module (so users get instant updates when new notices are published), what changes would be needed across the backend and frontend? Consider the existing notice architecture.",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CHANGE_PLAN",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysNoticeController.java",
+      "ruoyi-framework/src/main/java/com/ruoyi/framework/config/SecurityConfig.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysNoticeController.java:32-150"
+    ],
+    "_old_notes": "Hard hypothetical: cross-cutting change requiring new infrastructure.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": [
+      "Exact WebSocket library choice and configuration details are implementation decisions"
+    ]
+  },
+  {
+    "question_id": "ruoyi-change-plan-0033",
+    "task_type": "CHANGE_PLAN",
+    "language": "zh",
+    "difficulty": "hard",
+    "question": "如果需要将系统的JWT认证机制从Redis存储迁移到数据库存储（例如为了支持无Redis部署），需要修改哪些核心文件？请分析涉及认证、令牌管理和安全配置的所有相关文件。",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CHANGE_PLAN",
+    "_provenance_files": [
+      "ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/TokenService.java",
+      "ruoyi-framework/src/main/java/com/ruoyi/framework/security/filter/JwtAuthenticationTokenFilter.java",
+      "ruoyi-framework/src/main/java/com/ruoyi/framework/config/SecurityConfig.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-framework/src/main/java/com/ruoyi/framework/config/SecurityConfig.java:85-117",
+      "ruoyi-framework/src/main/java/com/ruoyi/framework/security/filter/JwtAuthenticationTokenFilter.java:30-43"
+    ],
+    "_old_notes": "Hard: cross-cutting architectural change affecting multiple framework files.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": []
+  },
+  {
+    "question_id": "ruoyi-change-plan-0034",
+    "task_type": "CHANGE_PLAN",
+    "language": "en",
+    "difficulty": "hard",
+    "question": "If we wanted to migrate the entire RuoYi-Vue backend from Spring Boot to Quarkus framework, what would be the complete list of files that need to be rewritten?",
+    "source_answerable": false,
+    "evaluation_layers": [
+      "routing",
+      "retrieval"
+    ],
+    "expected_task_type": "CHANGE_PLAN",
+    "_provenance_files": [],
+    "_provenance_lines": [],
+    "_old_notes": "Unanswerable: scope too large for precise file listing.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": [
+      "A full framework migration would affect virtually all 266 Java files",
+      "The scope is too large to enumerate precisely",
+      "Spring-specific annotations (@RestController, @Autowired, @PreAuthorize) would all need Quarkus equivalents",
+      "Spring Security configuration would need a complete replacement"
+    ]
+  },
+  {
+    "question_id": "ruoyi-change-plan-0035",
+    "task_type": "CHANGE_PLAN",
+    "language": "zh",
+    "difficulty": "hard",
+    "question": "如果要为系统添加多租户支持，使得不同租户的用户只能看到自己租户下的数据，现有的哪些核心模块需要修改？请分析用户、角色、部门、菜单四个模块的修改影响。",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CHANGE_PLAN",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysUserController.java",
+      "ruoyi-system/src/main/java/com/ruoyi/system/service/impl/SysUserServiceImpl.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysUserController.java:59-66"
+    ],
+    "_old_notes": "Hard: architectural cross-cutting change. No exact file names in question.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": [
+      "具体的租户隔离策略(行级隔离、Schema隔离、数据库隔离)需要架构决策"
+    ]
+  },
+  {
+    "question_id": "ruoyi-change-plan-0036",
+    "task_type": "CHANGE_PLAN",
+    "language": "en",
+    "difficulty": "hard",
+    "question": "To fix the security vulnerability where scheduled jobs can execute arbitrary Java methods via the invoke target, what is the minimal set of code changes needed while still preserving the scheduling functionality?",
+    "source_answerable": false,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CHANGE_PLAN",
+    "_provenance_files": [
+      "ruoyi-quartz/src/main/java/com/ruoyi/quartz/controller/SysJobController.java"
+    ],
+    "_provenance_lines": [
+      "ruoyi-quartz/src/main/java/com/ruoyi/quartz/controller/SysJobController.java:80-111"
+    ],
+    "_old_notes": "Unanswerable: 'minimal change' is subjective and the execution mechanism is in service layer not visible from controller alone.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": [
+      "The exact 'minimal' change set depends on the chosen security strategy",
+      "Options include: stricter whitelist, sandboxed execution, removing reflection-based invocation entirely",
+      "The current whitelist in ScheduleUtils.whiteList provides some protection but the exact scope is hard to determine from static analysis alone",
+      "Whether the fix should be in the controller validation, the service execution, or both is a design decision"
+    ]
+  },
+  {
+    "question_id": "ruoyi-change-plan-0037",
+    "task_type": "CHANGE_PLAN",
+    "language": "zh",
+    "difficulty": "medium",
+    "question": "When a role's permissions are modified, automatically refresh the permissions of all currently online users who hold that role, so that permission changes take effect immediately without requiring users to log out and back in.",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CHANGE_PLAN",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysRoleController.java",
+      "ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/TokenService.java"
+    ],
+    "_provenance_lines": [],
+    "_old_notes": "Focused backend logic change in the authentication/authorization layer. The fix moves permission-refresh logic from the controller into TokenService where it belongs, and adds iteration over online users holding the changed role. Clear security-relevant intent. Good example of a small but high-impact change that requires understanding of the token/session model.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": [],
+    "_historical_change": true,
+    "_hc_case_id": "HC-001",
+    "_hc_base_commit": "69aaabd09d09294f2672a81e08937f7738ef319a",
+    "_hc_target_commit": "dbe9834e4cf5185bca2e1e60a146925b2e38561a",
+    "_hc_commit_message": "角色权限变更后刷新所有持有该角色的在线用户权限",
+    "_hc_change_type": "bug_fix",
+    "_hc_diff_summary": "2 files changed, 41 insertions(+), 11 deletions(-)",
+    "_hc_layers_touched": [
+      "controller",
+      "framework-service"
+    ]
+  },
+  {
+    "question_id": "ruoyi-change-plan-0038",
+    "task_type": "CHANGE_PLAN",
+    "language": "zh",
+    "difficulty": "medium",
+    "question": "Fix the issue where the @Sensitive data desensitization (masking) annotation is not taking effect during JSON serialization, tracked as issue IIPBZR.",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CHANGE_PLAN",
+    "_provenance_files": [
+      "ruoyi-common/pom.xml",
+      "ruoyi-common/src/main/java/com/ruoyi/common/annotation/Sensitive.java",
+      "ruoyi-common/src/main/java/com/ruoyi/common/config/serializer/SensitiveJsonSerializer.java"
+    ],
+    "_provenance_lines": [],
+    "_old_notes": "Focused bug fix in the data masking subsystem. The SensitiveJsonSerializer is rewritten to correctly apply desensitization rules. Includes an issue tracker reference (IIPBZR). The pom.xml change is minor. Good example of a backend bug fix requiring understanding of Jackson serialization and custom annotations. Tests would be highly relevant here but are absent.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": [],
+    "_historical_change": true,
+    "_hc_case_id": "HC-002",
+    "_hc_base_commit": "d454d9729ef59fde1a2fa7d3efd08d46dd233666",
+    "_hc_target_commit": "58f3c43c5026553f44ab552dfdfafeac2c0cc2e4",
+    "_hc_commit_message": "修复脱敏不生效问题(IIPBZR)",
+    "_hc_change_type": "bug_fix",
+    "_hc_diff_summary": "3 files changed, 29 insertions(+), 19 deletions(-)",
+    "_hc_layers_touched": [
+      "common-annotation",
+      "common-serializer",
+      "pom"
+    ]
+  },
+  {
+    "question_id": "ruoyi-change-plan-0039",
+    "task_type": "CHANGE_PLAN",
+    "language": "zh",
+    "difficulty": "medium",
+    "question": "Add a drawer-style detail panel to the user list page that shows detailed user information when clicking on a user, replacing or supplementing the existing dialog approach.",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CHANGE_PLAN",
+    "_provenance_files": [
+      "ruoyi-common/src/main/java/com/ruoyi/common/core/domain/entity/SysUser.java",
+      "ruoyi-system/src/main/resources/mapper/system/SysUserMapper.xml",
+      "ruoyi-ui/src/assets/styles/ruoyi.scss",
+      "ruoyi-ui/src/views/system/user/index.vue",
+      "ruoyi-ui/src/views/system/user/view.vue"
+    ],
+    "_provenance_lines": [],
+    "_old_notes": "Full-stack feature spanning the domain entity layer (adding a field to SysUser), the MyBatis mapper, shared CSS styles, and two Vue components (modified index + new view.vue). The new view.vue is 177 lines of detailed user info display. Good example of a UI enhancement that also requires a backend entity change and a mapper query update.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": [],
+    "_historical_change": true,
+    "_hc_case_id": "HC-003",
+    "_hc_base_commit": "df4261f4d307eaacf24e7e7ed57400dfdc268ce1",
+    "_hc_target_commit": "157228e1d0920159e2ec3e1b4b5ebec9fd03e3dc",
+    "_hc_commit_message": "用户列表新增抽屉效果详细信息",
+    "_hc_change_type": "new_feature",
+    "_hc_diff_summary": "5 files changed, 242 insertions(+), 3 deletions(-)",
+    "_hc_layers_touched": [
+      "domain-entity",
+      "mapper-xml",
+      "frontend-style",
+      "frontend-component"
+    ]
+  },
+  {
+    "question_id": "ruoyi-change-plan-0040",
+    "task_type": "CHANGE_PLAN",
+    "language": "zh",
+    "difficulty": "medium",
+    "question": "Add batch sorting save functionality to the menu management module, allowing administrators to reorder menu items and save all order changes at once instead of updating one at a time.",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CHANGE_PLAN",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysMenuController.java",
+      "ruoyi-system/src/main/java/com/ruoyi/system/mapper/SysMenuMapper.java",
+      "ruoyi-system/src/main/java/com/ruoyi/system/service/ISysMenuService.java",
+      "ruoyi-system/src/main/java/com/ruoyi/system/service/impl/SysMenuServiceImpl.java",
+      "ruoyi-system/src/main/resources/mapper/system/SysMenuMapper.xml",
+      "ruoyi-ui/src/api/system/menu.js",
+      "ruoyi-ui/src/views/system/menu/index.vue"
+    ],
+    "_provenance_lines": [],
+    "_old_notes": "Textbook full-stack CRUD feature touching every architectural layer: controller endpoint, mapper interface + XML, service interface + implementation, frontend API module, and Vue component. Clean 7-file, 126-insertion change with very clear intent. Excellent change-plan candidate because it demonstrates the standard RuoYi pattern for adding a new API operation across all layers.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": [],
+    "_historical_change": true,
+    "_hc_case_id": "HC-004",
+    "_hc_base_commit": "01fd7be61a0b2ecebcf684fccf6883a5cde1970e",
+    "_hc_target_commit": "b508e05b0c90656d25fd8aaaaa05d8d95501e09a",
+    "_hc_commit_message": "菜单管理支持批量保存排序",
+    "_hc_change_type": "new_feature",
+    "_hc_diff_summary": "7 files changed, 126 insertions(+), 3 deletions(-)",
+    "_hc_layers_touched": [
+      "controller",
+      "mapper-interface",
+      "service-interface",
+      "service-impl",
+      "mapper-xml",
+      "frontend-api",
+      "frontend-component"
+    ]
+  },
+  {
+    "question_id": "ruoyi-change-plan-0041",
+    "task_type": "CHANGE_PLAN",
+    "language": "zh",
+    "difficulty": "medium",
+    "question": "Optimize the scheduled task detail page display by creating a dedicated detail view component, and supplement the task log with an execution time field to show how long each job execution took.",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CHANGE_PLAN",
+    "_provenance_files": [
+      "ruoyi-quartz/src/main/java/com/ruoyi/quartz/domain/SysJobLog.java",
+      "ruoyi-quartz/src/main/java/com/ruoyi/quartz/util/AbstractQuartzJob.java",
+      "ruoyi-quartz/src/main/resources/mapper/quartz/SysJobLogMapper.xml",
+      "ruoyi-quartz/src/main/resources/mapper/quartz/SysJobMapper.xml",
+      "ruoyi-ui/src/assets/styles/ruoyi.scss",
+      "ruoyi-ui/src/views/monitor/job/detail.vue",
+      "ruoyi-ui/src/views/monitor/job/index.vue",
+      "ruoyi-ui/src/views/monitor/job/log.vue",
+      "ruoyi-ui/src/views/monitor/operlog/detail.vue",
+      "sql/ry_20260320.sql"
+    ],
+    "_provenance_lines": [],
+    "_old_notes": "Multi-layer enhancement spanning the Quartz scheduling module: adds execution time tracking to the domain model and mapper, creates a new detail.vue component (197 lines), refactors index.vue and log.vue to delegate to the detail view, adds shared CSS styles, and updates the SQL schema. Also deletes an old operlog detail component (68 lines removed). Good example of a feature that combines new functionality with UI refactoring.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": [],
+    "_historical_change": true,
+    "_hc_case_id": "HC-005",
+    "_hc_base_commit": "fde9db31e4b69a7556573bbd0bc3e96dbcffba6e",
+    "_hc_target_commit": "9f0b31ebbd682d83e4d3f04eb9026924f85f2a67",
+    "_hc_commit_message": "优化定时任务详情页展示&补充执行时间字段",
+    "_hc_change_type": "enhancement",
+    "_hc_diff_summary": "10 files changed, 298 insertions(+), 160 deletions(-)",
+    "_hc_layers_touched": [
+      "domain",
+      "quartz-util",
+      "mapper-xml",
+      "frontend-style",
+      "frontend-component",
+      "sql-schema"
+    ]
+  },
+  {
+    "question_id": "ruoyi-change-plan-0042",
+    "task_type": "CHANGE_PLAN",
+    "language": "zh",
+    "difficulty": "medium",
+    "question": "Add a notification and announcement message reminder feature to the homepage, including a bell icon in the navigation bar, a read-tracking system for notices, and a dropdown panel showing unread notifications.",
+    "source_answerable": true,
+    "evaluation_layers": [
+      "routing",
+      "retrieval",
+      "synthesis"
+    ],
+    "expected_task_type": "CHANGE_PLAN",
+    "_provenance_files": [
+      "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysNoticeController.java",
+      "ruoyi-system/src/main/java/com/ruoyi/system/domain/SysNotice.java",
+      "ruoyi-system/src/main/java/com/ruoyi/system/domain/SysNoticeRead.java",
+      "ruoyi-system/src/main/java/com/ruoyi/system/mapper/SysNoticeReadMapper.java",
+      "ruoyi-system/src/main/java/com/ruoyi/system/service/ISysNoticeReadService.java",
+      "ruoyi-system/src/main/java/com/ruoyi/system/service/impl/SysNoticeReadServiceImpl.java",
+      "ruoyi-system/src/main/resources/mapper/system/SysNoticeMapper.xml",
+      "ruoyi-system/src/main/resources/mapper/system/SysNoticeReadMapper.xml",
+      "ruoyi-ui/src/api/system/notice.js",
+      "ruoyi-ui/src/assets/icons/svg/bell.svg",
+      "ruoyi-ui/src/layout/components/HeaderNotice/index.vue",
+      "ruoyi-ui/src/layout/components/Navbar.vue",
+      "sql/ry_20260320.sql"
+    ],
+    "_provenance_lines": [],
+    "_old_notes": "Comprehensive full-stack new feature: introduces a new SysNoticeRead entity with full CRUD (domain, mapper, service), extends the SysNoticeController with new endpoints, creates a HeaderNotice Vue component (229 lines) for the notification dropdown, adds a bell SVG icon, modifies the Navbar layout, and updates the SQL schema. The largest case in the set at 677 insertions across 13 files, but well-structured as a cohesive feature. Excellent for testing whether the change-plan agent can plan a complete new module from scratch.",
+    "_special_types": [],
+    "_old_forbidden": [],
+    "_old_uncertainties": [],
+    "_historical_change": true,
+    "_hc_case_id": "HC-006",
+    "_hc_base_commit": "f80143eccbee92c35f4d91f6beaf6f914cde4e1a",
+    "_hc_target_commit": "5b52281fe1aeb18644bdbfd2cfda07475797cc2c",
+    "_hc_commit_message": "首页新增通知公告消息提醒",
+    "_hc_change_type": "new_feature",
+    "_hc_diff_summary": "13 files changed, 677 insertions(+), 10 deletions(-)",
+    "_hc_layers_touched": [
+      "controller",
+      "domain",
+      "mapper-interface",
+      "mapper-xml",
+      "service-interface",
+      "service-impl",
+      "frontend-api",
+      "frontend-component",
+      "layout",
+      "sql-schema"
+    ]
+  }
+]

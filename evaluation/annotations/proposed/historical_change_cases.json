@@ -1,0 +1,175 @@
+{
+  "metadata": {
+    "source_repo": "RuoYi-Vue (yangzongzhuan/RuoYi-Vue)",
+    "source_url": "https://github.com/yangzongzhuan/RuoYi-Vue",
+    "head_commit_at_extraction": "41720e624c5a668c7d3777835e4c87095a7a1dfd",
+    "total_commits_examined": 50,
+    "total_suitable_candidates": 14,
+    "cases_selected": 6,
+    "selection_criteria": [
+      "Commit message describes a clear feature, fix, or refactor",
+      "Changes touch 2-15 files (not trivially small, not overwhelmingly large)",
+      "Changes include Java and/or Vue source files across multiple layers",
+      "Excluded: pure formatting, dependency bumps, version bumps, merge commits, single-line fixes, duplicate commits, vague messages"
+    ],
+    "prioritization": [
+      "Recent commits preferred",
+      "Business-logic changes over infrastructure",
+      "Multi-layer changes (controller + service + mapper + frontend) preferred",
+      "Clear intent derivable from commit message alone"
+    ],
+    "exclusion_reasons_summary": {
+      "too_small_1_file_or_trivial": 18,
+      "vague_commit_message": 5,
+      "dependency_or_version_bump": 4,
+      "duplicate_commits": 4,
+      "pure_ui_styleing_changes": 9
+    },
+    "disk_space": {
+      "git_dir_before": "2.2M",
+      "git_dir_after": "2.6M",
+      "delta": "0.4M"
+    },
+    "fetch_strategy": "Single incremental deepen: git fetch --deepen=50 (sufficient, no further deepening needed)",
+    "generated_at": "2026-07-15T16:19:17+08:00",
+    "status": "prepared_not_executed"
+  },
+  "cases": [
+    {
+      "case_id": "HC-001",
+      "status": "prepared_not_executed",
+      "base_commit_sha": "69aaabd09d09294f2672a81e08937f7738ef319a",
+      "target_commit_sha": "dbe9834e4cf5185bca2e1e60a146925b2e38561a",
+      "commit_date": "2026-04-16T00:00:00+08:00",
+      "commit_message": "角色权限变更后刷新所有持有该角色的在线用户权限",
+      "change_request": "When a role's permissions are modified, automatically refresh the permissions of all currently online users who hold that role, so that permission changes take effect immediately without requiring users to log out and back in.",
+      "observed_changed_files": [
+        "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysRoleController.java",
+        "ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/TokenService.java"
+      ],
+      "diff_summary": "2 files changed, 41 insertions(+), 11 deletions(-)",
+      "includes_tests": false,
+      "change_type": "bug_fix",
+      "layers_touched": ["controller", "framework-service"],
+      "suitability_notes": "Focused backend logic change in the authentication/authorization layer. The fix moves permission-refresh logic from the controller into TokenService where it belongs, and adds iteration over online users holding the changed role. Clear security-relevant intent. Good example of a small but high-impact change that requires understanding of the token/session model."
+    },
+    {
+      "case_id": "HC-002",
+      "status": "prepared_not_executed",
+      "base_commit_sha": "d454d9729ef59fde1a2fa7d3efd08d46dd233666",
+      "target_commit_sha": "58f3c43c5026553f44ab552dfdfafeac2c0cc2e4",
+      "commit_date": "2026-04-15T00:00:00+08:00",
+      "commit_message": "修复脱敏不生效问题(IIPBZR)",
+      "change_request": "Fix the issue where the @Sensitive data desensitization (masking) annotation is not taking effect during JSON serialization, tracked as issue IIPBZR.",
+      "observed_changed_files": [
+        "ruoyi-common/pom.xml",
+        "ruoyi-common/src/main/java/com/ruoyi/common/annotation/Sensitive.java",
+        "ruoyi-common/src/main/java/com/ruoyi/common/config/serializer/SensitiveJsonSerializer.java"
+      ],
+      "diff_summary": "3 files changed, 29 insertions(+), 19 deletions(-)",
+      "includes_tests": false,
+      "change_type": "bug_fix",
+      "layers_touched": ["common-annotation", "common-serializer", "pom"],
+      "suitability_notes": "Focused bug fix in the data masking subsystem. The SensitiveJsonSerializer is rewritten to correctly apply desensitization rules. Includes an issue tracker reference (IIPBZR). The pom.xml change is minor. Good example of a backend bug fix requiring understanding of Jackson serialization and custom annotations. Tests would be highly relevant here but are absent."
+    },
+    {
+      "case_id": "HC-003",
+      "status": "prepared_not_executed",
+      "base_commit_sha": "df4261f4d307eaacf24e7e7ed57400dfdc268ce1",
+      "target_commit_sha": "157228e1d0920159e2ec3e1b4b5ebec9fd03e3dc",
+      "commit_date": "2026-04-09T00:00:00+08:00",
+      "commit_message": "用户列表新增抽屉效果详细信息",
+      "change_request": "Add a drawer-style detail panel to the user list page that shows detailed user information when clicking on a user, replacing or supplementing the existing dialog approach.",
+      "observed_changed_files": [
+        "ruoyi-common/src/main/java/com/ruoyi/common/core/domain/entity/SysUser.java",
+        "ruoyi-system/src/main/resources/mapper/system/SysUserMapper.xml",
+        "ruoyi-ui/src/assets/styles/ruoyi.scss",
+        "ruoyi-ui/src/views/system/user/index.vue",
+        "ruoyi-ui/src/views/system/user/view.vue"
+      ],
+      "diff_summary": "5 files changed, 242 insertions(+), 3 deletions(-)",
+      "includes_tests": false,
+      "change_type": "new_feature",
+      "layers_touched": ["domain-entity", "mapper-xml", "frontend-style", "frontend-component"],
+      "suitability_notes": "Full-stack feature spanning the domain entity layer (adding a field to SysUser), the MyBatis mapper, shared CSS styles, and two Vue components (modified index + new view.vue). The new view.vue is 177 lines of detailed user info display. Good example of a UI enhancement that also requires a backend entity change and a mapper query update."
+    },
+    {
+      "case_id": "HC-004",
+      "status": "prepared_not_executed",
+      "base_commit_sha": "01fd7be61a0b2ecebcf684fccf6883a5cde1970e",
+      "target_commit_sha": "b508e05b0c90656d25fd8aaaaa05d8d95501e09a",
+      "commit_date": "2026-03-21T00:00:00+08:00",
+      "commit_message": "菜单管理支持批量保存排序",
+      "change_request": "Add batch sorting save functionality to the menu management module, allowing administrators to reorder menu items and save all order changes at once instead of updating one at a time.",
+      "observed_changed_files": [
+        "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysMenuController.java",
+        "ruoyi-system/src/main/java/com/ruoyi/system/mapper/SysMenuMapper.java",
+        "ruoyi-system/src/main/java/com/ruoyi/system/service/ISysMenuService.java",
+        "ruoyi-system/src/main/java/com/ruoyi/system/service/impl/SysMenuServiceImpl.java",
+        "ruoyi-system/src/main/resources/mapper/system/SysMenuMapper.xml",
+        "ruoyi-ui/src/api/system/menu.js",
+        "ruoyi-ui/src/views/system/menu/index.vue"
+      ],
+      "diff_summary": "7 files changed, 126 insertions(+), 3 deletions(-)",
+      "includes_tests": false,
+      "change_type": "new_feature",
+      "layers_touched": ["controller", "mapper-interface", "service-interface", "service-impl", "mapper-xml", "frontend-api", "frontend-component"],
+      "suitability_notes": "Textbook full-stack CRUD feature touching every architectural layer: controller endpoint, mapper interface + XML, service interface + implementation, frontend API module, and Vue component. Clean 7-file, 126-insertion change with very clear intent. Excellent change-plan candidate because it demonstrates the standard RuoYi pattern for adding a new API operation across all layers."
+    },
+    {
+      "case_id": "HC-005",
+      "status": "prepared_not_executed",
+      "base_commit_sha": "fde9db31e4b69a7556573bbd0bc3e96dbcffba6e",
+      "target_commit_sha": "9f0b31ebbd682d83e4d3f04eb9026924f85f2a67",
+      "commit_date": "2026-03-20T00:00:00+08:00",
+      "commit_message": "优化定时任务详情页展示&补充执行时间字段",
+      "change_request": "Optimize the scheduled task detail page display by creating a dedicated detail view component, and supplement the task log with an execution time field to show how long each job execution took.",
+      "observed_changed_files": [
+        "ruoyi-quartz/src/main/java/com/ruoyi/quartz/domain/SysJobLog.java",
+        "ruoyi-quartz/src/main/java/com/ruoyi/quartz/util/AbstractQuartzJob.java",
+        "ruoyi-quartz/src/main/resources/mapper/quartz/SysJobLogMapper.xml",
+        "ruoyi-quartz/src/main/resources/mapper/quartz/SysJobMapper.xml",
+        "ruoyi-ui/src/assets/styles/ruoyi.scss",
+        "ruoyi-ui/src/views/monitor/job/detail.vue",
+        "ruoyi-ui/src/views/monitor/job/index.vue",
+        "ruoyi-ui/src/views/monitor/job/log.vue",
+        "ruoyi-ui/src/views/monitor/operlog/detail.vue",
+        "sql/ry_20260320.sql"
+      ],
+      "diff_summary": "10 files changed, 298 insertions(+), 160 deletions(-)",
+      "includes_tests": false,
+      "change_type": "enhancement",
+      "layers_touched": ["domain", "quartz-util", "mapper-xml", "frontend-style", "frontend-component", "sql-schema"],
+      "suitability_notes": "Multi-layer enhancement spanning the Quartz scheduling module: adds execution time tracking to the domain model and mapper, creates a new detail.vue component (197 lines), refactors index.vue and log.vue to delegate to the detail view, adds shared CSS styles, and updates the SQL schema. Also deletes an old operlog detail component (68 lines removed). Good example of a feature that combines new functionality with UI refactoring."
+    },
+    {
+      "case_id": "HC-006",
+      "status": "prepared_not_executed",
+      "base_commit_sha": "f80143eccbee92c35f4d91f6beaf6f914cde4e1a",
+      "target_commit_sha": "5b52281fe1aeb18644bdbfd2cfda07475797cc2c",
+      "commit_date": "2026-03-20T00:00:00+08:00",
+      "commit_message": "首页新增通知公告消息提醒",
+      "change_request": "Add a notification and announcement message reminder feature to the homepage, including a bell icon in the navigation bar, a read-tracking system for notices, and a dropdown panel showing unread notifications.",
+      "observed_changed_files": [
+        "ruoyi-admin/src/main/java/com/ruoyi/web/controller/system/SysNoticeController.java",
+        "ruoyi-system/src/main/java/com/ruoyi/system/domain/SysNotice.java",
+        "ruoyi-system/src/main/java/com/ruoyi/system/domain/SysNoticeRead.java",
+        "ruoyi-system/src/main/java/com/ruoyi/system/mapper/SysNoticeReadMapper.java",
+        "ruoyi-system/src/main/java/com/ruoyi/system/service/ISysNoticeReadService.java",
+        "ruoyi-system/src/main/java/com/ruoyi/system/service/impl/SysNoticeReadServiceImpl.java",
+        "ruoyi-system/src/main/resources/mapper/system/SysNoticeMapper.xml",
+        "ruoyi-system/src/main/resources/mapper/system/SysNoticeReadMapper.xml",
+        "ruoyi-ui/src/api/system/notice.js",
+        "ruoyi-ui/src/assets/icons/svg/bell.svg",
+        "ruoyi-ui/src/layout/components/HeaderNotice/index.vue",
+        "ruoyi-ui/src/layout/components/Navbar.vue",
+        "sql/ry_20260320.sql"
+      ],
+      "diff_summary": "13 files changed, 677 insertions(+), 10 deletions(-)",
+      "includes_tests": false,
+      "change_type": "new_feature",
+      "layers_touched": ["controller", "domain", "mapper-interface", "mapper-xml", "service-interface", "service-impl", "frontend-api", "frontend-component", "layout", "sql-schema"],
+      "suitability_notes": "Comprehensive full-stack new feature: introduces a new SysNoticeRead entity with full CRUD (domain, mapper, service), extends the SysNoticeController with new endpoints, creates a HeaderNotice Vue component (229 lines) for the notification dropdown, adds a bell SVG icon, modifies the Navbar layout, and updates the SQL schema. The largest case in the set at 677 insertions across 13 files, but well-structured as a cohesive feature. Excellent for testing whether the change-plan agent can plan a complete new module from scratch."
+    }
+  ]
+}

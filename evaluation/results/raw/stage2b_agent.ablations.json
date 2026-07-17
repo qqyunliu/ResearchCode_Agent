@@ -1,0 +1,22 @@
+{
+  "A7": {
+    "reason": "The canonical dataset has no multi-turn cases; conversation memory cannot be ablated fairly.",
+    "status": "not_executable"
+  },
+  "A8": {
+    "reason": "AnswerEvidenceValidator is replaced by an explicit AlwaysValid validator, removing guard and repair.",
+    "status": "executable"
+  },
+  "A9": {
+    "reason": "Task services expose no fair validate-but-no-repair hook; this must not be conflated with A8.",
+    "status": "not_executable"
+  },
+  "identity": {
+    "config_fingerprint": "fcab0773d6bdb9479c0e0b19f0ace154374b3005cacbababf217d31910ad4f80",
+    "dataset_sha256": "86ffda7cf4b90eabfaf5d44dff6b76a9f841fe7e6e9bcb8df6cae1e8fac8d65c",
+    "db_sha256": "cffd46aa7a2d495877dea84ed6eb613d0a78ce9f9cd19808cb6d720fbf9e1049",
+    "repo_commit": "41720e624c5a668c7d3777835e4c87095a7a1dfd",
+    "run_id": "stage2b-3cef886023854b46",
+    "snapshot_sha256": "2eb5eb8148e088f08159fc4605466ba0473145f2ae6217b6d89bac697bf61504"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "config_fingerprint": "8a5e7fb24ab2ea3f357cdf20f31baadb86899f5f114b947a2b1e0ed09937ba7f",
+  "dataset_sha256": "86ffda7cf4b90eabfaf5d44dff6b76a9f841fe7e6e9bcb8df6cae1e8fac8d65c",
+  "effective_config": {
+    "contract_version": 1,
+    "ranking_unit": "file",
+    "top_k": 10,
+    "variant": "B0"
+  },
+  "records_written": 36,
+  "repo_commit": "41720e624c5a668c7d3777835e4c87095a7a1dfd",
+  "run_id": "stage2b-b0-cdf2fb3a4030395e",
+  "run_index": 0,
+  "status": "completed",
+  "variant": "B0"
+}

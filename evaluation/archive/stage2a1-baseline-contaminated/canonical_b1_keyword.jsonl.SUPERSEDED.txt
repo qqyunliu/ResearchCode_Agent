@@ -1,0 +1,10 @@
+SUPERSEDED - 2026-07-15T16:19:17+08:00
+
+This file (canonical_b1_keyword.jsonl) was computed on a canonical dataset of
+42 records that included 6 historical change cases (HC-001 through HC-006)
+mixed with 36 synthetic questions. The historical data leakage means these B1
+(keyword search) baseline predictions do not reflect a clean evaluation of the
+synthetic-only pilot.
+
+Archived for provenance tracking only. The corrected B1 predictions will be
+regenerated after the Stage 2A.2 historical case split.

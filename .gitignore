@@ -7,7 +7,15 @@ __pycache__/
 *.db
 .coverage
 .pytest_tmp/
+.pytest*/
+.tmp*/
 qdrant_storage/
 node_modules/
 dist/
 expert-question-notes/
+
+# Superseded local evaluation attempts; canonical artifacts stay versioned.
+evaluation/results/raw/fusion_weight_sweep_v*_failed.jsonl
+evaluation/results/raw/fusion_weight_sweep_v*_failed.metadata.json
+evaluation/results/raw/fusion_weight_sweep_v3_missing_zero_ledger.jsonl
+evaluation/results/raw/fusion_weight_sweep_v3_missing_zero_ledger.metadata.json
